@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/lwjgl-stb/lwjgl-stb.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/lwjgl-stb/lwjgl-stb-natives-linux.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/lwjgl-stb/lwjgl-stb-natives-macos.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/lwjgl-stb/lwjgl-stb-natives-windows.jar!/" />
+        </CLASSES>
+        <JAVADOC>
+          <root url="jar://$MODULE_DIR$/lib/lwjgl-stb/lwjgl-stb-javadoc.jar!/" />
+        </JAVADOC>
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/lwjgl-opengl/lwjgl-opengl.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/lwjgl-opengl/lwjgl-opengl-natives-linux.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/lwjgl-opengl/lwjgl-opengl-natives-macos.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/lwjgl-opengl/lwjgl-opengl-natives-windows.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/lwjgl-glfw/lwjgl-glfw.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/lwjgl-glfw/lwjgl-glfw-natives-linux.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/lwjgl-glfw/lwjgl-glfw-natives-macos.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/lwjgl-glfw/lwjgl-glfw-natives-windows.jar!/" />
+        </CLASSES>
+        <JAVADOC>
+          <root url="jar://$MODULE_DIR$/lib/lwjgl-glfw/lwjgl-glfw-javadoc.jar!/" />
+        </JAVADOC>
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/lwjgl/lwjgl.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/lwjgl/lwjgl-natives-windows.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/lwjgl/lwjgl-natives-macos.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/lwjgl/lwjgl-natives-linux.jar!/" />
+        </CLASSES>
+        <JAVADOC>
+          <root url="jar://$MODULE_DIR$/lib/lwjgl/lwjgl-javadoc.jar!/" />
+        </JAVADOC>
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/jbullet/jbullet.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/jinput/jinput.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/joml/joml-1.9.8.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/oObjLoader/oObjLoader.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+  </component>
+</module>
