@@ -18,7 +18,7 @@ public abstract class RenderTargetMS extends RenderTarget<TextureMS> {
         m_colorTextures.forEach((Integer i, TextureMS t) -> {
         	t.setMultisampleCount(m_samples);
         });
-        if(hasDepthTexture()) {
+        if(containsDepthTexture()) {
             m_depthTexture.setMultisampleCount(m_samples);
         }
     }

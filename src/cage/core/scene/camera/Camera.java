@@ -1,5 +1,7 @@
 package cage.core.scene.camera;
 
+import cage.core.graphics.IBufferData;
+import cage.core.graphics.config.LayoutConfig;
 import cage.core.scene.Node;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -7,7 +9,10 @@ import org.lwjgl.BufferUtils;
 
 import java.nio.FloatBuffer;
 
-public abstract class Camera extends Node {
+public abstract class Camera extends Node implements IBufferData {
+
+    public static final int BUFFER_DATA_SIZE = 64;
+    public static final LayoutConfig BUFFER_LAYOUT = new LayoutConfig().float4x4().float4x4().float4x4().float4x4();
 
     private float m_zNear;
     private float m_zFar;
@@ -46,11 +51,11 @@ public abstract class Camera extends Node {
         m_zFar = zFar;
     }
 
-
+    @Override
     public FloatBuffer getBufferData() {
     	Matrix4f projMatrix = getProjectionMatrix();
     	Matrix4f viewMatrix = getViewMatrix();
-        FloatBuffer buffer = BufferUtils.createFloatBuffer(64);
+        FloatBuffer buffer = BufferUtils.createFloatBuffer(BUFFER_DATA_SIZE);
         projMatrix.get(buffer);
         buffer.position(16);
         viewMatrix.get(buffer);

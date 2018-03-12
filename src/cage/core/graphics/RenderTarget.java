@@ -1,6 +1,7 @@
 package cage.core.graphics;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
@@ -25,7 +26,7 @@ public abstract class RenderTarget<T extends Texture> {
     public void setWidth(int width) {
         m_width = width;
         m_colorTextures.forEach((Integer i, T t) -> t.setWidth(m_width));
-        if(hasDepthTexture()) {
+        if(containsDepthTexture()) {
             m_depthTexture.setWidth(m_width);
         }
     }
@@ -37,12 +38,24 @@ public abstract class RenderTarget<T extends Texture> {
     public void setHeight(int height) {
         m_height = height;
         m_colorTextures.forEach((Integer i, T t) -> t.setHeight(m_height));
-        if(hasDepthTexture()) {
+        if(containsDepthTexture()) {
             m_depthTexture.setHeight(m_height);
         }
     }
-    
-    public boolean hasColorTexture(int index) {
+
+    public void attachColorTexture(int index, T colorTexture) {
+        m_colorTextures.put(index, colorTexture);
+    }
+
+    public void detachColorTexture(int index) {
+        m_colorTextures.remove(index);
+    }
+
+    public Iterator<Map.Entry<Integer, T>> getColorTextureIterator() {
+        return m_colorTextures.entrySet().iterator();
+    }
+
+    public boolean containsColorTexture(int index) {
         return m_colorTextures.containsKey(index);
     }
 
@@ -50,31 +63,19 @@ public abstract class RenderTarget<T extends Texture> {
         return m_colorTextures.get(index);
     }
 
-    public void removeColorTexture(int index) {
-        m_colorTextures.remove(index);
+    public void attachDepthTexture(T depthTexture) {
+        m_depthTexture = depthTexture;
     }
 
-    public void forEachColorTexture(BiConsumer<? super Integer, ? super T> action) {
-        m_colorTextures.forEach(action);
+    public void detachDepthTexture(T depthTexture) {
+        m_depthTexture = null;
     }
 
-    public boolean hasDepthTexture() {
+    public boolean containsDepthTexture() {
         return m_depthTexture != null;
     }
 
     public Texture getDepthTexture() {
         return m_depthTexture;
-    }
-
-    public void removeDepthTexture() {
-        m_depthTexture = null;
-    }
-
-    public void attachColorTexture(int index, T colorTexture) {
-        m_colorTextures.put(index, colorTexture);
-    }
-
-    public void attachDepthTexture(T depthTexture) {
-        m_depthTexture = depthTexture;
     }
 }

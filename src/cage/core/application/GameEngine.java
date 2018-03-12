@@ -1,25 +1,28 @@
 package cage.core.application;
 
-import cage.core.asset.AssetLoader;
+import cage.core.asset.AssetManager;
 import cage.core.graphics.IGraphicsContext;
 import cage.core.graphics.IGraphicsDevice;
-import cage.core.scene.SceneGraph;
+import cage.core.render.RenderManager;
+import cage.core.scene.SceneManager;
 
 public abstract class GameEngine {
 
     protected GameWindow m_window;
     protected IGraphicsDevice m_graphicsDevice;
     protected IGraphicsContext m_graphicsContext;
-    protected AssetLoader m_assetLoader;
-    protected SceneGraph m_sceneGraph;
+    protected AssetManager m_assetManager;
+    protected SceneManager m_sceneManager;
+    protected RenderManager m_renderManager;
     protected int m_fps;
 
-    protected GameEngine(GameWindow window, IGraphicsDevice graphicsDevice, IGraphicsContext graphicsContext) {
+    protected GameEngine(GameWindow window, IGraphicsDevice graphicsDevice) {
         m_window = window;
         m_graphicsDevice = graphicsDevice;
-        m_graphicsContext = graphicsContext;
-        m_assetLoader = new AssetLoader(m_graphicsDevice);
-        m_sceneGraph = new SceneGraph();
+        m_graphicsContext = graphicsDevice.getGraphicsContext();
+        m_assetManager = new AssetManager(m_graphicsDevice);
+        m_sceneManager = new SceneManager(m_window);
+        m_renderManager = new RenderManager(m_graphicsDevice, m_graphicsContext, m_window, m_sceneManager, m_assetManager);
         m_fps = 0;
     }
 
@@ -37,12 +40,16 @@ public abstract class GameEngine {
         return m_graphicsContext;
     }
 
-    public AssetLoader getAssetLoader() {
-        return m_assetLoader;
+    public AssetManager getAssetManager() {
+        return m_assetManager;
     }
 
-    public SceneGraph getSceneGraph() {
-        return m_sceneGraph;
+    public SceneManager getSceneManager() {
+        return m_sceneManager;
+    }
+
+    public RenderManager getRenderManager() {
+        return m_renderManager;
     }
 
     public int getFPS() {

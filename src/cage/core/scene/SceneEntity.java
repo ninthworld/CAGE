@@ -1,17 +1,22 @@
 package cage.core.scene;
 
+import cage.core.graphics.IBufferData;
+import cage.core.graphics.config.LayoutConfig;
 import cage.core.model.Model;
 import org.lwjgl.BufferUtils;
 
 import java.nio.FloatBuffer;
 
-public class SceneEntity extends Node {
+public class SceneEntity extends SceneNode implements IBufferData {
+
+    public static final int BUFFER_DATA_SIZE = 16;
+    public static final LayoutConfig BUFFER_LAYOUT = new LayoutConfig().float4x4();
 
     private Model m_model;
 
-    public SceneEntity(Node parent) {
+    public SceneEntity(Node parent, Model model) {
         super(parent);
-        m_model = null;
+        m_model = model;
     }
 
     public Model getModel() {
@@ -22,8 +27,9 @@ public class SceneEntity extends Node {
         m_model = model;
     }
 
+    @Override
     public FloatBuffer getBufferData() {
-        FloatBuffer buffer = BufferUtils.createFloatBuffer(16);
+        FloatBuffer buffer = BufferUtils.createFloatBuffer(BUFFER_DATA_SIZE);
         getWorldMatrix().get(buffer);
         buffer.rewind();
         return buffer;

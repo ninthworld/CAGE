@@ -93,6 +93,13 @@ public class GLVertexArray extends VertexArray implements IGLObject {
         }
     }
 
+    @Override
+    public void detachVertexBuffer(VertexBuffer buffer) {
+        if(m_vertexBuffers.remove(buffer)) {
+            m_attributeCount -= buffer.getLayout().getLayoutStack().size();
+        }
+    }
+
     public int getVertexArrayId() {
         return m_vertexArrayId;
     }

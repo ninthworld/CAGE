@@ -32,20 +32,66 @@ public class GLShader extends Shader implements IGLObject {
         }
     }
 
-    @Override
-    public void attachUniformBuffer(String name, UniformBuffer buffer) {
+    private int getUniformBufferIndex(String name) {
         int index = glGetUniformBlockIndex(m_programId, name);
         checkError("glGetUniformBlockIndex");
+        return index;
+    }
+
+    @Override
+    public void attachUniformBuffer(String name, UniformBuffer buffer) {
+        int index = getUniformBufferIndex(name);
         glUniformBlockBinding(m_programId, index, index);
         checkError("glUniformBlockBinding");
         m_uniformBuffers.put(index, buffer);
     }
 
     @Override
-    public void attachTexture(String name, Texture texture) {
+    public void detachUniformBuffer(String name) {
+        int index = getUniformBufferIndex(name);
+        m_uniformBuffers.remove(index);
+    }
+
+    @Override
+    public boolean containsUniformBuffer(String name) {
+        int index = getUniformBufferIndex(name);
+        return m_uniformBuffers.containsKey(index);
+    }
+
+    @Override
+    public UniformBuffer getUniformBuffer(String name) {
+        int index = getUniformBufferIndex(name);
+        return m_uniformBuffers.get(index);
+    }
+
+    private int getTextureIndex(String name) {
         int index = glGetUniformLocation(m_programId, name);
         checkError("glGetUniformLocation");
+        return index;
+    }
+
+    @Override
+    public void attachTexture(String name, Texture texture) {
+        int index = getTextureIndex(name);
         m_textures.put(index, texture);
+    }
+
+    @Override
+    public void detachTexture(String name) {
+        int index = getTextureIndex(name);
+        m_textures.remove(index);
+    }
+
+    @Override
+    public boolean containsTexture(String name) {
+        int index = getTextureIndex(name);
+        return m_textures.containsKey(index);
+    }
+
+    @Override
+    public Texture getTexture(String name) {
+        int index = getTextureIndex(name);
+        return m_textures.get(index);
     }
 
     @Override

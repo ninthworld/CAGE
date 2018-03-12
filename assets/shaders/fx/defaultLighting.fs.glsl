@@ -1,16 +1,15 @@
 #version 430 core
 
-#define MAX_LIGHTS 2
+#define MAX_LIGHTS 3
 
-layout(location=0) in vec2 vs_texCoord;
+in vec2 vs_texCoord;
 
 layout(location=0) out vec4 fs_color;
 
-layout(binding=0) uniform sampler2D ambientTexture;
-layout(binding=1) uniform sampler2D diffuseTexture;
-layout(binding=2) uniform sampler2D specularTexture;
-layout(binding=3) uniform sampler2D normalTexture;
-layout(binding=4) uniform sampler2D depthTexture;
+uniform sampler2D diffuseTexture;
+uniform sampler2D specularTexture;
+uniform sampler2D normalTexture;
+uniform sampler2D depthTexture;
 
 struct Light_t {
 	vec4 ambientColor;
@@ -18,16 +17,16 @@ struct Light_t {
     vec4 specularColor;
     vec4 worldPosition;
     float range;
-    float attenuation;
+    float attConstant;
     float attLinear;
-    float attQuadratic;    	
+    float attQuadratic;
 };
-    
-layout(binding=5, std140) uniform Light {
+
+layout(std140) uniform Light {
      Light_t light[MAX_LIGHTS];
 };
 
-layout(binding=6, std140) uniform Camera {
+layout(std140) uniform Camera {
     mat4 projMatrix;
     mat4 viewMatrix;
     mat4 invProjMatrix;
@@ -41,33 +40,46 @@ vec3 worldPosFromDepth(float depth) {
 }
 
 void main() {
-	
-	vec3 ambient = texture(ambientTexture, vs_texCoord).rgb;
 	vec3 diffuse = texture(diffuseTexture, vs_texCoord).rgb;
 	vec3 specular = texture(specularTexture, vs_texCoord).rgb;
-	float power = texture(specularTexture, vs_texCoord).a;
+	float power = texture(specularTexture, vs_texCoord).a * 128.0;
 	vec3 normal = texture(normalTexture, vs_texCoord).rgb * 2.0 - 1.0;
 	float depth = texture(depthTexture, vs_texCoord).r;
 	vec3 position = worldPosFromDepth(depth);
 
+	vec3 camPosition = -vec3(camera.viewMatrix * vec4(0.0, 0.0, 0.0, 1.0));
+
 	vec3 color = vec3(0.0, 0.0, 0.0);
 	if(depth < 1.0) {
 		for(int i = 0; i < MAX_LIGHTS; ++i) {
+            // Ambient
+            color += diffuse * light[i].ambientColor.rgb;
+
+            // Diffuse
 			float dist = distance(light[i].worldPosition.xyz, position);
 			float cosTheta = dot(normal, normalize(light[i].worldPosition.xyz));
-			
-			if(light[i].attConstant == 0.0) {
-				cosTheta *= 1.0f - clamp(distance(position, light[i].worldPosition.xyz) / light[i].range, 0.0, 1.0);
+			float att = 1.0;
+			if(light[i].range > 0.0 && (light[i].attLinear > 0.0 || light[i].attQuadratic > 0.0)) {
+			    att = clamp(1.0 - dist/light[i].range, 0.0, 1.0);
 				if(light[i].attQuadratic > 0.0) {
-					cosTheta *= cosTheta;
+					att *= att;
 				}
 			}
-			color += mix(ambient + light[i].ambientColor.rgb, diffuse + light[i].diffuseColor.rgb, clamp(cosTheta, 0.0, 1.0));
+            color += clamp(diffuse * light[i].diffuseColor.rgb * cosTheta * att, 0.0, 1.0);
+
+            // Specular
+            vec3 vertexToCam = normalize(camPosition - position);
+            vec3 lightReflect = normalize(reflect(-normalize(light[i].worldPosition.xyz), normal));
+            float factor = dot(vertexToCam, lightReflect);
+            if(factor > 0.0) {
+            factor = pow(factor, power);
+                color += clamp(att * specular * light[i].specularColor.rgb * factor, 0.0, 1.0);
+            }
 		}
 	}
 	else {
 		color = diffuse;
 	}
-	
+
 	fs_color = vec4(color, 1.0);
 }

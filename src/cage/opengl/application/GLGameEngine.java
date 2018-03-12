@@ -10,14 +10,14 @@ public class GLGameEngine extends GameEngine {
     private GameTimer m_timer;
 
     public GLGameEngine(GLGameWindow window) {
-        super(window, new GLGraphicsDevice(window), null);
-        m_graphicsContext = ((GLGraphicsDevice)m_graphicsDevice).getGraphicsContext();
+        super(window, new GLGraphicsDevice(window));
         m_timer = createTimer();
     }
 
     @Override
     public void run(IGame game) {
         game.initialize(this);
+        getSceneManager().update();
 
         int frames = 0;
         GameTimer fpsTimer = createTimer();
@@ -27,7 +27,9 @@ public class GLGameEngine extends GameEngine {
             m_timer.reset();
 
             game.update(this, deltaTime);
+            getSceneManager().update();
             game.render(this);
+            getRenderManager().render();
             m_graphicsContext.swapBuffers();
 
             m_window.update();

@@ -1,14 +1,18 @@
 package cage.core.model.material;
 
+import cage.core.graphics.IBufferData;
 import cage.core.graphics.Texture;
+import cage.core.graphics.config.LayoutConfig;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
 
 import java.nio.FloatBuffer;
 
-public class Material {
+public class Material implements IBufferData {
 
-    private Vector3f m_ambient;
+    public static final int BUFFER_DATA_SIZE = 12;
+    public static final LayoutConfig BUFFER_LAYOUT = new LayoutConfig().float1().float1().float1().float1().float4().float4();
+
     private Vector3f m_diffuse;
     private Vector3f m_specular;
     private float m_specularExp;
@@ -18,7 +22,6 @@ public class Material {
     private Texture m_normalMap;
 
     public Material() {
-        m_ambient = new Vector3f();
         m_diffuse = new Vector3f();
         m_specular = new Vector3f();
         m_specularExp = 0.0f;
@@ -26,14 +29,6 @@ public class Material {
         m_specularMap = null;
         m_highlightMap = null;
         m_normalMap = null;
-    }
-
-    public Vector3f getAmbientColor() {
-        return new Vector3f(m_ambient);
-    }
-
-    public void setAmbientColor(Vector3f ambient) {
-        m_ambient = ambient;
     }
 
     public Vector3f getDiffuseColor() {
@@ -89,15 +84,15 @@ public class Material {
         m_normalMap = normal;
     }
 
+    @Override
     public FloatBuffer getBufferData() {
-        FloatBuffer buffer = BufferUtils.createFloatBuffer(16);
+        FloatBuffer buffer = BufferUtils.createFloatBuffer(BUFFER_DATA_SIZE);
         buffer.put(0, (m_diffuseMap == null ? 0.0f : 1.0f));
         buffer.put(1, (m_specularMap == null ? 0.0f : 1.0f));
         buffer.put(2, (m_normalMap == null ? 0.0f : 1.0f));
         buffer.put(3, m_specularExp);
-        m_ambient.get(4, buffer).put(7, 1.0f);
-        m_diffuse.get(8, buffer).put(11, 1.0f);
-        m_specular.get(12, buffer).put(15, 1.0f);
+        m_diffuse.get(4, buffer).put(7, 1.0f);
+        m_specular.get(8, buffer).put(11, 1.0f);
         buffer.rewind();
         return buffer;
     }

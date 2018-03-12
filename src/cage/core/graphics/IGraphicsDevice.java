@@ -4,6 +4,8 @@ import cage.core.graphics.type.FormatType;
 
 public interface IGraphicsDevice {
 
+    IGraphicsContext getGraphicsContext();
+
     IndexBuffer createIndexBuffer();
     VertexBuffer createVertexBuffer();
     UniformBuffer createUniformBuffer();

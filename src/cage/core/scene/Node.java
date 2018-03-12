@@ -4,6 +4,7 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -64,34 +65,48 @@ public abstract class Node {
         m_children.forEach(Node::update);
     }
 
-    public void addChild(Node child) {
-        if(child != this) {
-            m_children.add(child);
-        }
-    }
-
-    public int getChildCount() {
+    public int getNodeCount() {
         return m_children.size();
     }
 
-    public boolean hasChild(Node child) {
-        return m_children.contains(child);
+    public void attachNode(Node node) {
+        if(node != this) {
+            if(node.getParentNode() != null) {
+                node.getParentNode().m_children.remove(node);
+            }
+            node.m_parent = this;
+            m_children.add(node);
+        }
     }
 
-    public Node getChild(int index) {
+    public void detachNode(Node node) {
+        m_children.remove(node);
+        node.m_parent = null;
+    }
+
+    public boolean containsNode(Node node) {
+        return m_children.contains(node);
+    }
+
+    public Node getNode(int index) {
         return m_children.get(index);
     }
 
-    public void removeChild(int index) {
-        m_children.remove(index).m_parent = null;
+    public Iterator<Node> getNodeIterator() {
+        return m_children.iterator();
     }
 
-    public void forEachChild(Consumer<? super Node> action) {
-        m_children.forEach(action);
-    }
-
-    public Node getParent() {
+    public Node getParentNode() {
         return m_parent;
+    }
+
+    public void setParentNode(Node parent) {
+        if(m_parent != null) {
+            m_parent.detachNode(this);
+        }
+        if(parent != null) {
+            parent.attachNode(this);
+        }
     }
 
     public Vector3f getLocalPosition() {
@@ -102,6 +117,10 @@ public abstract class Node {
         m_localPosition = position;
     }
 
+    public void setLocalPosition(float x, float y, float z) {
+        m_localPosition = new Vector3f(x, y, z);
+    }
+
     public Vector3f getLocalRotation() {
         return new Vector3f(m_localRotation);
     }
@@ -110,12 +129,20 @@ public abstract class Node {
         m_localRotation = rotation;
     }
 
+    public void setLocalRotation(float pitch, float yaw, float roll) {
+        m_localRotation = new Vector3f(pitch, yaw, roll);
+    }
+
     public Vector3f getLocalScale() {
         return new Vector3f(m_localScale);
     }
 
     public void setLocalScale(Vector3f scale) {
         m_localScale = scale;
+    }
+
+    public void setLocalScale(float x, float y, float z) {
+        m_localScale = new Vector3f(x, y, z);
     }
 
     public Vector3f getWorldPosition() {
@@ -141,7 +168,7 @@ public abstract class Node {
         return worldMatrix;
     }
 
-    public boolean isInheritPosition() {
+    public boolean inheritPosition() {
         return m_inheritPosition;
     }
 
@@ -149,7 +176,7 @@ public abstract class Node {
         m_inheritPosition = inherit;
     }
 
-    public boolean isInheritRotation() {
+    public boolean inheritRotation() {
         return m_inheritRotation;
     }
 
@@ -157,7 +184,7 @@ public abstract class Node {
         m_inheritRotation = inherit;
     }
 
-    public boolean isInheritScale() {
+    public boolean inheritScale() {
         return m_inheritScale;
     }
 

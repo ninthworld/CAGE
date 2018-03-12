@@ -1,33 +1,29 @@
-#version 430 core
+#version 400 core
 
 in vec3 vs_normal;
 in vec3 vs_tangent;
 in vec3 vs_bitangent;
 in vec2 vs_texCoord;
 
-layout(location=0) out vec4 fs_ambient;
-layout(location=1) out vec4 fs_diffuse;
-layout(location=2) out vec4 fs_specular;
-layout(location=3) out vec4 fs_normal;
+layout(location=0) out vec4 fs_diffuse;
+layout(location=1) out vec4 fs_specular;
+layout(location=2) out vec4 fs_normal;
 
-layout(binding=2, std140) uniform Material {
+layout(std140) uniform Material {
     float useDiffuseTexture;
     float useSpecularTexture;
     float useNormalTexture;
     float specularExp;
-    vec4 ambientColor;
     vec4 diffuseColor;
     vec4 specularColor;
 } material;
 
-layout(binding=3) uniform sampler2D diffuseTexture;
-layout(binding=4) uniform sampler2D specularTexture;
-layout(binding=5) uniform sampler2D highlightTexture;
-layout(binding=6) uniform sampler2D normalTexture;
+uniform sampler2D diffuseTexture;
+uniform sampler2D specularTexture;
+uniform sampler2D highlightTexture;
+uniform sampler2D normalTexture;
 
 void main() {
-	
-    fs_ambient = vec4(material.ambientColor.rgb, 1.0);
 
     if(material.useDiffuseTexture > 0.0) {
         fs_diffuse = vec4(texture(diffuseTexture, vs_texCoord).rgb, 1.0);
@@ -37,10 +33,10 @@ void main() {
     }
 
     if(material.useSpecularTexture > 0.0) {
-        fs_specular = vec4(texture(specularTexture, vs_texCoord).rgb, texture(highlightTexture, vs_texCoord).r);
+        fs_specular = vec4(texture(specularTexture, vs_texCoord).rgb, texture(highlightTexture, vs_texCoord).r / 128.0);
     }
     else {
-        fs_specular = vec4(material.specularColor.rgb, material.specularExp);
+        fs_specular = vec4(material.specularColor.rgb, material.specularExp / 128.0);
     }
 
     if(material.useNormalTexture > 0.0) {

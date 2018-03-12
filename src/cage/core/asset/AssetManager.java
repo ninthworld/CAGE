@@ -34,7 +34,7 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
 
-public class AssetLoader {
+public class AssetManager {
 
     public static final String ASSETS_ROOT_DIR = "assets/";
 
@@ -44,7 +44,7 @@ public class AssetLoader {
     private Shader m_defaultGeometryShader;
     private Shader m_defaultLightingShader;
 
-    public AssetLoader(IGraphicsDevice graphicsDevice) {
+    public AssetManager(IGraphicsDevice graphicsDevice) {
         m_graphicsDevice = graphicsDevice;
         m_assetsDir = Paths.get(ASSETS_ROOT_DIR);
         m_textures = new HashMap<>();
@@ -128,13 +128,12 @@ public class AssetLoader {
 
             // TODO: Temp Code
             Material material = new Material();
-            material.setAmbientColor(new Vector3f(0.0f, 0.0f, 0.0f));
             material.setDiffuse(new Vector3f(1.0f, 1.0f, 1.0f));
 
             Mesh mesh = new Mesh(indexBuffer, material);
 
             Model model = new Model(vertexArray);
-            model.addMesh(mesh);
+            model.attachMesh(mesh);
             
             return model;
     	} catch(FileNotFoundException e) {

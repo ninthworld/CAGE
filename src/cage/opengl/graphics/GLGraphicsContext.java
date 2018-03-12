@@ -5,6 +5,9 @@ import cage.core.graphics.type.PrimitiveType;
 import cage.opengl.application.GLGameWindow;
 
 import java.awt.*;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.function.BiConsumer;
 
 import static cage.opengl.utils.GLUtils.*;
 import static org.lwjgl.glfw.GLFW.*;
@@ -163,12 +166,11 @@ public class GLGraphicsContext implements IGraphicsContext {
 	@Override
 	public void resolveToRenderTarget(RenderTarget renderTargetFrom, RenderTarget renderTargetTo, Rectangle clipFrom, Rectangle clipTo) {
 		if(renderTargetFrom instanceof IGLRenderTarget && renderTargetTo instanceof IGLRenderTarget) {
-
-	        ((RenderTarget<Texture>)renderTargetFrom).forEachColorTexture((Integer i, Texture texture) -> {
+            ((RenderTarget<Texture>)renderTargetFrom).getColorTextureIterator().forEachRemaining((Map.Entry<Integer, Texture> entry) -> {
 	        	glBindFramebuffer(GL_READ_FRAMEBUFFER, ((IGLRenderTarget)renderTargetFrom).getFramebufferId());
-	            glReadBuffer(GL_COLOR_ATTACHMENT0 + i);
+	            glReadBuffer(GL_COLOR_ATTACHMENT0 + entry.getKey());
 	            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, ((IGLRenderTarget)renderTargetTo).getFramebufferId());
-	            glDrawBuffer(GL_COLOR_ATTACHMENT0 + i);
+	            glDrawBuffer(GL_COLOR_ATTACHMENT0 + entry.getKey());
 
 	            glBlitFramebuffer(
 	                    clipFrom.x, clipFrom.y, clipFrom.x + clipFrom.width, clipFrom.y + clipFrom.height,

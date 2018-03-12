@@ -1,6 +1,7 @@
 package cage.core.graphics;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public abstract class VertexArray {
@@ -21,13 +22,19 @@ public abstract class VertexArray {
         return m_vertexBuffers.size();
     }
 
+    public abstract void attachVertexBuffer(VertexBuffer buffer);
+
+    public abstract void detachVertexBuffer(VertexBuffer buffer);
+
+    public Iterator<VertexBuffer> getVertexBufferIterator() {
+        return m_vertexBuffers.iterator();
+    }
+
+    public boolean containsVertexBuffer(VertexBuffer buffer) {
+        return m_vertexBuffers.contains(buffer);
+    }
+
     public VertexBuffer getVertexBuffer(int index) {
         return m_vertexBuffers.get(index);
     }
-
-    public void removeVertexBuffer(int index) {
-        m_vertexBuffers.remove(index);
-    }
-
-    public abstract void attachVertexBuffer(VertexBuffer buffer);
 }

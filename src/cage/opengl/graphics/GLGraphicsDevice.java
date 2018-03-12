@@ -44,6 +44,7 @@ public class GLGraphicsDevice implements IGraphicsDevice {
         glfwTerminate();
     }
 
+    @Override
     public GLGraphicsContext getGraphicsContext() {
         return m_graphicsContext;
     }

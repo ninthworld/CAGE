@@ -3,6 +3,7 @@ package cage.core.model;
 import cage.core.graphics.VertexArray;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class Model {
@@ -23,19 +24,27 @@ public class Model {
         m_vertexArray = vertexArray;
     }
 
-    public void addMesh(Mesh mesh) {
-        m_meshes.add(mesh);
-    }
-
-    public void removeMesh(int index) {
-        m_meshes.remove(index);
-    }
-
     public int getMeshCount() {
         return m_meshes.size();
     }
 
-    public List<Mesh> getMeshes() {
-        return m_meshes;
+    public void attachMesh(Mesh mesh) {
+        m_meshes.add(mesh);
+    }
+
+    public void detachMesh(Mesh mesh) {
+        m_meshes.remove(mesh);
+    }
+
+    public Iterator<Mesh> getMeshIterator() {
+        return m_meshes.iterator();
+    }
+
+    public boolean containsMesh(Mesh mesh) {
+        return m_meshes.contains(mesh);
+    }
+
+    public Mesh getMesh(int index) {
+        return m_meshes.get(index);
     }
 }
