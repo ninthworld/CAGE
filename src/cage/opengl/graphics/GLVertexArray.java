@@ -13,28 +13,28 @@ import static org.lwjgl.opengl.GL30.*;
 
 public class GLVertexArray extends VertexArray implements IGLObject {
 
-    private int m_vertexArrayId;
+    private int vertexArrayId;
 
     public GLVertexArray() {
         super();
 
         int[] arrays = new int[1];
         glGenVertexArrays(arrays);
-        m_vertexArrayId = arrays[0];
+        this.vertexArrayId = arrays[0];
     }
 
     @Override
     public void destroy() {
-        if(m_vertexArrayId != GL_FALSE) {
-            glDeleteVertexArrays(new int[]{ m_vertexArrayId });
+        if(vertexArrayId != GL_FALSE) {
+            glDeleteVertexArrays(new int[]{ vertexArrayId });
         }
     }
 
     @Override
     public void bind() {
-        glBindVertexArray(m_vertexArrayId);
+        glBindVertexArray(vertexArrayId);
         checkError("glBindVertexArray");
-        for(int i = 0; i < m_attributeCount; ++i) {
+        for(int i = 0; i < getAttributeCount(); ++i) {
             glEnableVertexAttribArray(i);
             checkError("glEnableVertexAttribArray");
         }
@@ -42,7 +42,7 @@ public class GLVertexArray extends VertexArray implements IGLObject {
 
     @Override
     public void unbind() {
-        for(int i = 0; i < m_attributeCount; ++i) {
+        for(int i = 0; i < getAttributeCount(); ++i) {
             glDisableVertexAttribArray(i);
             checkError("glDisableVertexAttribArray");
         }
@@ -54,7 +54,7 @@ public class GLVertexArray extends VertexArray implements IGLObject {
         if(buffer instanceof GLVertexBuffer) {
             GLVertexBuffer glBuffer = (GLVertexBuffer)buffer;
 
-            glBindVertexArray(m_vertexArrayId);
+            glBindVertexArray(vertexArrayId);
             glBindBuffer(GL_ARRAY_BUFFER, glBuffer.getBufferId());
 
             int totalBytes = 0;
@@ -72,7 +72,7 @@ public class GLVertexArray extends VertexArray implements IGLObject {
                 }
 
                 glVertexAttribPointer(
-                        i + m_attributeCount,
+                        i + getAttributeCount(),
                         unitCount, unitFlag, false,
                         glBuffer.getLayout().getUnitSize(),
                         totalBytes);
@@ -84,23 +84,23 @@ public class GLVertexArray extends VertexArray implements IGLObject {
                 }
             }
 
-            m_attributeCount += glBuffer.getLayout().getLayoutStack().size();
+            attributeCount += glBuffer.getLayout().getLayoutStack().size();
 
             glBindBuffer(GL_ARRAY_BUFFER, 0);
             glBindVertexArray(0);
 
-            m_vertexBuffers.add(glBuffer);
+            vertexBuffers.add(glBuffer);
         }
     }
 
     @Override
     public void detachVertexBuffer(VertexBuffer buffer) {
-        if(m_vertexBuffers.remove(buffer)) {
-            m_attributeCount -= buffer.getLayout().getLayoutStack().size();
+        if(vertexBuffers.remove(buffer)) {
+            attributeCount -= buffer.getLayout().getLayoutStack().size();
         }
     }
 
     public int getVertexArrayId() {
-        return m_vertexArrayId;
+        return vertexArrayId;
     }
 }

@@ -2,21 +2,21 @@ package cage.core.application;
 
 public abstract class GameTimer {
 
-    protected double m_startTime;
-    protected double m_lastTime;
+    protected double startTime;
+    protected double lastTime;
 
     protected GameTimer() {
-        m_startTime = 0.0;
-        m_startTime = getTime();
+        this.startTime = 0.0;
+        this.startTime = getTime();
         reset();
     }
 
     public void reset() {
-        m_lastTime = getTime();
+        this.lastTime = getTime();
     }
 
     public double getElapsed() {
-        return getTime() - m_lastTime;
+        return getTime() - this.lastTime;
     }
 
     public abstract double getTime();

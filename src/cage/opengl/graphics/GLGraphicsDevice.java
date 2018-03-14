@@ -13,12 +13,12 @@ import static org.lwjgl.glfw.GLFW.*;
 
 public class GLGraphicsDevice implements IGraphicsDevice {
 
-    private GLGraphicsContext m_graphicsContext;
-    private List<IGLObject> m_glObjects;
+    private GLGraphicsContext graphicsContext;
+    private List<IGLObject> glObjects;
 
-    private GLRasterizer m_defaultRasterizer;
-    private GLSampler m_defaultSampler;
-    private GLBlender m_defaultBlender;
+    private GLRasterizer defaultRasterizer;
+    private GLSampler defaultSampler;
+    private GLBlender defaultBlender;
 
     public GLGraphicsDevice(GLGameWindow window) {
         GLFWErrorCallback.createPrint(System.err);
@@ -29,127 +29,127 @@ public class GLGraphicsDevice implements IGraphicsDevice {
         window.initialize();
         GL.createCapabilities();
 
-        m_glObjects = new ArrayList<>();
+        this.glObjects = new ArrayList<>();
 
-        m_defaultRasterizer = (GLRasterizer)createRasterizer();
-        m_defaultSampler = (GLSampler)createSampler();
-        m_defaultBlender = (GLBlender)createBlender();
+        this.defaultRasterizer = (GLRasterizer)createRasterizer();
+        this.defaultSampler = (GLSampler)createSampler();
+        this.defaultBlender = (GLBlender)createBlender();
 
-        m_graphicsContext = new GLGraphicsContext(window);
-        m_graphicsContext.bindRasterizer(m_defaultRasterizer);
+        this.graphicsContext = new GLGraphicsContext(window);
+        this.graphicsContext.bindRasterizer(this.defaultRasterizer);
     }
 
     public void destroy() {
-        m_glObjects.forEach(IGLObject::destroy);
+        glObjects.forEach(IGLObject::destroy);
         glfwTerminate();
     }
 
     @Override
     public GLGraphicsContext getGraphicsContext() {
-        return m_graphicsContext;
+        return graphicsContext;
     }
 
     @Override
     public IndexBuffer createIndexBuffer() {
         GLIndexBuffer glIndexBuffer = new GLIndexBuffer();
-        m_glObjects.add(glIndexBuffer);
+        glObjects.add(glIndexBuffer);
         return glIndexBuffer;
     }
 
     @Override
     public VertexBuffer createVertexBuffer() {
         GLVertexBuffer glVertexBuffer = new GLVertexBuffer();
-        m_glObjects.add(glVertexBuffer);
+        glObjects.add(glVertexBuffer);
         return glVertexBuffer;
     }
 
     @Override
     public UniformBuffer createUniformBuffer() {
         GLUniformBuffer glUniformBuffer = new GLUniformBuffer();
-        m_glObjects.add(glUniformBuffer);
+        glObjects.add(glUniformBuffer);
         return glUniformBuffer;
     }
 
     @Override
     public Shader createShader() {
         GLShader glShader = new GLShader();
-        m_glObjects.add(glShader);
+        glObjects.add(glShader);
         return glShader;
     }
 
     @Override
     public Rasterizer createRasterizer() {
         GLRasterizer glRasterizer = new GLRasterizer();
-        m_glObjects.add(glRasterizer);
+        glObjects.add(glRasterizer);
         return glRasterizer;
     }
 
     @Override
     public Blender createBlender() {
         GLBlender glBlender = new GLBlender();
-        m_glObjects.add(glBlender);
+        glObjects.add(glBlender);
         return glBlender;
     }
 
     @Override
-    public Texture createTexture(int width, int height) {
-        GLTexture glTexture = new GLTexture(width, height);
-        glTexture.setSampler(m_defaultSampler);
-        m_glObjects.add(glTexture);
+    public Texture2D createTexture2D(int width, int height) {
+        GLTexture2D glTexture = new GLTexture2D(width, height);
+        glTexture.setSampler(defaultSampler);
+        glObjects.add(glTexture);
         return glTexture;
     }
 
     @Override
-    public Texture createTexture(int width, int height, FormatType format) {
-        GLTexture glTexture = new GLTexture(width, height, format);
-        glTexture.setSampler(m_defaultSampler);
-        m_glObjects.add(glTexture);
+    public Texture2D createTexture2D(int width, int height, FormatType format) {
+        GLTexture2D glTexture = new GLTexture2D(width, height, format);
+        glTexture.setSampler(defaultSampler);
+        glObjects.add(glTexture);
         return glTexture;
     }
 
     @Override
-    public Texture createTexture(int width, int height, boolean mipmapping) {
-        GLTexture glTexture = new GLTexture(width, height, mipmapping);
-        glTexture.setSampler(m_defaultSampler);
-        m_glObjects.add(glTexture);
+    public Texture2D createTexture2D(int width, int height, boolean mipmapping) {
+        GLTexture2D glTexture = new GLTexture2D(width, height, mipmapping);
+        glTexture.setSampler(defaultSampler);
+        glObjects.add(glTexture);
         return glTexture;
     }
 
     @Override
-    public Texture createTexture(int width, int height, FormatType format, boolean mipmapping) {
-        GLTexture glTexture = new GLTexture(width, height, format, mipmapping);
-        glTexture.setSampler(m_defaultSampler);
-        m_glObjects.add(glTexture);
+    public Texture2D createTexture2D(int width, int height, FormatType format, boolean mipmapping) {
+        GLTexture2D glTexture = new GLTexture2D(width, height, format, mipmapping);
+        glTexture.setSampler(defaultSampler);
+        glObjects.add(glTexture);
         return glTexture;
     }
 
     @Override
     public TextureMS createTextureMS(int width, int height, int samples) {
         GLTextureMS glTexture = new GLTextureMS(width, height, samples);
-        m_glObjects.add(glTexture);
+        glObjects.add(glTexture);
         return glTexture;
     }
 
     @Override
     public TextureMS createTextureMS(int width, int height, int samples, FormatType format) {
         GLTextureMS glTexture = new GLTextureMS(width, height, samples, format);
-        m_glObjects.add(glTexture);
+        glObjects.add(glTexture);
         return glTexture;
     }
 
     @Override
     public Sampler createSampler() {
         GLSampler glSampler = new GLSampler();
-        m_glObjects.add(glSampler);
+        glObjects.add(glSampler);
         return glSampler;
     }
 
     @Override
-    public RenderTarget createRenderTarget(int width, int height) {
-        GLRenderTarget glRenderTarget = new GLRenderTarget(width, height);
-        glRenderTarget.attachDepthTexture((GLTexture)createTexture(width, height, FormatType.DEPTH_24_STENCIL_8));
-        glRenderTarget.attachColorTexture(0, (GLTexture)createTexture(width, height));
-        m_glObjects.add(glRenderTarget);
+    public RenderTarget2D createRenderTarget2D(int width, int height) {
+        GLRenderTarget2D glRenderTarget = new GLRenderTarget2D(width, height);
+        glRenderTarget.attachDepthTexture(createTexture2D(width, height, FormatType.DEPTH_24_STENCIL_8));
+        glRenderTarget.attachColorTexture(0, createTexture2D(width, height));
+        glObjects.add(glRenderTarget);
         return glRenderTarget;
     }
 
@@ -158,29 +158,29 @@ public class GLGraphicsDevice implements IGraphicsDevice {
         GLRenderTargetMS glRenderTarget = new GLRenderTargetMS(width, height, samples);
         glRenderTarget.attachDepthTexture(createTextureMS(width, height, samples, FormatType.DEPTH_24_STENCIL_8));
         glRenderTarget.attachColorTexture(0, createTextureMS(width, height, samples));
-        m_glObjects.add(glRenderTarget);
+        glObjects.add(glRenderTarget);
         return glRenderTarget;
     }
     
     @Override
     public VertexArray createVertexArray() {
         GLVertexArray glVertexArray = new GLVertexArray();
-        m_glObjects.add(glVertexArray);
+        glObjects.add(glVertexArray);
         return glVertexArray;
     }
 
     @Override
     public Rasterizer getDefaultRasterizer() {
-        return m_defaultRasterizer;
+        return defaultRasterizer;
     }
 
     @Override
     public Sampler getDefaultSampler() {
-        return m_defaultSampler;
+        return defaultSampler;
     }
 
     @Override
     public Blender getDefaultBlender() {
-        return m_defaultBlender;
+        return defaultBlender;
     }
 }

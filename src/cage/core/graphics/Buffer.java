@@ -1,21 +1,33 @@
 package cage.core.graphics;
 
+import cage.core.graphics.config.LayoutConfig;
+
 import java.nio.*;
 
 public abstract class Buffer {
 
-    protected int m_unitCount;
+    private int unitCount;
+    private LayoutConfig layout;
 
-    protected Buffer() {
-        m_unitCount = 0;
+    public Buffer() {
+        this.unitCount = 0;
+        this.layout = new LayoutConfig();
     }
 
     public int getUnitCount() {
-        return m_unitCount;
+        return unitCount;
     }
 
     public void setUnitCount(int unitCount) {
-        m_unitCount = unitCount;
+        this.unitCount = unitCount;
+    }
+
+    public LayoutConfig getLayout() {
+        return layout;
+    }
+
+    public void setLayout(LayoutConfig layout) {
+        this.layout = layout;
     }
 
     public abstract void setData(ByteBuffer data);

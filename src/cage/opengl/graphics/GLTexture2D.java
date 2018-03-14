@@ -1,6 +1,7 @@
 package cage.opengl.graphics;
 
 import cage.core.graphics.Texture;
+import cage.core.graphics.Texture2D;
 import cage.core.graphics.type.FormatType;
 
 import java.nio.*;
@@ -11,52 +12,52 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.*;
 import static org.lwjgl.opengl.GL30.*;
 
-public class GLTexture extends Texture implements IGLTexture {
+public class GLTexture2D extends Texture2D implements IGLTexture {
 
-    private int m_textureId;
-    private Buffer m_data;
+    private int textureId;
+    private Buffer data;
 
-    public GLTexture(int width, int height, FormatType format, boolean mipmapping) {
+    public GLTexture2D(int width, int height, FormatType format, boolean mipmapping) {
         super(width, height, format, mipmapping);
-        m_data = null;
+        this.data = null;
         generate();
     }
 
-    public GLTexture(int width, int height, boolean mipmapping) {
+    public GLTexture2D(int width, int height, boolean mipmapping) {
         super(width, height, mipmapping);
-        m_data = null;
+        this.data = null;
         generate();
     }
 
-    public GLTexture(int width, int height, FormatType format) {
+    public GLTexture2D(int width, int height, FormatType format) {
         super(width, height, format);
-        m_data = null;
+        this.data = null;
         generate();
     }
 
-    public GLTexture(int width, int height) {
+    public GLTexture2D(int width, int height) {
         super(width, height);
-        m_data = null;
+        this.data = null;
         generate();
     }
 
     private void generate() {
         int[] textures = new int[1];
         glGenTextures(textures);
-        m_textureId = textures[0];
+        textureId = textures[0];
         initialize();
     }
 
     @Override
     public void destroy() {
-        if(m_textureId > 0) {
-            glDeleteTextures(new int[]{ m_textureId });
+        if(textureId > 0) {
+            glDeleteTextures(new int[]{ textureId });
         }
     }
 
     @Override
     public void bind() {
-        glBindTexture(GL_TEXTURE_2D, m_textureId);
+        glBindTexture(GL_TEXTURE_2D, textureId);
     }
 
     @Override
@@ -69,15 +70,15 @@ public class GLTexture extends Texture implements IGLTexture {
         glTexImage2D(
                 GL_TEXTURE_2D,
                 0,
-                getGLInternalFormatType(m_format),
-                m_width, m_height,
+                getGLInternalFormatType(getFormat()),
+                getWidth(), getHeight(),
                 0,
-                getGLFormatType(m_format),
-                getGLDataType(m_format),
+                getGLFormatType(getFormat()),
+                getGLDataType(getFormat()),
                 0);
         checkError("glTexImage2D");
 
-        if(m_mipmapping) {
+        if(isMipmapping()) {
             glGenerateMipmap(GL_TEXTURE_2D);
             checkError("glGenerateMipmap");
         }
@@ -87,21 +88,21 @@ public class GLTexture extends Texture implements IGLTexture {
         }
         unbind();
 
-        if(m_data != null) {
-            if(m_data instanceof ByteBuffer) {
-                setData((ByteBuffer)m_data);
+        if(data != null) {
+            if(data instanceof ByteBuffer) {
+                setData((ByteBuffer)data);
             }
-            else if(m_data instanceof ShortBuffer) {
-                setData((ShortBuffer)m_data);
+            else if(data instanceof ShortBuffer) {
+                setData((ShortBuffer)data);
             }
-            else if(m_data instanceof IntBuffer) {
-                setData((IntBuffer)m_data);
+            else if(data instanceof IntBuffer) {
+                setData((IntBuffer)data);
             }
-            else if(m_data instanceof FloatBuffer) {
-                setData((FloatBuffer)m_data);
+            else if(data instanceof FloatBuffer) {
+                setData((FloatBuffer)data);
             }
-            else if(m_data instanceof DoubleBuffer) {
-                setData((DoubleBuffer)m_data);
+            else if(data instanceof DoubleBuffer) {
+                setData((DoubleBuffer)data);
             }
         }
     }
@@ -132,15 +133,15 @@ public class GLTexture extends Texture implements IGLTexture {
     
     @Override
     public void setData(ByteBuffer data) {
-        m_data = data;
+        this.data = data;
         bind();
         glTexSubImage2D(
                 GL_TEXTURE_2D,
                 0,
                 0,0,
-                m_width, m_height,
-                getGLFormatType(m_format),
-                getGLDataType(m_format),
+                getWidth(), getHeight(),
+                getGLFormatType(getFormat()),
+                getGLDataType(getFormat()),
                 data);
         checkError("glTexSubImage2D");
         unbind();
@@ -148,15 +149,15 @@ public class GLTexture extends Texture implements IGLTexture {
 
     @Override
     public void setData(ShortBuffer data) {
-        m_data = data;
+        this.data = data;
         bind();
         glTexSubImage2D(
                 GL_TEXTURE_2D,
                 0,
                 0,0,
-                m_width, m_height,
-                getGLFormatType(m_format),
-                getGLDataType(m_format),
+                getWidth(), getHeight(),
+                getGLFormatType(getFormat()),
+                getGLDataType(getFormat()),
                 data);
         checkError("glTexSubImage2D");
         unbind();
@@ -164,15 +165,15 @@ public class GLTexture extends Texture implements IGLTexture {
 
     @Override
     public void setData(IntBuffer data) {
-        m_data = data;
+        this.data = data;
         bind();
         glTexSubImage2D(
                 GL_TEXTURE_2D,
                 0,
                 0,0,
-                m_width, m_height,
-                getGLFormatType(m_format),
-                getGLDataType(m_format),
+                getWidth(), getHeight(),
+                getGLFormatType(getFormat()),
+                getGLDataType(getFormat()),
                 data);
         checkError("glTexSubImage2D");
         unbind();
@@ -180,15 +181,15 @@ public class GLTexture extends Texture implements IGLTexture {
 
     @Override
     public void setData(FloatBuffer data) {
-        m_data = data;
+        this.data = data;
         bind();
         glTexSubImage2D(
                 GL_TEXTURE_2D,
                 0,
                 0,0,
-                m_width, m_height,
-                getGLFormatType(m_format),
-                getGLDataType(m_format),
+                getWidth(), getHeight(),
+                getGLFormatType(getFormat()),
+                getGLDataType(getFormat()),
                 data);
         checkError("glTexSubImage2D");
         unbind();
@@ -196,15 +197,15 @@ public class GLTexture extends Texture implements IGLTexture {
 
     @Override
     public void setData(DoubleBuffer data) {
-        m_data = data;
+        this.data = data;
         bind();
         glTexSubImage2D(
                 GL_TEXTURE_2D,
                 0,
                 0,0,
-                m_width, m_height,
-                getGLFormatType(m_format),
-                getGLDataType(m_format),
+                getWidth(), getHeight(),
+                getGLFormatType(getFormat()),
+                getGLDataType(getFormat()),
                 data);
         checkError("glTexSubImage2D");
         unbind();
@@ -212,6 +213,6 @@ public class GLTexture extends Texture implements IGLTexture {
 
     @Override
     public int getTextureId() {
-        return m_textureId;
+        return textureId;
     }
 }

@@ -11,45 +11,45 @@ import cage.core.scene.camera.Camera;
 
 public class GeometryRenderStage extends RenderStage {
 
-    protected IGraphicsContext m_graphicsContext;
-    protected UniformBuffer m_cameraUniform;
-    protected UniformBuffer m_entityUniform;
-    protected UniformBuffer m_materialUniform;
-    protected Camera m_camera;
-    protected SceneNode m_node;
+    private IGraphicsContext graphicsContext;
+    private UniformBuffer cameraUniform;
+    private UniformBuffer entityUniform;
+    private UniformBuffer materialUniform;
+    private Camera camera;
+    private SceneNode node;
 
     public GeometryRenderStage(SceneNode node, Camera camera, Shader shader, RenderTarget renderTarget, IGraphicsContext graphicsContext) {
         super(shader, renderTarget);
-        m_graphicsContext = graphicsContext;
-        m_node = node;
-        m_camera = camera;
+        this.graphicsContext = graphicsContext;
+        this.node = node;
+        this.camera = camera;
     }
 
     @Override
     public void preRender() {
-        if(m_cameraUniform == null) {
-            m_cameraUniform = getShader().getUniformBuffer("Camera");
+        if(cameraUniform == null) {
+            cameraUniform = getShader().getUniformBuffer("Camera");
         }
 
-        if(m_entityUniform == null) {
-            m_entityUniform = getShader().getUniformBuffer("Entity");
+        if(entityUniform == null) {
+            entityUniform = getShader().getUniformBuffer("Entity");
         }
 
-        if(m_materialUniform == null) {
-            m_materialUniform = getShader().getUniformBuffer("Material");
+        if(materialUniform == null) {
+            materialUniform = getShader().getUniformBuffer("Material");
         }
 
-        m_cameraUniform.setData(m_camera.getBufferData());
+        cameraUniform.setData(camera.getBufferData());
     }
 
     @Override
     public void render() {
         super.render();
 
-        m_graphicsContext.bindRenderTarget(getRenderTarget());
-        m_graphicsContext.clear();
+        graphicsContext.bindRenderTarget(getRenderTarget());
+        graphicsContext.clear();
 
-        renderNode(m_node);
+        renderNode(node);
     }
 
     private void renderNode(Node node) {
@@ -58,12 +58,12 @@ public class GeometryRenderStage extends RenderStage {
             SceneEntity entity = (SceneEntity)node;
             Model model = entity.getModel();
 
-            m_entityUniform.setData(entity.getBufferData());
+            entityUniform.setData(entity.getBufferData());
 
-            m_graphicsContext.bindVertexArray(model.getVertexArray());
+            graphicsContext.bindVertexArray(model.getVertexArray());
             model.getMeshIterator().forEachRemaining((Mesh mesh) -> {
                 Material material = mesh.getMaterial();
-                m_materialUniform.setData(material.getBufferData());
+                materialUniform.setData(material.getBufferData());
 
                 if(material.getDiffuseTexture() != null) {
                     getShader().attachTexture("diffuseTexture", material.getDiffuseTexture());
@@ -81,26 +81,26 @@ public class GeometryRenderStage extends RenderStage {
                     getShader().attachTexture("highlightTexture", material.getSpecularHighlightTexture());
                 }
 
-                m_graphicsContext.bindShader(getShader());
-                m_graphicsContext.drawIndexed(mesh.getIndexBuffer());
+                graphicsContext.bindShader(getShader());
+                graphicsContext.drawIndexed(mesh.getIndexBuffer());
             });
         }
     }
 
     public Camera getCamera() {
-         return m_camera;
+         return camera;
     }
 
     public void setCamera(Camera camera) {
-        m_camera = camera;
+        this.camera = camera;
     }
 
     public SceneNode getSceneNode() {
-        return m_node;
+        return node;
     }
 
     public void setSceneNode(SceneNode node) {
-        m_node = node;
+        this.node = node;
     }
 
     public Texture getDiffuseTextureOutput() {

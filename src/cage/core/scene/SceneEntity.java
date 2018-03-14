@@ -10,21 +10,21 @@ import java.nio.FloatBuffer;
 public class SceneEntity extends SceneNode implements IBufferData {
 
     public static final int BUFFER_DATA_SIZE = 16;
-    public static final LayoutConfig BUFFER_LAYOUT = new LayoutConfig().float4x4();
+    public static final LayoutConfig BUFFER_LAYOUT = new LayoutConfig().mat4();
 
-    private Model m_model;
+    private Model model;
 
     public SceneEntity(Node parent, Model model) {
         super(parent);
-        m_model = model;
+        this.model = model;
     }
 
     public Model getModel() {
-        return m_model;
+        return model;
     }
 
     public void setModel(Model model) {
-        m_model = model;
+        this.model = model;
     }
 
     @Override

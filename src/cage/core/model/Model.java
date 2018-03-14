@@ -8,43 +8,43 @@ import java.util.List;
 
 public class Model {
 
-    private VertexArray m_vertexArray;
-    private List<Mesh> m_meshes;
+    private VertexArray vertexArray;
+    private List<Mesh> meshes;
 
     public Model(VertexArray vertexArray) {
-        m_vertexArray = vertexArray;
-        m_meshes = new ArrayList<>();
+        this.vertexArray = vertexArray;
+        this.meshes = new ArrayList<>();
     }
 
     public VertexArray getVertexArray() {
-        return m_vertexArray;
+        return vertexArray;
     }
 
     public void setVertexArray(VertexArray vertexArray) {
-        m_vertexArray = vertexArray;
+        this.vertexArray = vertexArray;
     }
 
     public int getMeshCount() {
-        return m_meshes.size();
+        return meshes.size();
     }
 
     public void attachMesh(Mesh mesh) {
-        m_meshes.add(mesh);
+        this.meshes.add(mesh);
     }
 
     public void detachMesh(Mesh mesh) {
-        m_meshes.remove(mesh);
+        this.meshes.remove(mesh);
     }
 
     public Iterator<Mesh> getMeshIterator() {
-        return m_meshes.iterator();
+        return meshes.iterator();
     }
 
     public boolean containsMesh(Mesh mesh) {
-        return m_meshes.contains(mesh);
+        return meshes.contains(mesh);
     }
 
     public Mesh getMesh(int index) {
-        return m_meshes.get(index);
+        return meshes.get(index);
     }
 }

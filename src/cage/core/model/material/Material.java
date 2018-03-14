@@ -13,86 +13,86 @@ public class Material implements IBufferData {
     public static final int BUFFER_DATA_SIZE = 12;
     public static final LayoutConfig BUFFER_LAYOUT = new LayoutConfig().float1().float1().float1().float1().float4().float4();
 
-    private Vector3f m_diffuse;
-    private Vector3f m_specular;
-    private float m_specularExp;
-    private Texture m_diffuseMap;
-    private Texture m_specularMap;
-    private Texture m_highlightMap;
-    private Texture m_normalMap;
+    private Vector3f diffuse;
+    private Vector3f specular;
+    private float specularExp;
+    private Texture diffuseMap;
+    private Texture specularMap;
+    private Texture highlightMap;
+    private Texture normalMap;
 
     public Material() {
-        m_diffuse = new Vector3f();
-        m_specular = new Vector3f();
-        m_specularExp = 0.0f;
-        m_diffuseMap = null;
-        m_specularMap = null;
-        m_highlightMap = null;
-        m_normalMap = null;
+        this.diffuse = new Vector3f();
+        this.specular = new Vector3f();
+        this.specularExp = 0.0f;
+        this.diffuseMap = null;
+        this.specularMap = null;
+        this.highlightMap = null;
+        this.normalMap = null;
     }
 
     public Vector3f getDiffuseColor() {
-        return new Vector3f(m_diffuse);
+        return new Vector3f(diffuse);
     }
 
     public Texture getDiffuseTexture() {
-        return m_diffuseMap;
+        return diffuseMap;
     }
 
     public void setDiffuse(Vector3f diffuse) {
-        m_diffuseMap = null;
-        m_diffuse = diffuse;
+        this.diffuseMap = null;
+        this.diffuse = diffuse;
     }
 
     public void setDiffuse(Texture diffuse) {
-        m_diffuseMap = diffuse;
+        this.diffuseMap = diffuse;
     }
 
     public Vector3f getSpecularColor() {
-        return new Vector3f(m_specular);
+        return new Vector3f(specular);
     }
 
     public float getSpecularExponent() {
-        return m_specularExp;
+        return specularExp;
     }
 
     public Texture getSpecularTexture() {
-        return m_specularMap;
+        return specularMap;
     }
 
     public Texture getSpecularHighlightTexture() {
-        return m_highlightMap;
+        return highlightMap;
     }
 
     public void setSpecular(Vector3f specular, float exponent) {
-        m_specularMap = null;
-        m_highlightMap = null;
-        m_specular = specular;
-        m_specularExp = exponent;
+        this.specularMap = null;
+        this.highlightMap = null;
+        this.specular = specular;
+        this.specularExp = exponent;
     }
 
     public void setSpecular(Texture specular, Texture highlight) {
-        m_specularMap = specular;
-        m_highlightMap = highlight;
+        this.specularMap = specular;
+        this.highlightMap = highlight;
     }
 
     public Texture getNormalTexture() {
-        return m_normalMap;
+        return normalMap;
     }
 
     public void setNormalTexture(Texture normal) {
-        m_normalMap = normal;
+        this.normalMap = normal;
     }
 
     @Override
     public FloatBuffer getBufferData() {
         FloatBuffer buffer = BufferUtils.createFloatBuffer(BUFFER_DATA_SIZE);
-        buffer.put(0, (m_diffuseMap == null ? 0.0f : 1.0f));
-        buffer.put(1, (m_specularMap == null ? 0.0f : 1.0f));
-        buffer.put(2, (m_normalMap == null ? 0.0f : 1.0f));
-        buffer.put(3, m_specularExp);
-        m_diffuse.get(4, buffer).put(7, 1.0f);
-        m_specular.get(8, buffer).put(11, 1.0f);
+        buffer.put(0, (diffuseMap == null ? 0.0f : 1.0f));
+        buffer.put(1, (specularMap == null ? 0.0f : 1.0f));
+        buffer.put(2, (normalMap == null ? 0.0f : 1.0f));
+        buffer.put(3, specularExp);
+        diffuse.get(4, buffer).put(7, 1.0f);
+        specular.get(8, buffer).put(11, 1.0f);
         buffer.rewind();
         return buffer;
     }

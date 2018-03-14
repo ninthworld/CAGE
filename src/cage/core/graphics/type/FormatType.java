@@ -13,5 +13,5 @@ public enum FormatType {
 
     DEPTH_16,
     DEPTH_32,
-    DEPTH_24_STENCIL_8;
+    DEPTH_24_STENCIL_8
 }

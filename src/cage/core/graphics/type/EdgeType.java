@@ -1,5 +1,5 @@
 package cage.core.graphics.type;
 
 public enum EdgeType {
-    WRAP, MIRROR, CLAMP, BORDER;
+    WRAP, MIRROR, CLAMP, BORDER
 }

@@ -15,72 +15,72 @@ import java.util.List;
 
 public class SceneManager extends SceneNode {
 
-    private GameWindow m_window;
-    private List<Camera> m_cameras;
-    private List<Light> m_lights;
-    private Camera m_defaultCamera;
-    private AmbientLight m_defaultAmbientLight;
+    private GameWindow window;
+    private List<Camera> cameras;
+    private List<Light> lights;
+    private Camera defaultCamera;
+    private AmbientLight defaultAmbientLight;
 
     public SceneManager(GameWindow window) {
         super(null);
-        m_window = window;
-        m_cameras = new ArrayList<>();
-        m_lights = new ArrayList<>();
-        m_defaultCamera = createPerspectiveCamera();
-        m_defaultAmbientLight = createAmbientLight();
-        m_defaultAmbientLight.setAmbientColor(0.1f, 0.1f, 0.1f);
+        this.window = window;
+        this.cameras = new ArrayList<>();
+        this.lights = new ArrayList<>();
+        this.defaultCamera = createPerspectiveCamera();
+        this.defaultAmbientLight = createAmbientLight();
+        this.defaultAmbientLight.setAmbientColor(0.1f, 0.1f, 0.1f);
     }
 
     public Camera getDefaultCamera() {
-        return m_defaultCamera;
+        return defaultCamera;
     }
 
     public AmbientLight getDefaultAmbientLight() {
-        return m_defaultAmbientLight;
+        return defaultAmbientLight;
     }
 
     public PerspectiveCamera createPerspectiveCamera() {
         PerspectiveCamera camera = new PerspectiveCamera(null);
-        camera.setAspectRatio((float)m_window.getWidth() / (float)m_window.getHeight());
+        camera.setAspectRatio((float)window.getWidth() / (float)window.getHeight());
         attachNode(camera);
-        m_cameras.add(camera);
+        cameras.add(camera);
         return camera;
     }
 
     public OrthographicCamera createOrthographicCamera() {
         OrthographicCamera camera = new OrthographicCamera(null);
         attachNode(camera);
-        m_cameras.add(camera);
+        cameras.add(camera);
         return camera;
     }
 
     public AmbientLight createAmbientLight() {
         AmbientLight light = new AmbientLight(null);
         attachNode(light);
-        m_lights.add(light);
+        lights.add(light);
         return light;
     }
 
     public PointLight createPointLight() {
         PointLight light = new PointLight(null);
         attachNode(light);
-        m_lights.add(light);
+        lights.add(light);
         return light;
     }
 
     public int getLightCount() {
-        return m_lights.size();
+        return lights.size();
     }
 
     public Iterator<Light> getLightIterator() {
-        return m_lights.iterator();
+        return lights.iterator();
     }
 
     public int getCameraCount() {
-        return m_cameras.size();
+        return cameras.size();
     }
 
     public Iterator<Camera> getCameraIterator() {
-        return m_cameras.iterator();
+        return cameras.iterator();
     }
 }

@@ -13,16 +13,18 @@ public interface IGraphicsDevice {
     Rasterizer createRasterizer();
     Blender createBlender();
 
-    Texture createTexture(int width, int height);
-    Texture createTexture(int width, int height, FormatType format);
-    Texture createTexture(int width, int height, boolean mipmapping);
-    Texture createTexture(int width, int height, FormatType format, boolean mipmapping);
+    Texture2D createTexture2D(int width, int height);
+    Texture2D createTexture2D(int width, int height, FormatType format);
+    Texture2D createTexture2D(int width, int height, boolean mipmapping);
+    Texture2D createTexture2D(int width, int height, FormatType format, boolean mipmapping);
 
-    Texture createTextureMS(int width, int height, int samples);
-    Texture createTextureMS(int width, int height, int samples, FormatType format);
+    /* TODO: Texture3D */
+
+    TextureMS createTextureMS(int width, int height, int samples);
+    TextureMS createTextureMS(int width, int height, int samples, FormatType format);
 
     Sampler createSampler();
-    RenderTarget createRenderTarget(int width, int height);
+    RenderTarget2D createRenderTarget2D(int width, int height);
     RenderTargetMS createRenderTargetMS(int width, int height, int samples);
     VertexArray createVertexArray();
 

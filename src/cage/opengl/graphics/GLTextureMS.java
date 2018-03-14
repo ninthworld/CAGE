@@ -12,7 +12,7 @@ import static org.lwjgl.opengl.GL32.*;
 
 public class GLTextureMS extends TextureMS implements IGLTexture {
 
-    private int m_textureId;
+    private int textureId;
 
     public GLTextureMS(int width, int height, int samples, FormatType format) {
         super(width, height, samples, format);
@@ -27,20 +27,20 @@ public class GLTextureMS extends TextureMS implements IGLTexture {
     private void generate() {
         int[] textures = new int[1];
         glGenTextures(textures);
-        m_textureId = textures[0];
+        textureId = textures[0];
         initialize();
     }
 
     @Override
     public void destroy() {
-        if(m_textureId > 0) {
-            glDeleteTextures(new int[]{ m_textureId });
+        if(textureId > 0) {
+            glDeleteTextures(new int[]{ textureId });
         }
     }
 
     @Override
     public void bind() {
-        glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_textureId);
+        glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureId);
     }
 
     @Override
@@ -52,9 +52,9 @@ public class GLTextureMS extends TextureMS implements IGLTexture {
         bind();
         glTexImage2DMultisample(
                 GL_TEXTURE_2D_MULTISAMPLE,
-                m_samples,
-                getGLInternalFormatType(m_format),
-                m_width, m_height, false);
+                getMultisampleCount(),
+                getGLInternalFormatType(getFormat()),
+                getWidth(), getHeight(), false);
         checkError("glTexImage2DMultisample");
         unbind();
     }
@@ -105,6 +105,6 @@ public class GLTextureMS extends TextureMS implements IGLTexture {
 
     @Override
     public int getTextureId() {
-        return m_textureId;
+        return textureId;
     }
 }

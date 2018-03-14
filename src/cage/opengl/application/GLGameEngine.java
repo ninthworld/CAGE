@@ -7,11 +7,11 @@ import cage.opengl.graphics.GLGraphicsDevice;
 
 public class GLGameEngine extends GameEngine {
 
-    private GameTimer m_timer;
+    private GameTimer timer;
 
     public GLGameEngine(GLGameWindow window) {
         super(window, new GLGraphicsDevice(window));
-        m_timer = createTimer();
+        this.timer = createTimer();
     }
 
     @Override
@@ -22,20 +22,20 @@ public class GLGameEngine extends GameEngine {
         int frames = 0;
         GameTimer fpsTimer = createTimer();
         double deltaTime;
-        while(!m_window.isClosed()) {
-            deltaTime = m_timer.getElapsed();
-            m_timer.reset();
+        while(!getWindow().isClosed()) {
+            deltaTime = timer.getElapsed();
+            timer.reset();
 
             game.update(this, deltaTime);
             getSceneManager().update();
             game.render(this);
             getRenderManager().render();
-            m_graphicsContext.swapBuffers();
+            getGraphicsContext().swapBuffers();
 
-            m_window.update();
+            getWindow().update();
 
             if(fpsTimer.getElapsed() > 1.0) {
-                m_fps = frames;
+                fps = frames;
                 frames = 0;
                 fpsTimer.reset();
             }
@@ -51,6 +51,6 @@ public class GLGameEngine extends GameEngine {
     }
 
     public void destroy() {
-        ((GLGraphicsDevice)m_graphicsDevice).destroy();
+        ((GLGraphicsDevice)getGraphicsDevice()).destroy();
     }
 }

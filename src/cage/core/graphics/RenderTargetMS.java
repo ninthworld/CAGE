@@ -1,25 +1,27 @@
 package cage.core.graphics;
 
+import java.util.Map;
+
 public abstract class RenderTargetMS extends RenderTarget<TextureMS> {
 
-    protected int m_samples;
+    private int samples;
 
-    protected RenderTargetMS(int width, int height, int samples) {
+    public RenderTargetMS(int width, int height, int samples) {
         super(width, height);
-        m_samples = samples;
+        this.samples = samples;
     }
 
     public int getMultisampleCount() {
-        return m_samples;
+        return samples;
     }
 
     public void setMultisampleCount(int samples) {
-        m_samples = samples;
-        m_colorTextures.forEach((Integer i, TextureMS t) -> {
-        	t.setMultisampleCount(m_samples);
+        this.samples = samples;
+        getColorTextureIterator().forEachRemaining((Map.Entry<Integer, TextureMS> entry) -> {
+        	entry.getValue().setMultisampleCount(samples);
         });
         if(containsDepthTexture()) {
-            m_depthTexture.setMultisampleCount(m_samples);
+            getDepthTexture().setMultisampleCount(samples);
         }
     }
 }

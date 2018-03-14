@@ -9,67 +9,67 @@ import static cage.core.graphics.type.LayoutType.*;
 
 public class LayoutConfig {
 
-    private int m_unitSize;
-    private List<LayoutType> m_layoutStack;
+    private List<LayoutType> layoutStack;
+    private int unitSize;
 
     public LayoutConfig(){
-        m_unitSize = 0;
-        m_layoutStack = new ArrayList<>();
+        this.unitSize = 0;
+        this.layoutStack = new ArrayList<>();
     }
 
     public LayoutConfig int1(){
-        m_unitSize += LayoutType.sizeof(INT1);
-        m_layoutStack.add(INT1);
+        this.unitSize += LayoutType.sizeof(INT1);
+        this.layoutStack.add(INT1);
         return this;
     }
 
     public LayoutConfig short1(){
-        m_unitSize += LayoutType.sizeof(SHORT1);
-        m_layoutStack.add(SHORT1);
+        this.unitSize += LayoutType.sizeof(SHORT1);
+        this.layoutStack.add(SHORT1);
         return this;
     }
 
     public LayoutConfig float1(){
-        m_unitSize += LayoutType.sizeof(FLOAT1);
-        m_layoutStack.add(FLOAT1);
+        this.unitSize += LayoutType.sizeof(FLOAT1);
+        this.layoutStack.add(FLOAT1);
         return this;
     }
 
     public LayoutConfig float2(){
-        m_unitSize += LayoutType.sizeof(FLOAT2);
-        m_layoutStack.add(FLOAT2);
+        this.unitSize += LayoutType.sizeof(FLOAT2);
+        this.layoutStack.add(FLOAT2);
         return this;
     }
 
     public LayoutConfig float3(){
-        m_unitSize += LayoutType.sizeof(FLOAT3);
-        m_layoutStack.add(FLOAT3);
+        this.unitSize += LayoutType.sizeof(FLOAT3);
+        this.layoutStack.add(FLOAT3);
         return this;
     }
 
     public LayoutConfig float4(){
-        m_unitSize += LayoutType.sizeof(FLOAT4);
-        m_layoutStack.add(FLOAT4);
+        this.unitSize += LayoutType.sizeof(FLOAT4);
+        this.layoutStack.add(FLOAT4);
         return this;
     }
 
-    public LayoutConfig float3x3(){
-        m_unitSize += LayoutType.sizeof(FLOAT3X3);
-        m_layoutStack.add(FLOAT3X3);
+    public LayoutConfig mat3(){
+        this.unitSize += LayoutType.sizeof(MAT3);
+        this.layoutStack.add(MAT3);
         return this;
     }
 
-    public LayoutConfig float4x4(){
-        m_unitSize += LayoutType.sizeof(FLOAT4X4);
-        m_layoutStack.add(FLOAT4X4);
+    public LayoutConfig mat4(){
+        this.unitSize += LayoutType.sizeof(MAT4);
+        this.layoutStack.add(MAT4);
         return this;
     }
 
     public List<LayoutType> getLayoutStack(){
-        return m_layoutStack;
+        return layoutStack;
     }
 
     public int getUnitSize(){
-        return m_unitSize;
+        return unitSize;
     }
 }

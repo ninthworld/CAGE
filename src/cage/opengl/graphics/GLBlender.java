@@ -23,18 +23,18 @@ public class GLBlender extends Blender implements IGLObject {
     public void bind() {
         glEnable(GL_BLEND);
 
-        if(m_alphaToCoverage) {
+        if(isAlphaToCoverage()) {
             glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE);
         }
 
-        glBlendEquationi(m_index, getGLBlendEquation(m_blendFunc));
-        glBlendFunci(m_index, getGLBlendType(m_blendSrc), getGLBlendType(m_blendDest));
-        glColorMaski(m_index, m_maskR, m_maskG, m_maskB, m_maskA);
+        glBlendEquationi(getDrawBufferIndex(), getGLBlendEquation(getBlendFunc()));
+        glBlendFunci(getDrawBufferIndex(), getGLBlendType(getBlendSrc()), getGLBlendType(getBlendDest()));
+        glColorMaski(getDrawBufferIndex(), isMaskingRed(), isMaskingGreen(), isMaskingBlue(), isMaskingAlpha());
     }
 
     @Override
     public void unbind() {
-        if(m_alphaToCoverage) {
+        if(isAlphaToCoverage()) {
             glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);
         }
 

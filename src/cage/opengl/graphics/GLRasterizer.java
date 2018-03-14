@@ -22,51 +22,51 @@ public class GLRasterizer extends Rasterizer implements IGLObject {
 
     	glEnable(GL_TEXTURE_2D);
     	
-        if(m_fill == FillType.SOLID) {
+        if(getFillType() == FillType.SOLID) {
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
-        else if(m_fill == FillType.WIREFRAME) {
+        else if(getFillType() == FillType.WIREFRAME) {
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         }
 
-        if(m_cull == CullType.NONE) {
+        if(getCullType() == CullType.NONE) {
             glDisable(GL_CULL_FACE);
         }
         else {
             glEnable(GL_CULL_FACE);
-            if(m_cull == CullType.BACK) {
+            if(getCullType() == CullType.BACK) {
                 glCullFace(GL_BACK);
             }
-            else if(m_cull == CullType.FRONT) {
+            else if(getCullType() == CullType.FRONT) {
                 glCullFace(GL_FRONT);
             }
-            else if(m_cull == CullType.FRONT_AND_BACK) {
+            else if(getCullType() == CullType.FRONT_AND_BACK) {
                 glCullFace(GL_FRONT_AND_BACK);
             }
         }
 
-        if(m_frontCCW) {
+        if(isFrontCCW()) {
             glFrontFace(GL_CCW);
         }
         else {
             glFrontFace(GL_CW);
         }
 
-        if(m_multisampling) {
+        if(isMultisampling()) {
             glEnable(GL_MULTISAMPLE);
         }
         else {
             glDisable(GL_MULTISAMPLE);
         }
 
-        if(m_scissoring) {
+        if(isScissoring()) {
             glEnable(GL_SCISSOR_TEST);
         }
         else {
             glDisable(GL_SCISSOR_TEST);
         }
 
-        if(m_depthClipping) {
+        if(isDepthClipping()) {
             glEnable(GL_DEPTH_TEST);
         }
         else {

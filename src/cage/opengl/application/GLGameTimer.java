@@ -12,6 +12,6 @@ public class GLGameTimer extends GameTimer {
 
     @Override
     public double getTime() {
-        return glfwGetTime() - m_startTime;
+        return glfwGetTime() - startTime;
     }
 }

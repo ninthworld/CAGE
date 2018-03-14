@@ -17,22 +17,22 @@ import static org.lwjgl.opengl.GL33.*;
 
 public class GLSampler extends Sampler implements IGLObject {
 
-    private int m_samplerId;
+    private int samplerId;
 
     public GLSampler() {
         super();
 
         int[] samplers = new int[1];
         glGenSamplers(samplers);
-        m_samplerId = samplers[0];
+        this.samplerId = samplers[0];
 
         initialize();
     }
 
     @Override
     public void destroy() {
-        if(m_samplerId > 0) {
-            glDeleteSamplers(new int[]{ m_samplerId });
+        if(samplerId > 0) {
+            glDeleteSamplers(new int[]{ samplerId });
         }
     }
 
@@ -45,39 +45,39 @@ public class GLSampler extends Sampler implements IGLObject {
     }
 
     public void initialize() {
-        glSamplerParameteri(m_samplerId, GL_TEXTURE_WRAP_S, getGLEdgeType(m_edgeU));
-        glSamplerParameteri(m_samplerId, GL_TEXTURE_WRAP_T, getGLEdgeType(m_edgeV));
-        glSamplerParameteri(m_samplerId, GL_TEXTURE_WRAP_R, getGLEdgeType(m_edgeW));
+        glSamplerParameteri(samplerId, GL_TEXTURE_WRAP_S, getGLEdgeType(getEdgeU()));
+        glSamplerParameteri(samplerId, GL_TEXTURE_WRAP_T, getGLEdgeType(getEdgeV()));
+        glSamplerParameteri(samplerId, GL_TEXTURE_WRAP_R, getGLEdgeType(getEdgeW()));
 
-        if(m_mipmapping) {
-            glSamplerParameteri(m_samplerId, GL_TEXTURE_MIN_FILTER, getGLFilterType(m_min, m_mipmap));
-            glSamplerParameteri(m_samplerId, GL_TEXTURE_MAG_FILTER, getGLFilterType(m_mag, m_mipmap));
+        if(isMipmapping()) {
+            glSamplerParameteri(samplerId, GL_TEXTURE_MIN_FILTER, getGLFilterType(getFilterMin(), getFilterMipmap()));
+            glSamplerParameteri(samplerId, GL_TEXTURE_MAG_FILTER, getGLFilterType(getFilterMag(), getFilterMipmap()));
 
-            glSamplerParameterf(m_samplerId, GL_TEXTURE_MIN_LOD, m_minLod);
-            glSamplerParameterf(m_samplerId, GL_TEXTURE_MAX_LOD, m_maxLod);
-            glSamplerParameterf(m_samplerId, GL_TEXTURE_LOD_BIAS, m_biasLod);
+            glSamplerParameterf(samplerId, GL_TEXTURE_MIN_LOD, getMipmapMinLOD());
+            glSamplerParameterf(samplerId, GL_TEXTURE_MAX_LOD, getMipmapMaxLOD());
+            glSamplerParameterf(samplerId, GL_TEXTURE_LOD_BIAS, getMipmapBiasLOD());
         }
         else {
-            glSamplerParameteri(m_samplerId, GL_TEXTURE_MIN_FILTER, getGLFilterType(m_min));
-            glSamplerParameteri(m_samplerId, GL_TEXTURE_MAG_FILTER, getGLFilterType(m_mag));
+            glSamplerParameteri(samplerId, GL_TEXTURE_MIN_FILTER, getGLFilterType(getFilterMin()));
+            glSamplerParameteri(samplerId, GL_TEXTURE_MAG_FILTER, getGLFilterType(getFilterMag()));
         }
 
-        if(m_anisotropy) {
-            glSamplerParameterf(m_samplerId, GL_TEXTURE_MAX_ANISOTROPY_EXT, m_maxAnisotropy);
+        if(isAnisotropy()) {
+            glSamplerParameterf(samplerId, GL_TEXTURE_MAX_ANISOTROPY_EXT, getMaxAnisotropy());
         }
 
-        if(m_compare) {
-            glSamplerParameteri(m_samplerId, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
-            glSamplerParameteri(m_samplerId, GL_TEXTURE_COMPARE_FUNC, getGLCompareType(m_compareFunc));
+        if(isCompare()) {
+            glSamplerParameteri(samplerId, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+            glSamplerParameteri(samplerId, GL_TEXTURE_COMPARE_FUNC, getGLCompareType(getCompareFunc()));
         }
 
         float[] borderColor = new float[]{
-                m_border.getRed() / 255.0f,
-                m_border.getGreen() / 255.0f,
-                m_border.getBlue() / 255.0f,
-                m_border.getAlpha() / 255.0f
+                getBorderColor().getRed() / 255.0f,
+                getBorderColor().getGreen() / 255.0f,
+                getBorderColor().getBlue() / 255.0f,
+                getBorderColor().getAlpha() / 255.0f
         };
-        glSamplerParameterfv(m_samplerId, GL_TEXTURE_BORDER_COLOR, borderColor);
+        glSamplerParameterfv(samplerId, GL_TEXTURE_BORDER_COLOR, borderColor);
     }
 
     @Override
@@ -171,6 +171,6 @@ public class GLSampler extends Sampler implements IGLObject {
     }
 
     public int getSamplerId(){
-        return m_samplerId;
+        return samplerId;
     }
 }

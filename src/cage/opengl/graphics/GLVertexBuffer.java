@@ -9,26 +9,26 @@ import static org.lwjgl.opengl.GL15.*;
 
 public class GLVertexBuffer extends VertexBuffer implements IGLBuffer {
 
-    private int m_bufferId;
+    private int bufferId;
 
     public GLVertexBuffer() {
         super();
 
         int[] buffers = new int[1];
         glGenBuffers(buffers);
-        m_bufferId = buffers[0];
+        this.bufferId = buffers[0];
     }
 
     @Override
     public void destroy() {
-        if(m_bufferId > 0) {
-            glDeleteBuffers(new int[]{ m_bufferId });
+        if(bufferId > 0) {
+            glDeleteBuffers(new int[]{ bufferId });
         }
     }
 
     @Override
     public void bind() {
-        glBindBuffer(GL_ARRAY_BUFFER, m_bufferId);
+        glBindBuffer(GL_ARRAY_BUFFER, bufferId);
     }
 
     @Override
@@ -38,7 +38,7 @@ public class GLVertexBuffer extends VertexBuffer implements IGLBuffer {
 
     @Override
     public int getBufferId() {
-        return m_bufferId;
+        return bufferId;
     }
 
     @Override

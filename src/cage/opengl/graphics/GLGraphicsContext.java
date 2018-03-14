@@ -19,18 +19,18 @@ import static org.lwjgl.opengl.GL40.*;
 
 public class GLGraphicsContext implements IGraphicsContext {
 
-    private GLGameWindow m_window;
-    private int m_primitive;
-    private int m_patchSize;
-    private int m_boundFBOId;
-    private int m_boundShaderId;
+    private GLGameWindow window;
+    private int primitive;
+    private int patchSize;
+    private int boundFBOId;
+    private int boundShaderId;
 
     public GLGraphicsContext(GLGameWindow window) {
-        m_window = window;
-        m_primitive = GL_TRIANGLES;
-        m_patchSize = 1;
-        m_boundFBOId = 0;
-        m_boundShaderId = 0;
+		this.window = window;
+		this.primitive = GL_TRIANGLES;
+		this.patchSize = 1;
+		this.boundFBOId = 0;
+		this.boundShaderId = 0;
         setClearColor(new Color(0, 0, 0, 255));
     }
 
@@ -41,11 +41,11 @@ public class GLGraphicsContext implements IGraphicsContext {
 
 	@Override
 	public void draw(int vertexCount, int startIndex) {
-		if(m_primitive == GL_PATCHES) {
-			glPatchParameteri(GL_PATCH_VERTICES, m_patchSize);
+		if(primitive == GL_PATCHES) {
+			glPatchParameteri(GL_PATCH_VERTICES, patchSize);
 		}
 		
-		glDrawArrays(m_primitive, startIndex, vertexCount);
+		glDrawArrays(primitive, startIndex, vertexCount);
 		checkError("glDrawArrays");
 	}
 
@@ -56,15 +56,15 @@ public class GLGraphicsContext implements IGraphicsContext {
 
 	@Override
 	public void drawIndexed(IndexBuffer indexBuffer, int indexCount, int startIndex) {
-		if(m_primitive == GL_PATCHES) {
-			glPatchParameteri(GL_PATCH_VERTICES, m_patchSize);
+		if(primitive == GL_PATCHES) {
+			glPatchParameteri(GL_PATCH_VERTICES, patchSize);
 		}
 		
 		if(indexBuffer instanceof GLIndexBuffer) {
 			GLIndexBuffer glBuffer = (GLIndexBuffer)indexBuffer;
 			glBuffer.bind();
 			glDrawElements(
-					m_primitive, indexCount,
+					primitive, indexCount,
                     GL_UNSIGNED_INT, // FIX ME
 					startIndex);
 			checkError("glDrawElements");
@@ -79,11 +79,11 @@ public class GLGraphicsContext implements IGraphicsContext {
 
 	@Override
 	public void drawInstanced(int instances, int vertexCount, int startIndex) {
-		if(m_primitive == GL_PATCHES) {
-			glPatchParameteri(GL_PATCH_VERTICES, m_patchSize);
+		if(primitive == GL_PATCHES) {
+			glPatchParameteri(GL_PATCH_VERTICES, patchSize);
 		}
 		
-		glDrawArraysInstanced(m_primitive, startIndex, vertexCount, instances);
+		glDrawArraysInstanced(primitive, startIndex, vertexCount, instances);
 		checkError("glDrawArraysInstanced");
 	}
 
@@ -94,15 +94,15 @@ public class GLGraphicsContext implements IGraphicsContext {
 
 	@Override
 	public void drawIndexedInstanced(int instances, IndexBuffer indexBuffer, int indexCount, int startIndex) {
-		if(m_primitive == GL_PATCHES) {
-			glPatchParameteri(GL_PATCH_VERTICES, m_patchSize);
+		if(primitive == GL_PATCHES) {
+			glPatchParameteri(GL_PATCH_VERTICES, patchSize);
 		}
 		
 		if(indexBuffer instanceof GLIndexBuffer) {
 			GLIndexBuffer glBuffer = (GLIndexBuffer)indexBuffer;
 			glBuffer.bind();
 			glDrawElementsInstanced(
-					m_primitive, indexCount,
+					primitive, indexCount,
                     GL_UNSIGNED_INT, // FIX ME
 					startIndex, instances);
 			checkError("glDrawElements");
@@ -112,14 +112,14 @@ public class GLGraphicsContext implements IGraphicsContext {
 	
     @Override
     public void swapBuffers() {
-        glfwSwapBuffers(m_window.getHandle());
+        glfwSwapBuffers(window.getHandle());
     }
 
     @Override
     public void bindBackBuffer() {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        setViewport(new Rectangle(0, 0, m_window.getWidth(), m_window.getHeight()));
-        m_boundFBOId = 0;
+        setViewport(new Rectangle(0, 0, window.getWidth(), window.getHeight()));
+        boundFBOId = 0;
     }
 
     @Override
@@ -132,7 +132,7 @@ public class GLGraphicsContext implements IGraphicsContext {
         resolveToBackBuffer(
                 renderTarget,
                 new Rectangle(0, 0, renderTarget.getWidth(), renderTarget.getHeight()),
-                new Rectangle(0, 0, m_window.getWidth(), m_window.getHeight()));
+                new Rectangle(0, 0, window.getWidth(), window.getHeight()));
     }
 
 	@Override
@@ -150,7 +150,7 @@ public class GLGraphicsContext implements IGraphicsContext {
 	                GL_NEAREST);
 	        checkError("glBlitFramebuffer");
 	
-	        glBindFramebuffer(GL_FRAMEBUFFER, m_boundFBOId);
+	        glBindFramebuffer(GL_FRAMEBUFFER, boundFBOId);
 		}
 	}
 
@@ -180,7 +180,7 @@ public class GLGraphicsContext implements IGraphicsContext {
 	            checkError("glBlitFramebuffer");
 	        });
 
-	        glBindFramebuffer(GL_FRAMEBUFFER, m_boundFBOId);
+	        glBindFramebuffer(GL_FRAMEBUFFER, boundFBOId);
 		}
 	}
 
@@ -203,7 +203,7 @@ public class GLGraphicsContext implements IGraphicsContext {
         if(renderTarget instanceof IGLRenderTarget) {
             ((IGLRenderTarget) renderTarget).bind();
             setViewport(new Rectangle(0, 0, renderTarget.getWidth(), renderTarget.getHeight()));
-            m_boundFBOId = ((IGLRenderTarget) renderTarget).getFramebufferId();
+            boundFBOId = ((IGLRenderTarget) renderTarget).getFramebufferId();
         }
 	}
 
@@ -211,9 +211,9 @@ public class GLGraphicsContext implements IGraphicsContext {
 	public void bindShader(Shader shader) {
 		if(shader instanceof GLShader) {
 			GLShader glShader = (GLShader)shader;
-			if(glShader.getProgramId() != m_boundShaderId) {
+			if(glShader.getProgramId() != boundShaderId) {
                 glShader.bind();
-                m_boundShaderId = glShader.getProgramId();
+                boundShaderId = glShader.getProgramId();
             }
             glShader.bindTextures();
 		}
@@ -239,7 +239,7 @@ public class GLGraphicsContext implements IGraphicsContext {
 		if(shader instanceof GLShader) {
 			GLShader glShader = (GLShader)shader;
 			glShader.unbind();
-            m_boundShaderId = 0;
+            boundShaderId = 0;
 		}
 	}
 
@@ -268,18 +268,18 @@ public class GLGraphicsContext implements IGraphicsContext {
     @Override
     public void setPrimitive(PrimitiveType primitive) {
         switch(primitive) {
-            case POINTS: m_primitive = GL_POINTS; break;
-            case LINES: m_primitive = GL_LINES; break;
-            case LINE_STRIP: m_primitive = GL_LINE_STRIP; break;
-            case TRIANGLES: m_primitive = GL_TRIANGLES; break;
-            case TRIANGLE_STRIP: m_primitive = GL_TRIANGLE_STRIP; break;
-            case PATCHES: m_primitive = GL_PATCHES; break;
+            case POINTS: this.primitive = GL_POINTS; break;
+            case LINES: this.primitive = GL_LINES; break;
+            case LINE_STRIP: this.primitive = GL_LINE_STRIP; break;
+            case TRIANGLES: this.primitive = GL_TRIANGLES; break;
+            case TRIANGLE_STRIP: this.primitive = GL_TRIANGLE_STRIP; break;
+            case PATCHES: this.primitive = GL_PATCHES; break;
         }
     }
     
     @Override
     public void setPrimitive(PrimitiveType primitive, int patchSize) {
-    	m_patchSize = patchSize;
+		this.patchSize = patchSize;
     	setPrimitive(primitive);
     }
 }

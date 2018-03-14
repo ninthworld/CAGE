@@ -8,52 +8,52 @@ import cage.core.scene.SceneManager;
 
 public abstract class GameEngine {
 
-    protected GameWindow m_window;
-    protected IGraphicsDevice m_graphicsDevice;
-    protected IGraphicsContext m_graphicsContext;
-    protected AssetManager m_assetManager;
-    protected SceneManager m_sceneManager;
-    protected RenderManager m_renderManager;
-    protected int m_fps;
+    private GameWindow window;
+    private IGraphicsDevice graphicsDevice;
+    private IGraphicsContext graphicsContext;
+    private AssetManager assetManager;
+    private SceneManager sceneManager;
+    private RenderManager renderManager;
+    protected int fps;
 
-    protected GameEngine(GameWindow window, IGraphicsDevice graphicsDevice) {
-        m_window = window;
-        m_graphicsDevice = graphicsDevice;
-        m_graphicsContext = graphicsDevice.getGraphicsContext();
-        m_assetManager = new AssetManager(m_graphicsDevice);
-        m_sceneManager = new SceneManager(m_window);
-        m_renderManager = new RenderManager(m_graphicsDevice, m_graphicsContext, m_window, m_sceneManager, m_assetManager);
-        m_fps = 0;
+    public GameEngine(GameWindow window, IGraphicsDevice graphicsDevice) {
+        this.window = window;
+        this.graphicsDevice = graphicsDevice;
+        this.graphicsContext = graphicsDevice.getGraphicsContext();
+        this.assetManager = new AssetManager(graphicsDevice);
+        this.sceneManager = new SceneManager(window);
+        this.renderManager = new RenderManager(this.graphicsDevice, this.graphicsContext, this.window, this.sceneManager, this.assetManager);
+        this.fps = 0;
     }
 
     public abstract void run(IGame game);
 
     public GameWindow getWindow() {
-        return m_window;
+        return window;
     }
 
     public IGraphicsDevice getGraphicsDevice() {
-        return m_graphicsDevice;
+        return graphicsDevice;
     }
 
     public IGraphicsContext getGraphicsContext() {
-        return m_graphicsContext;
+        return graphicsContext;
     }
 
     public AssetManager getAssetManager() {
-        return m_assetManager;
+        return assetManager;
     }
 
     public SceneManager getSceneManager() {
-        return m_sceneManager;
+        return sceneManager;
     }
 
     public RenderManager getRenderManager() {
-        return m_renderManager;
+        return renderManager;
     }
 
     public int getFPS() {
-        return m_fps;
+        return fps;
     }
 
     public abstract GameTimer createTimer();

@@ -38,24 +38,24 @@ public class AssetManager {
 
     public static final String ASSETS_ROOT_DIR = "assets/";
 
-    private IGraphicsDevice m_graphicsDevice;
-    private Path m_assetsDir;
-    private Map<String, Texture> m_textures;
-    private Shader m_defaultGeometryShader;
-    private Shader m_defaultLightingShader;
+    private IGraphicsDevice graphicsDevice;
+    private Path assetsDir;
+    private Map<String, Texture> textures;
+    private Shader defaultGeometryShader;
+    private Shader defaultLightingShader;
 
     public AssetManager(IGraphicsDevice graphicsDevice) {
-        m_graphicsDevice = graphicsDevice;
-        m_assetsDir = Paths.get(ASSETS_ROOT_DIR);
-        m_textures = new HashMap<>();
-        m_defaultGeometryShader = loadShader("geometry/defaultGeometry.vs.glsl", "geometry/defaultGeometry.fs.glsl");
-        m_defaultLightingShader = loadShader("fx/defaultFX.vs.glsl", "fx/defaultLighting.fs.glsl");
+        this.graphicsDevice = graphicsDevice;
+        this.assetsDir = Paths.get(ASSETS_ROOT_DIR);
+        this.textures = new HashMap<>();
+        this.defaultGeometryShader = loadShader("geometry/defaultGeometry.vs.glsl", "geometry/defaultGeometry.fs.glsl");
+        this.defaultLightingShader = loadShader("fx/defaultFX.vs.glsl", "fx/defaultLighting.fs.glsl");
     }
 
     public Model loadOBJModel(String file) {
     	try {
         	Build builder = new Build();
-        	Parse obj = new Parse(builder, m_assetsDir.resolve("models/").resolve(file).toString());    	
+        	Parse obj = new Parse(builder, assetsDir.resolve("models/").resolve(file).toString());    	
         	
         	HashMap<FaceVertex, Integer> indexMap = new HashMap<>();
         	ArrayList<FaceVertex> faceVertices = new ArrayList<>();
@@ -114,16 +114,16 @@ public class AssetManager {
         	}
         	indices.flip();
 
-            VertexBuffer vertexBuffer = m_graphicsDevice.createVertexBuffer();
+            VertexBuffer vertexBuffer = graphicsDevice.createVertexBuffer();
             vertexBuffer.setLayout(new LayoutConfig().float3().float2().float3().float3());
             vertexBuffer.setUnitCount(index);
             vertexBuffer.setData(vertices);
             
-        	IndexBuffer indexBuffer = m_graphicsDevice.createIndexBuffer();
+        	IndexBuffer indexBuffer = graphicsDevice.createIndexBuffer();
         	indexBuffer.setUnitCount(builder.faces.size() * 3);
         	indexBuffer.setData(indices);
 
-        	VertexArray vertexArray = m_graphicsDevice.createVertexArray();
+        	VertexArray vertexArray = graphicsDevice.createVertexArray();
             vertexArray.attachVertexBuffer(vertexBuffer);
 
             // TODO: Temp Code
@@ -145,18 +145,18 @@ public class AssetManager {
     }
 
     public Shader loadShader(String vertexFile, String fragmentFile) {
-        Shader shader = m_graphicsDevice.createShader();
+        Shader shader = graphicsDevice.createShader();
 
         try {
             String line;
 
-            BufferedReader vertexReader = Files.newBufferedReader(m_assetsDir.resolve("shaders/").resolve(vertexFile));
+            BufferedReader vertexReader = Files.newBufferedReader(assetsDir.resolve("shaders/").resolve(vertexFile));
             StringBuilder vertexShaderSrc = new StringBuilder();
             while ((line = vertexReader.readLine()) != null) {
                 vertexShaderSrc.append(line).append("\n");
             }
 
-            BufferedReader fragmentReader = Files.newBufferedReader(m_assetsDir.resolve("shaders/").resolve(fragmentFile));
+            BufferedReader fragmentReader = Files.newBufferedReader(assetsDir.resolve("shaders/").resolve(fragmentFile));
             StringBuilder fragmentShaderSrc = new StringBuilder();
             while ((line = fragmentReader.readLine()) != null) {
                 fragmentShaderSrc.append(line).append("\n");
@@ -173,8 +173,8 @@ public class AssetManager {
     }
 
     public Texture loadTexture(String file) {
-        if(m_textures.containsKey(file)) {
-            return m_textures.get(file);
+        if(textures.containsKey(file)) {
+            return textures.get(file);
         }
         else {
             return null;
@@ -182,10 +182,10 @@ public class AssetManager {
     }
 
     public Shader getDefaultGeometryShader() {
-        return m_defaultGeometryShader;
+        return defaultGeometryShader;
     }
 
     public Shader getDefaultLightingShader() {
-        return m_defaultLightingShader;
+        return defaultLightingShader;
     }
 }

@@ -4,24 +4,24 @@ import cage.core.graphics.type.FormatType;
 
 public abstract class TextureMS extends Texture {
 
-    protected int m_samples;
+    private int samples;
 
-    protected TextureMS(int width, int height, int samples, FormatType format) {
+    public TextureMS(int width, int height, int samples, FormatType format) {
         super(width, height, format);
-        m_samples = samples;
+        this.samples = samples;
     }
 
-    protected TextureMS(int width, int height, int samples) {
+    public TextureMS(int width, int height, int samples) {
         super(width, height);
-        m_samples = samples;
+        this.samples = samples;
     }
 
     public int getMultisampleCount() {
-        return m_samples;
+        return samples;
     }
 
     public void setMultisampleCount(int samples) {
-        m_samples = samples;
+        this.samples = samples;
     }
 
     public void setSampler(Sampler sampler) {

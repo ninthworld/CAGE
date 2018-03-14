@@ -10,23 +10,23 @@ import java.util.logging.Logger;
 
 public class GLBootstrap {
 
-    private String m_title;
-    private int m_width;
-    private int m_height;
-    private int m_samples;
+    private String title;
+    private int width;
+    private int height;
+    private int samples;
 
     public GLBootstrap(String title, int width, int height) {
-        m_title = title;
-        m_width = width;
-        m_height = height;
-        m_samples = 1;
+        this.title = title;
+        this.width = width;
+        this.height = height;
+        this.samples = 1;
     }
 
     public GLBootstrap(String title, int width, int height, int samples) {
-        m_title = title;
-        m_width = width;
-        m_height = height;
-        m_samples = samples;
+        this.title = title;
+        this.width = width;
+        this.height = height;
+        this.samples = samples;
     }
 
     public void run(GLGameConstructor app) {
@@ -35,7 +35,7 @@ public class GLBootstrap {
         GLGameEngine engine = null;
         IGame game = null;
         try {
-            window = new GLGameWindow(m_title, m_width, m_height, m_samples);
+            window = new GLGameWindow(title, width, height, samples);
             engine = new GLGameEngine(window);
             game = app.game(engine);
             engine.run(game);

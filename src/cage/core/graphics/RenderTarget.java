@@ -7,75 +7,79 @@ import java.util.function.BiConsumer;
 
 public abstract class RenderTarget<T extends Texture> {
 
-    protected Map<Integer, T> m_colorTextures;
-    protected T m_depthTexture;
-    protected int m_width;
-    protected int m_height;
+    private Map<Integer, T> colorTextures;
+    private T depthTexture;
+    private int width;
+    private int height;
 
-    protected RenderTarget(int width, int height) {
-        m_colorTextures = new HashMap<>();
-        m_depthTexture = null;
-        m_width = width;
-        m_height = height;
+    public RenderTarget(int width, int height) {
+        this.colorTextures = new HashMap<>();
+        this.depthTexture = null;
+        this.width = width;
+        this.height = height;
     }
 
     public int getWidth() {
-        return m_width;
+        return width;
     }
 
     public void setWidth(int width) {
-        m_width = width;
-        m_colorTextures.forEach((Integer i, T t) -> t.setWidth(m_width));
+        this.width = width;
+        colorTextures.forEach((Integer i, T t) -> t.setWidth(width));
         if(containsDepthTexture()) {
-            m_depthTexture.setWidth(m_width);
+            depthTexture.setWidth(width);
         }
     }
 
     public int getHeight() {
-        return m_height;
+        return height;
     }
 
     public void setHeight(int height) {
-        m_height = height;
-        m_colorTextures.forEach((Integer i, T t) -> t.setHeight(m_height));
+        this.height = height;
+        colorTextures.forEach((Integer i, T t) -> t.setHeight(height));
         if(containsDepthTexture()) {
-            m_depthTexture.setHeight(m_height);
+            depthTexture.setHeight(height);
         }
     }
 
+    public int getColorTextureCount() {
+        return colorTextures.size();
+    }
+
     public void attachColorTexture(int index, T colorTexture) {
-        m_colorTextures.put(index, colorTexture);
+        colorTextures.put(index, colorTexture);
     }
 
     public void detachColorTexture(int index) {
-        m_colorTextures.remove(index);
+        colorTextures.remove(index);
     }
 
     public Iterator<Map.Entry<Integer, T>> getColorTextureIterator() {
-        return m_colorTextures.entrySet().iterator();
+        return colorTextures.entrySet().iterator();
     }
 
     public boolean containsColorTexture(int index) {
-        return m_colorTextures.containsKey(index);
+        return colorTextures.containsKey(index);
     }
 
-    public Texture getColorTexture(int index) {
-        return m_colorTextures.get(index);
+    public T getColorTexture(int index) {
+        return colorTextures.get(index);
     }
 
     public void attachDepthTexture(T depthTexture) {
-        m_depthTexture = depthTexture;
+        this.depthTexture = depthTexture;
     }
 
     public void detachDepthTexture(T depthTexture) {
-        m_depthTexture = null;
+        this.depthTexture = null;
     }
 
     public boolean containsDepthTexture() {
-        return m_depthTexture != null;
+        return depthTexture != null;
     }
 
-    public Texture getDepthTexture() {
-        return m_depthTexture;
+    public T getDepthTexture() {
+        return depthTexture;
     }
 }

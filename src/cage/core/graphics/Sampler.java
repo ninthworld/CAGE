@@ -8,153 +8,153 @@ import java.awt.*;
 
 public abstract class Sampler {
 
-    protected EdgeType m_edgeU;
-    protected EdgeType m_edgeV;
-    protected EdgeType m_edgeW;
-    protected FilterType m_min;
-    protected FilterType m_mag;
-    protected boolean m_mipmapping;
-    protected FilterType m_mipmap;
-    protected float m_minLod;
-    protected float m_maxLod;
-    protected float m_biasLod;
-    protected boolean m_anisotropy;
-    protected int m_maxAnisotropy;
-    protected boolean m_compare;
-    protected CompareType m_compareFunc;
-    protected Color m_border;
+    private EdgeType edgeU;
+    private EdgeType edgeV;
+    private EdgeType edgeW;
+    private FilterType min;
+    private FilterType mag;
+    private boolean mipmapping;
+    private FilterType mipmap;
+    private float minLod;
+    private float maxLod;
+    private float biasLod;
+    private boolean anisotropy;
+    private int maxAnisotropy;
+    private boolean compare;
+    private CompareType compareFunc;
+    private Color border;
 
-    protected Sampler() {
-        m_edgeU = m_edgeV = m_edgeW = EdgeType.CLAMP;
-        m_min = m_mag = m_mipmap = FilterType.LINEAR;
-        m_mipmapping = false;
-        m_minLod = Float.MIN_VALUE;
-        m_maxLod = Float.MAX_VALUE;
-        m_biasLod = 0.0f;
-        m_anisotropy = false;
-        m_maxAnisotropy = 1;
-        m_compare = false;
-        m_compareFunc = CompareType.NEVER;
-        m_border = Color.WHITE;
+    public Sampler() {
+        this.edgeU = this.edgeV = this.edgeW = EdgeType.CLAMP;
+        this.min = this.mag = this.mipmap = FilterType.LINEAR;
+        this.mipmapping = false;
+        this.minLod = Float.MIN_VALUE;
+        this.maxLod = Float.MAX_VALUE;
+        this.biasLod = 0.0f;
+        this.anisotropy = false;
+        this.maxAnisotropy = 1;
+        this.compare = false;
+        this.compareFunc = CompareType.NEVER;
+        this.border = Color.WHITE;
     }
 
     public EdgeType getEdgeU() {
-        return m_edgeU;
+        return edgeU;
     }
 
     public void setEdgeU(EdgeType edge) {
-        m_edgeU = edge;
+        this.edgeU = edge;
     }
     
     public EdgeType getEdgeV() {
-        return m_edgeV;
+        return edgeV;
     }
 
     public void setEdgeV(EdgeType edge) {
-        m_edgeV = edge;
+        this.edgeV = edge;
     }
     
     public EdgeType getEdgeW() {
-        return m_edgeW;
+        return edgeW;
     }
 
     public void setEdgeW(EdgeType edge) {
-        m_edgeW = edge;
+        this.edgeW = edge;
     }
     
     public FilterType getFilterMin() {
-        return m_min;
+        return min;
     }
 
     public void setFilterMin(FilterType filter) {
-        m_min = filter;
+        this.min = filter;
     }
     
     public FilterType getFilterMag() {
-        return m_mag;
+        return mag;
     }
 
     public void setFilterMag(FilterType filter) {
-        m_mag = filter;
+        this.mag = filter;
     }
 
     public boolean isMipmapping() {
-        return m_mipmapping;
+        return mipmapping;
     }
 
     public void setMipmapping(boolean mipmapping) {
-        m_mipmapping = mipmapping;
+        this.mipmapping = mipmapping;
     }
     
     public FilterType getFilterMipmap() {
-        return m_mipmap;
+        return mipmap;
     }
 
     public void setFilterMipmap(FilterType mipmap) {
-        m_mipmap = mipmap;
+        this.mipmap = mipmap;
     }
     
     public float getMipmapMinLOD() {
-        return m_minLod;
+        return minLod;
     }
 
     public void setMipmapMinLOD(float minLod) {
-        m_minLod = minLod;
+        this.minLod = minLod;
     }
     
     public float getMipmapMaxLOD() {
-        return m_maxLod;
+        return maxLod;
     }
 
     public void setMipmapMaxLOD(float maxLod) {
-        m_maxLod = maxLod;
+        this.maxLod = maxLod;
     }
     
     public float getMipmapBiasLOD() {
-        return m_biasLod;
+        return biasLod;
     }
 
     public void setMipmapBiasLOD(float biasLod) {
-        m_biasLod = biasLod;
+        this.biasLod = biasLod;
     }
     
     public boolean isAnisotropy() {
-        return m_anisotropy;
+        return anisotropy;
     }
 
     public void setAnisotropy(boolean anisotropy) {
-        m_anisotropy = anisotropy;
+        this.anisotropy = anisotropy;
     }
     
     public int getMaxAnisotropy() {
-        return m_maxAnisotropy;
+        return maxAnisotropy;
     }
 
     public void setMaxAnisotropy(int maxAnisotropy) {
-        m_maxAnisotropy = maxAnisotropy;
+        this.maxAnisotropy = maxAnisotropy;
     }
     
     public boolean isCompare() {
-        return m_compare;
+        return compare;
     }
 
     public void setCompare(boolean compare) {
-        m_compare = compare;
+        this.compare = compare;
     }
     
     public CompareType getCompareFunc() {
-        return m_compareFunc;
+        return compareFunc;
     }
 
     public void setCompareFunc(CompareType compareFunc) {
-        m_compareFunc = compareFunc;
+        this.compareFunc = compareFunc;
     }
     
     public Color getBorderColor() {
-        return m_border;
+        return border;
     }
 
     public void setBorderColor(Color border) {
-        m_border = border;
+        this.border = border;
     }
 }

@@ -6,70 +6,70 @@ import java.nio.*;
 
 public abstract class Texture {
 
-    protected int m_width;
-    protected int m_height;
-    protected FormatType m_format;
-    protected boolean m_mipmapping;
-    protected Sampler m_sampler;
+    private int width;
+    private int height;
+    private FormatType format;
+    private boolean mipmapping;
+    private Sampler sampler;
 
-    protected Texture(int width, int height, FormatType format, boolean mipmapping) {
-        m_width = width;
-        m_height = height;
-        m_format = format;
-        m_mipmapping = mipmapping;
-        m_sampler = null;
+    public Texture(int width, int height, FormatType format, boolean mipmapping) {
+        this.width = width;
+        this.height = height;
+        this.format = format;
+        this.mipmapping = mipmapping;
+        this.sampler = null;
     }
 
-    protected Texture(int width, int height, FormatType format) {
+    public Texture(int width, int height, FormatType format) {
         this(width, height, format, false);
     }
 
-    protected Texture(int width, int height, boolean mipmapping) {
+    public Texture(int width, int height, boolean mipmapping) {
         this(width, height, FormatType.RGBA_8_UNORM, mipmapping);
     }
 
-    protected Texture(int width, int height) {
+    public Texture(int width, int height) {
         this(width, height, FormatType.RGBA_8_UNORM, false);
     }
 
     public int getWidth() {
-        return m_width;
+        return width;
     }
 
     public void setWidth(int width) {
-        m_width = width;
+        this.width = width;
     }
 
     public int getHeight() {
-        return m_height;
+        return height;
     }
 
     public void setHeight(int height) {
-        m_height = height;
+        this.height = height;
     }
 
     public FormatType getFormat() {
-        return m_format;
+        return format;
     }
 
     public void setFormat(FormatType format) {
-        m_format = format;
+        this.format = format;
     }
 
     public boolean isMipmapping() {
-        return m_mipmapping;
+        return mipmapping;
     }
 
     public void setMipmapping(boolean mipmapping) {
-        m_mipmapping = mipmapping;
+        this.mipmapping = mipmapping;
     }
 
     public Sampler getSampler() {
-        return m_sampler;
+        return sampler;
     }
 
     public void setSampler(Sampler sampler) {
-        m_sampler = sampler;
+        this.sampler = sampler;
     }
 
     public abstract void setData(ByteBuffer data);

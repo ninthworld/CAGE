@@ -5,59 +5,59 @@ import cage.core.graphics.type.BlendType;
 
 public abstract class Blender {
 
-    protected boolean m_alphaToCoverage;
-    protected int m_index;
-    protected BlendType m_blendSrc;
-    protected BlendType m_blendDest;
-    protected BlendOpType m_blendFunc;
-    protected boolean m_maskR, m_maskG, m_maskB, m_maskA;
+    private boolean alphaToCoverage;
+    private int index;
+    private BlendType blendSrc;
+    private BlendType blendDest;
+    private BlendOpType blendFunc;
+    private boolean maskR, maskG, maskB, maskA;
 
-    protected Blender() {
-        m_alphaToCoverage = false;
-        m_index = 0;
-        m_blendSrc = m_blendDest = BlendType.ONE;
-        m_blendFunc = BlendOpType.ADD;
-        m_maskR = m_maskG = m_maskB = m_maskA = true;
+    public Blender() {
+        this.alphaToCoverage = false;
+        this.index = 0;
+        this.blendSrc = blendDest = BlendType.ONE;
+        this.blendFunc = BlendOpType.ADD;
+        this.maskR = this.maskG = this.maskB = this.maskA = true;
     }
 
     public boolean isAlphaToCoverage() {
-        return m_alphaToCoverage;
+        return alphaToCoverage;
     }
 
     public void setAlphaToCoverage(boolean alphaToCoverage) {
-        m_alphaToCoverage = alphaToCoverage;
+        this.alphaToCoverage = alphaToCoverage;
     }
 
     public int getDrawBufferIndex() {
-        return m_index;
+        return index;
     }
 
     public void setDrawBufferIndex(int index) {
-        m_index = index;
+        this.index = index;
     }
 
     public BlendType getBlendSrc() {
-        return m_blendSrc;
+        return blendSrc;
     }
 
     public void setBlendSrc(BlendType blendSrc) {
-        m_blendSrc = blendSrc;
+        this.blendSrc = blendSrc;
     }
 
     public BlendType getBlendDest() {
-        return m_blendDest;
+        return blendDest;
     }
 
     public void setBlendDest(BlendType blendDest) {
-        m_blendDest = blendDest;
+        this.blendDest = blendDest;
     }
 
     public BlendOpType getBlendFunc() {
-        return m_blendFunc;
+        return blendFunc;
     }
 
     public void setBlendFunc(BlendOpType blendFunc) {
-        m_blendFunc = blendFunc;
+        this.blendFunc = blendFunc;
     }
 
     public void setBlend(BlendType blendSrc, BlendType blendDest, BlendOpType blendFunc) {
@@ -67,25 +67,25 @@ public abstract class Blender {
     }
 
     public boolean isMaskingRed() {
-        return m_maskR;
+        return maskR;
     }
 
     public boolean isMaskingGreen() {
-        return m_maskG;
+        return maskG;
     }
 
     public boolean isMaskingBlue() {
-        return m_maskB;
+        return maskB;
     }
 
     public boolean isMaskingAlpha() {
-        return m_maskA;
+        return maskA;
     }
 
     public void setColorMask(boolean red, boolean green, boolean blue, boolean alpha) {
-        m_maskR = red;
-        m_maskG = green;
-        m_maskB = blue;
-        m_maskA = alpha;
+        this.maskR = red;
+        this.maskG = green;
+        this.maskB = blue;
+        this.maskA = alpha;
     }
 }

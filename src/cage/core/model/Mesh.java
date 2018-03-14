@@ -5,27 +5,27 @@ import cage.core.model.material.Material;
 
 public class Mesh {
 
-    private IndexBuffer m_indexBuffer;
-    private Material m_material;
+    private IndexBuffer indexBuffer;
+    private Material material;
 
     public Mesh(IndexBuffer indexBuffer, Material material) {
-        m_indexBuffer = indexBuffer;
-        m_material = material;
+        this.indexBuffer = indexBuffer;
+        this.material = material;
     }
 
     public IndexBuffer getIndexBuffer() {
-        return m_indexBuffer;
+        return indexBuffer;
     }
 
     public void setIndexBuffer(IndexBuffer indexBuffer) {
-        m_indexBuffer = indexBuffer;
+        this.indexBuffer = indexBuffer;
     }
 
     public Material getMaterial() {
-        return m_material;
+        return material;
     }
 
     public void setMaterial(Material material) {
-        m_material = material;
+        this.material = material;
     }
 }

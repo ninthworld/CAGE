@@ -26,123 +26,123 @@ import java.util.List;
 
 public class RenderManager {
 
-    private IGraphicsDevice m_graphicsDevice;
-    private IGraphicsContext m_graphicsContext;
-    private GameWindow m_window;
-    private SceneManager m_sceneManager;
-    private AssetManager m_assetManager;
-    private List<RenderStage> m_outputStages;
-    private GeometryRenderStage m_defaultGeometryRenderStage;
-    private FXRenderStage m_defaultLightingRenderStage;
-    private UniformBuffer m_defaultCameraUniformBuffer;
-    private UniformBuffer m_defaultEntityUniformBuffer;
-    private UniformBuffer m_defaultMaterialUniformBuffer;
-    private UniformBuffer m_defaultLightUniformBuffer;
-    private Model m_defaultFXModel;
+    private IGraphicsDevice graphicsDevice;
+    private IGraphicsContext graphicsContext;
+    private GameWindow window;
+    private SceneManager sceneManager;
+    private AssetManager assetManager;
+    private List<RenderStage> outputStages;
+    private GeometryRenderStage defaultGeometryRenderStage;
+    private FXRenderStage defaultLightingRenderStage;
+    private UniformBuffer defaultCameraUniformBuffer;
+    private UniformBuffer defaultEntityUniformBuffer;
+    private UniformBuffer defaultMaterialUniformBuffer;
+    private UniformBuffer defaultLightUniformBuffer;
+    private Model defaultFXModel;
 
     public RenderManager(IGraphicsDevice graphicsDevice, IGraphicsContext graphicsContext, GameWindow window, SceneManager sceneManager, AssetManager assetManager) {
-        m_outputStages = new ArrayList<>();
-        m_graphicsDevice = graphicsDevice;
-        m_graphicsContext = graphicsContext;
-        m_window = window;
-        m_sceneManager = sceneManager;
-        m_assetManager = assetManager;
+        this.outputStages = new ArrayList<>();
+        this.graphicsDevice = graphicsDevice;
+        this.graphicsContext = graphicsContext;
+        this.window = window;
+        this.sceneManager = sceneManager;
+        this.assetManager = assetManager;
 
-        m_defaultCameraUniformBuffer = graphicsDevice.createUniformBuffer();
-        m_defaultCameraUniformBuffer.setLayout(Camera.BUFFER_LAYOUT);
+        defaultCameraUniformBuffer = graphicsDevice.createUniformBuffer();
+        defaultCameraUniformBuffer.setLayout(Camera.BUFFER_LAYOUT);
 
-        m_defaultEntityUniformBuffer = graphicsDevice.createUniformBuffer();
-        m_defaultEntityUniformBuffer.setLayout(SceneEntity.BUFFER_LAYOUT);
+        defaultEntityUniformBuffer = graphicsDevice.createUniformBuffer();
+        defaultEntityUniformBuffer.setLayout(SceneEntity.BUFFER_LAYOUT);
 
-        m_defaultMaterialUniformBuffer = graphicsDevice.createUniformBuffer();
-        m_defaultMaterialUniformBuffer.setLayout(Material.BUFFER_LAYOUT);
+        defaultMaterialUniformBuffer = graphicsDevice.createUniformBuffer();
+        defaultMaterialUniformBuffer.setLayout(Material.BUFFER_LAYOUT);
 
-        m_defaultLightUniformBuffer = graphicsDevice.createUniformBuffer();
-        m_defaultLightUniformBuffer.setLayout(Light.BUFFER_LAYOUT);
+        defaultLightUniformBuffer = graphicsDevice.createUniformBuffer();
+        defaultLightUniformBuffer.setLayout(Light.BUFFER_LAYOUT);
 
-        m_defaultFXModel = createDefaultFXModel();
+        defaultFXModel = createDefaultFXModel();
 
-        m_defaultGeometryRenderStage = createGeometryRenderStage(m_sceneManager, m_sceneManager.getDefaultCamera());
-        RenderTarget renderTarget = m_graphicsDevice.createRenderTarget(m_window.getWidth(), m_window.getHeight());
-        assetManager.getDefaultLightingShader().attachUniformBuffer("Camera", m_defaultCameraUniformBuffer);
-        assetManager.getDefaultLightingShader().attachUniformBuffer("Light", m_defaultLightUniformBuffer);
-        m_defaultLightingRenderStage = new LightingRenderStage(sceneManager, assetManager.getDefaultLightingShader(), renderTarget, m_defaultFXModel, m_graphicsContext);
-        m_defaultLightingRenderStage.attachInputStage(m_defaultGeometryRenderStage);
-        attachOutputStage(m_defaultLightingRenderStage);
+        defaultGeometryRenderStage = createGeometryRenderStage(sceneManager, sceneManager.getDefaultCamera());
+        RenderTarget renderTarget = graphicsDevice.createRenderTarget2D(window.getWidth(), window.getHeight());
+        assetManager.getDefaultLightingShader().attachUniformBuffer("Camera", defaultCameraUniformBuffer);
+        assetManager.getDefaultLightingShader().attachUniformBuffer("Light", defaultLightUniformBuffer);
+        defaultLightingRenderStage = new LightingRenderStage(sceneManager, assetManager.getDefaultLightingShader(), renderTarget, defaultFXModel, graphicsContext);
+        defaultLightingRenderStage.attachInputStage(defaultGeometryRenderStage);
+        attachOutputStage(defaultLightingRenderStage);
     }
 
     public void render() {
-        m_outputStages.forEach(RenderStage::render);
-        m_graphicsContext.bindBackBuffer();
-        m_graphicsContext.clear();
-        m_outputStages.forEach((RenderStage stage) -> m_graphicsContext.resolveToBackBuffer(stage.getRenderTarget()));
+        outputStages.forEach(RenderStage::render);
+        graphicsContext.bindBackBuffer();
+        graphicsContext.clear();
+        outputStages.forEach((RenderStage stage) -> graphicsContext.resolveToBackBuffer(stage.getRenderTarget()));
     }
 
     public GeometryRenderStage createGeometryRenderStage(SceneNode node, Camera camera) {
-        Shader shader = m_assetManager.getDefaultGeometryShader();
-        shader.attachUniformBuffer("Camera", m_defaultCameraUniformBuffer);
-        shader.attachUniformBuffer("Entity", m_defaultEntityUniformBuffer);
-        shader.attachUniformBuffer("Material", m_defaultMaterialUniformBuffer);
-        RenderTarget renderTarget = m_graphicsDevice.createRenderTarget(m_window.getWidth(), m_window.getHeight());
-        renderTarget.attachColorTexture(1, m_graphicsDevice.createTexture(m_window.getWidth(), m_window.getHeight()));
-        renderTarget.attachColorTexture(2, m_graphicsDevice.createTexture(m_window.getWidth(), m_window.getHeight()));
-        return new GeometryRenderStage(node, camera, shader, renderTarget, m_graphicsContext);
+        Shader shader = assetManager.getDefaultGeometryShader();
+        shader.attachUniformBuffer("Camera", defaultCameraUniformBuffer);
+        shader.attachUniformBuffer("Entity", defaultEntityUniformBuffer);
+        shader.attachUniformBuffer("Material", defaultMaterialUniformBuffer);
+        RenderTarget renderTarget = graphicsDevice.createRenderTarget2D(window.getWidth(), window.getHeight());
+        renderTarget.attachColorTexture(1, graphicsDevice.createTexture2D(window.getWidth(), window.getHeight()));
+        renderTarget.attachColorTexture(2, graphicsDevice.createTexture2D(window.getWidth(), window.getHeight()));
+        return new GeometryRenderStage(node, camera, shader, renderTarget, graphicsContext);
     }
 
     public FXRenderStage createFXRenderStage(Shader shader, RenderTarget renderTarget) {
-        return new FXRenderStage(shader, renderTarget, m_defaultFXModel, m_graphicsContext);
+        return new FXRenderStage(shader, renderTarget, defaultFXModel, graphicsContext);
     }
 
     public GeometryRenderStage getDefaultGeometryRenderStage() {
-        return m_defaultGeometryRenderStage;
+        return defaultGeometryRenderStage;
     }
 
     public FXRenderStage getDefaultLightingRenderStage() {
-        return m_defaultLightingRenderStage;
+        return defaultLightingRenderStage;
     }
 
     public UniformBuffer getDefaultCameraUniformBuffer() {
-        return m_defaultCameraUniformBuffer;
+        return defaultCameraUniformBuffer;
     }
 
     public UniformBuffer getDefaultEntityUniformBuffer() {
-        return m_defaultEntityUniformBuffer;
+        return defaultEntityUniformBuffer;
     }
 
     public UniformBuffer getDefaultLightUniformBuffer() {
-        return m_defaultLightUniformBuffer;
+        return defaultLightUniformBuffer;
     }
 
     public UniformBuffer getDefaultMaterialUniformBuffer() {
-        return m_defaultMaterialUniformBuffer;
+        return defaultMaterialUniformBuffer;
     }
 
     public Model getDefaultFXModel() {
-        return m_defaultFXModel;
+        return defaultFXModel;
     }
 
     public int getOutputStageCount() {
-        return m_outputStages.size();
+        return outputStages.size();
     }
 
     public void attachOutputStage(RenderStage stage) {
-        m_outputStages.add(stage);
+        outputStages.add(stage);
     }
 
     public void detachOutputStage(RenderStage stage) {
-        m_outputStages.remove(stage);
+        outputStages.remove(stage);
     }
 
     public boolean containsOutputStage(RenderStage stage) {
-        return m_outputStages.contains(stage);
+        return outputStages.contains(stage);
     }
 
     public RenderStage getOutputStage(int index) {
-        return m_outputStages.get(index);
+        return outputStages.get(index);
     }
 
     public Iterator<RenderStage> getOutputStageIterator() {
-        return m_outputStages.iterator();
+        return outputStages.iterator();
     }
 
     private Model createDefaultFXModel() {
@@ -152,17 +152,17 @@ public class RenderManager {
                 1.0f, 1.0f,
                 -1.0f, 1.0f
         };
-        VertexBuffer quadVertexBuffer = m_graphicsDevice.createVertexBuffer();
+        VertexBuffer quadVertexBuffer = graphicsDevice.createVertexBuffer();
         quadVertexBuffer.setLayout(new LayoutConfig().float2());
         quadVertexBuffer.setUnitCount(quadPositions.length / 2);
         quadVertexBuffer.setData((FloatBuffer) BufferUtils.createFloatBuffer(quadPositions.length).put(quadPositions).rewind());
 
         int[] quadIndices = new int[] { 0, 1, 2, 2, 3, 0 };
-        IndexBuffer quadIndexBuffer = m_graphicsDevice.createIndexBuffer();
+        IndexBuffer quadIndexBuffer = graphicsDevice.createIndexBuffer();
         quadIndexBuffer.setUnitCount(quadIndices.length);
         quadIndexBuffer.setData((IntBuffer)BufferUtils.createIntBuffer(quadIndices.length).put(quadIndices).rewind());
 
-        VertexArray quadVertexArray = m_graphicsDevice.createVertexArray();
+        VertexArray quadVertexArray = graphicsDevice.createVertexArray();
         quadVertexArray.attachVertexBuffer(quadVertexBuffer);
 
         Model quadModel = new Model(quadVertexArray);

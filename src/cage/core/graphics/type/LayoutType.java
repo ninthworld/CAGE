@@ -1,7 +1,7 @@
 package cage.core.graphics.type;
 
 public enum LayoutType {
-    INT1, SHORT1, FLOAT1, FLOAT2, FLOAT3, FLOAT4, FLOAT3X3, FLOAT4X4;
+    INT1, SHORT1, FLOAT1, FLOAT2, FLOAT3, FLOAT4, MAT3, MAT4;
 
     public static int sizeof(LayoutType type){
         switch(type){
@@ -11,8 +11,8 @@ public enum LayoutType {
             case FLOAT2: return 8;
             case FLOAT3: return 12;
             case FLOAT4: return 16;
-            case FLOAT3X3: return 36;
-            case FLOAT4X4: return 64;
+            case MAT3: return 36;
+            case MAT4: return 64;
             default: return 0;
         }
     }

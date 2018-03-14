@@ -6,20 +6,20 @@ import java.util.List;
 
 public abstract class VertexArray {
 
-    protected List<VertexBuffer> m_vertexBuffers;
-    protected int m_attributeCount;
+    protected List<VertexBuffer> vertexBuffers;
+    protected int attributeCount;
 
-    protected VertexArray() {
-        m_vertexBuffers = new ArrayList<>();
-        m_attributeCount = 0;
+    public VertexArray() {
+        this.vertexBuffers = new ArrayList<>();
+        this.attributeCount = 0;
     }
 
     public int getAttributeCount() {
-        return m_attributeCount;
+        return attributeCount;
     }
 
     public int getVertexBufferCount() {
-        return m_vertexBuffers.size();
+        return vertexBuffers.size();
     }
 
     public abstract void attachVertexBuffer(VertexBuffer buffer);
@@ -27,14 +27,14 @@ public abstract class VertexArray {
     public abstract void detachVertexBuffer(VertexBuffer buffer);
 
     public Iterator<VertexBuffer> getVertexBufferIterator() {
-        return m_vertexBuffers.iterator();
+        return vertexBuffers.iterator();
     }
 
     public boolean containsVertexBuffer(VertexBuffer buffer) {
-        return m_vertexBuffers.contains(buffer);
+        return vertexBuffers.contains(buffer);
     }
 
     public VertexBuffer getVertexBuffer(int index) {
-        return m_vertexBuffers.get(index);
+        return vertexBuffers.get(index);
     }
 }

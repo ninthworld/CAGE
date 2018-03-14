@@ -12,15 +12,15 @@ import java.nio.FloatBuffer;
 public abstract class Camera extends Node implements IBufferData {
 
     public static final int BUFFER_DATA_SIZE = 64;
-    public static final LayoutConfig BUFFER_LAYOUT = new LayoutConfig().float4x4().float4x4().float4x4().float4x4();
+    public static final LayoutConfig BUFFER_LAYOUT = new LayoutConfig().mat4().mat4().mat4().mat4();
 
-    private float m_zNear;
-    private float m_zFar;
+    private float zNear;
+    private float zFar;
 
     public Camera(Node parent) {
         super(parent);
-        m_zNear = 0.1f;
-        m_zFar = 1000.0f;
+        this.zNear = 0.1f;
+        this.zFar = 1000.0f;
     }
 
     public Matrix4f getViewMatrix() {
@@ -36,19 +36,19 @@ public abstract class Camera extends Node implements IBufferData {
     public abstract Matrix4f getProjectionMatrix();
 
     public float getZNear() {
-        return m_zNear;
+        return zNear;
     }
 
     public void setZNear(float zNear) {
-        m_zNear = zNear;
+        this.zNear = zNear;
     }
 
     public float getZFar() {
-        return m_zFar;
+        return zFar;
     }
 
     public void setZFar(float zFar) {
-        m_zFar = zFar;
+        this.zFar = zFar;
     }
 
     @Override

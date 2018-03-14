@@ -15,11 +15,11 @@ public class LightingRenderStage extends FXRenderStage {
 
     public static final int MAX_LIGHTS = 3;
 
-    private SceneManager m_sceneManager;
+    private SceneManager sceneManager;
 
     public LightingRenderStage(SceneManager sceneManager, Shader shader, RenderTarget renderTarget, Model fxModel, IGraphicsContext graphicsContext) {
         super(shader, renderTarget, fxModel, graphicsContext);
-        m_sceneManager = sceneManager;
+        this.sceneManager = sceneManager;
     }
 
     @Override
@@ -33,7 +33,7 @@ public class LightingRenderStage extends FXRenderStage {
 
             int capacity = MAX_LIGHTS * Light.BUFFER_DATA_SIZE;
             FloatBuffer lightBuffer = BufferUtils.createFloatBuffer(capacity);
-            Iterator<Light> it = m_sceneManager.getLightIterator();
+            Iterator<Light> it = this.sceneManager.getLightIterator();
             while(it.hasNext()) {
                 Light light = it.next();
                 lightBuffer.put(light.getBufferData());

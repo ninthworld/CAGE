@@ -5,36 +5,36 @@ import org.joml.Matrix4f;
 
 public class PerspectiveCamera extends Camera {
 
-    private float m_aspectRatio;
-    private float m_fov;
+    private float aspectRatio;
+    private float fov;
 
     public PerspectiveCamera(Node parent) {
         super(parent);
-        m_aspectRatio = 1.0f;
-        m_fov = 45.0f;
+        this.aspectRatio = 1.0f;
+        this.fov = 45.0f;
     }
 
     @Override
     public Matrix4f getProjectionMatrix() {
         Matrix4f projMatrix = new Matrix4f();
         projMatrix.identity();
-        projMatrix.perspective(m_fov, m_aspectRatio, getZNear(), getZFar());
+        projMatrix.perspective(fov, aspectRatio, getZNear(), getZFar());
         return projMatrix;
     }
 
     public float getAspectRatio() {
-        return m_aspectRatio;
+        return aspectRatio;
     }
 
     public void setAspectRatio(float aspectRatio) {
-        m_aspectRatio = aspectRatio;
+        this.aspectRatio = aspectRatio;
     }
 
     public float getFOV() {
-        return m_fov;
+        return fov;
     }
 
     public void setFOV(float fov) {
-        m_fov = fov;
+        this.fov = fov;
     }
 }
