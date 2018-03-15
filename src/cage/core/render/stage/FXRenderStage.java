@@ -8,22 +8,28 @@ import cage.core.model.Model;
 
 public class FXRenderStage extends RenderStage {
 
-    private IGraphicsContext graphicsContext;
     private Model fxModel;
 
-    public FXRenderStage(Shader shader, RenderTarget renderTarget, Model fxModel, IGraphicsContext graphicsContext) {
-        super(shader, renderTarget);
-        this.graphicsContext = graphicsContext;
+    public FXRenderStage(Model fxModel, Shader shader, RenderTarget renderTarget, IGraphicsContext graphicsContext) {
+        super(shader, renderTarget, graphicsContext);
         this.fxModel = fxModel;
     }
 
     @Override
     public void render() {
         super.render();
-        graphicsContext.bindRenderTarget(getRenderTarget());
-        graphicsContext.clear();
-        graphicsContext.bindVertexArray(fxModel.getVertexArray());
-        graphicsContext.bindShader(getShader());
-        fxModel.getMeshIterator().forEachRemaining((Mesh mesh) -> graphicsContext.drawIndexed(mesh.getIndexBuffer()));
+        getGraphicsContext().bindRenderTarget(getRenderTarget());
+        getGraphicsContext().clear();
+        getGraphicsContext().bindVertexArray(fxModel.getVertexArray());
+        getGraphicsContext().bindShader(getShader());
+        fxModel.getMeshIterator().forEachRemaining((Mesh mesh) -> getGraphicsContext().drawIndexed(mesh.getIndexBuffer()));
+    }
+    
+    public Model getFXModel() {
+    	return fxModel;
+    }
+    
+    public void setFXModel(Model fxModel) {
+    	this.fxModel = fxModel;
     }
 }

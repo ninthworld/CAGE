@@ -11,18 +11,16 @@ import cage.core.scene.camera.Camera;
 
 public class GeometryRenderStage extends RenderStage {
 
-    private IGraphicsContext graphicsContext;
     private UniformBuffer cameraUniform;
     private UniformBuffer entityUniform;
     private UniformBuffer materialUniform;
     private Camera camera;
     private SceneNode node;
 
-    public GeometryRenderStage(SceneNode node, Camera camera, Shader shader, RenderTarget renderTarget, IGraphicsContext graphicsContext) {
-        super(shader, renderTarget);
-        this.graphicsContext = graphicsContext;
-        this.node = node;
-        this.camera = camera;
+    public GeometryRenderStage(Shader shader, RenderTarget renderTarget, IGraphicsContext graphicsContext) {
+        super(shader, renderTarget, graphicsContext);
+        this.node = null;
+        this.camera = null;
     }
 
     @Override
@@ -46,8 +44,8 @@ public class GeometryRenderStage extends RenderStage {
     public void render() {
         super.render();
 
-        graphicsContext.bindRenderTarget(getRenderTarget());
-        graphicsContext.clear();
+        getGraphicsContext().bindRenderTarget(getRenderTarget());
+        getGraphicsContext().clear();
 
         renderNode(node);
     }
@@ -60,7 +58,7 @@ public class GeometryRenderStage extends RenderStage {
 
             entityUniform.setData(entity.getBufferData());
 
-            graphicsContext.bindVertexArray(model.getVertexArray());
+            getGraphicsContext().bindVertexArray(model.getVertexArray());
             model.getMeshIterator().forEachRemaining((Mesh mesh) -> {
                 Material material = mesh.getMaterial();
                 materialUniform.setData(material.getBufferData());
@@ -81,8 +79,8 @@ public class GeometryRenderStage extends RenderStage {
                     getShader().attachTexture("highlightTexture", material.getSpecularHighlightTexture());
                 }
 
-                graphicsContext.bindShader(getShader());
-                graphicsContext.drawIndexed(mesh.getIndexBuffer());
+                getGraphicsContext().bindShader(getShader());
+                getGraphicsContext().drawIndexed(mesh.getIndexBuffer());
             });
         }
     }

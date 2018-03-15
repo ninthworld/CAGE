@@ -17,9 +17,17 @@ public class LightingRenderStage extends FXRenderStage {
 
     private SceneManager sceneManager;
 
-    public LightingRenderStage(SceneManager sceneManager, Shader shader, RenderTarget renderTarget, Model fxModel, IGraphicsContext graphicsContext) {
-        super(shader, renderTarget, fxModel, graphicsContext);
-        this.sceneManager = sceneManager;
+    public LightingRenderStage(Model fxModel, Shader shader, RenderTarget renderTarget, IGraphicsContext graphicsContext) {
+        super(fxModel, shader, renderTarget, graphicsContext);
+        this.sceneManager = null;
+    }
+    
+    public SceneManager getSceneManager() {
+    	return sceneManager;
+    }
+    
+    public void setSceneManager(SceneManager sceneManager) {
+    	this.sceneManager = sceneManager;
     }
 
     @Override

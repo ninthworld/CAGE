@@ -36,5 +36,6 @@
 	<classpathentry kind="lib" path="lib/lwjgl/lwjgl-natives-windows.jar"/>
 	<classpathentry kind="lib" path="lib/lwjgl/lwjgl-sources.jar"/>
 	<classpathentry kind="lib" path="lib/lwjgl/lwjgl.jar"/>
+	<classpathentry kind="lib" path="lib/oObjLoader/oObjLoader.jar"/>
 	<classpathentry kind="output" path="out/production/CAGE"/>
 </classpath>

@@ -1,5 +1,6 @@
 package cage.core.render.stage;
 
+import cage.core.graphics.IGraphicsContext;
 import cage.core.graphics.RenderTarget;
 import cage.core.graphics.Shader;
 
@@ -9,14 +10,16 @@ import java.util.List;
 
 public abstract class RenderStage {
 
+    private IGraphicsContext graphicsContext;
     private List<RenderStage> inputStages;
     private Shader shader;
     private RenderTarget renderTarget;
 
-    public RenderStage(Shader shader, RenderTarget renderTarget) {
+    public RenderStage(Shader shader, RenderTarget renderTarget, IGraphicsContext graphicsContext) {
         this.inputStages = new ArrayList<>();
         this.shader = shader;
         this.renderTarget = renderTarget;
+        this.graphicsContext = graphicsContext;
     }
 
     public void preRender() {
@@ -27,6 +30,14 @@ public abstract class RenderStage {
         preRender();
     }
 
+    public IGraphicsContext getGraphicsContext() {
+    	return graphicsContext;
+    }
+    
+    public void setGraphicsContext(IGraphicsContext graphicsContext) {
+    	this.graphicsContext = graphicsContext;
+    }
+    
     public Shader getShader() {
         return shader;
     }
