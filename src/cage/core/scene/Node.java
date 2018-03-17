@@ -1,5 +1,7 @@
 package cage.core.scene;
 
+import cage.core.common.IDestroyable;
+import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -8,61 +10,75 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
 
-public abstract class Node {
+public abstract class Node implements IDestroyable {
 
     private Vector3f worldPosition;
-    private Vector3f worldRotation;
     private Vector3f worldScale;
+    private Matrix3f worldRotation;
+    private Matrix4f worldTransform;
+
     private Vector3f localPosition;
-    private Vector3f localRotation;
     private Vector3f localScale;
-    private boolean inheritPosition;
-    private boolean inheritRotation;
-    private boolean inheritScale;
+    private Matrix3f localRotation;
+    private Matrix4f localTransform;
+
     private List<Node> children;
     private Node parent;
+    private boolean localUpdated;
 
     protected Node(Node parent) {
-        this.parent = parent;
         this.worldPosition = new Vector3f();
-        this.worldRotation = new Vector3f();
         this.worldScale = new Vector3f(1.0f);
+        this.worldRotation = new Matrix3f().identity();
+        this.worldTransform = new Matrix4f().identity();
+
         this.localPosition = new Vector3f();
-        this.localRotation = new Vector3f();
         this.localScale = new Vector3f(1.0f);
-        this.inheritPosition = true;
-        this.inheritRotation = true;
-        this.inheritScale = true;
+        this.localRotation = new Matrix3f().identity();
+        this.localTransform = new Matrix4f().identity();
+
         this.children = new ArrayList<>();
+        this.localUpdated = true;
+        this.parent = parent;
+        if(this.parent != null) {
+            this.parent.attachNode(this);
+        }
     }
 
-    public void update() {
-        if(inheritPosition && parent != null) {
+    public void update(boolean forced) {
+        boolean shouldUpdate = (forced || localUpdated);
+        if(shouldUpdate) {
+            updateNode();
+            localUpdated = false;
+        }
+
+        children.forEach((Node node) -> node.update(shouldUpdate));
+    }
+
+    protected void updateNode() {
+        // Update local transform
+        localTransform.identity();
+        localTransform.translate(localPosition);
+        localTransform.mul(new Matrix4f().identity().set(localRotation));
+        localTransform.scale(localScale);
+
+        // Update world transform
+        if(parent != null) {
             worldPosition.set(parent.getWorldPosition());
-        }
-        else {
-            worldPosition.set(0.0f);
-        }
-
-        if(inheritRotation && parent != null) {
             worldRotation.set(parent.getWorldRotation());
-        }
-        else {
-            worldRotation.set(0.0f);
-        }
-
-        if(inheritScale && parent != null) {
             worldScale.set(parent.getWorldScale());
+            worldTransform.set(parent.getWorldTransform());
         }
         else {
-            worldScale.set(1.0f);
+            worldTransform.identity();
+            worldPosition.set(new Vector3f());
+            worldRotation.identity();
+            worldScale.set(new Vector3f(1.0f));
         }
-
         worldPosition.add(localPosition);
-        worldRotation.add(localRotation);
+        worldRotation.mul(localRotation);
         worldScale.mul(localScale);
-
-        children.forEach(Node::update);
+        worldTransform.mul(localTransform);
     }
 
     public int getNodeCount() {
@@ -71,8 +87,8 @@ public abstract class Node {
 
     public void attachNode(Node node) {
         if(node != this) {
-            if(node.getParentNode() != null) {
-                node.getParentNode().children.remove(node);
+            if(node.parent != null) {
+                node.parent.detachNode(this);
             }
             node.parent = this;
             children.add(node);
@@ -114,23 +130,21 @@ public abstract class Node {
     }
 
     public void setLocalPosition(Vector3f position) {
-        localPosition = position;
+        localPosition.set(position);
+        notifyUpdate();
     }
 
     public void setLocalPosition(float x, float y, float z) {
-        localPosition = new Vector3f(x, y, z);
+        setLocalPosition(new Vector3f(x, y, z));
     }
 
-    public Vector3f getLocalRotation() {
-        return new Vector3f(localRotation);
+    public Matrix3f getLocalRotation() {
+        return new Matrix3f(localRotation);
     }
 
-    public void setLocalRotation(Vector3f rotation) {
+    public void setLocalRotation(Matrix3f rotation) {
         localRotation = rotation;
-    }
-
-    public void setLocalRotation(float pitch, float yaw, float roll) {
-        localRotation = new Vector3f(pitch, yaw, roll);
+        notifyUpdate();
     }
 
     public Vector3f getLocalScale() {
@@ -138,57 +152,83 @@ public abstract class Node {
     }
 
     public void setLocalScale(Vector3f scale) {
-        localScale = scale;
+        localScale.set(scale);
+        notifyUpdate();
     }
 
     public void setLocalScale(float x, float y, float z) {
-        localScale = new Vector3f(x, y, z);
+        setLocalScale(new Vector3f(x, y, z));
+    }
+
+    public Matrix4f getLocalTransform() {
+        return localTransform;
     }
 
     public Vector3f getWorldPosition() {
-        return new Vector3f(worldPosition).add(localPosition);
+        return new Vector3f(worldPosition);
     }
 
-    public Vector3f getWorldRotation() {
-        return new Vector3f(worldRotation).add(localRotation);
+    public Matrix3f getWorldRotation() {
+        return new Matrix3f(worldRotation);
     }
 
     public Vector3f getWorldScale() {
-        return new Vector3f(worldScale).add(localScale);
+        return new Vector3f(worldScale);
     }
 
-    public Matrix4f getWorldMatrix() {
-        Matrix4f worldMatrix = new Matrix4f();
-        worldMatrix.identity();
-        worldMatrix.translate(worldPosition);
-        worldMatrix.rotate(worldRotation.x, new Vector3f(1, 0, 0));
-        worldMatrix.rotate(worldRotation.y, new Vector3f(0, 1, 0));
-        worldMatrix.rotate(worldRotation.z, new Vector3f(0, 0, 1));
-        worldMatrix.scale(worldScale);
-        return worldMatrix;
+    public Matrix4f getWorldTransform() {
+        return worldTransform;
     }
 
-    public boolean inheritPosition() {
-        return inheritPosition;
+    public void translate(Vector3f offset) {
+        localPosition.add(offset);
+        notifyUpdate();
     }
 
-    public void setInheritPosition(boolean inherit) {
-        inheritPosition = inherit;
+    public void translate(float x, float y, float z) {
+        translate(new Vector3f(x, y, z));
     }
 
-    public boolean inheritRotation() {
-        return inheritRotation;
+    public void rotate(float angle, Vector3f axis) {
+        localRotation.rotate(angle, axis);
+        notifyUpdate();
     }
 
-    public void setInheritRotation(boolean inherit) {
-        inheritRotation = inherit;
+    public void scale(Vector3f mul) {
+        localScale.mul(mul);
+        notifyUpdate();
     }
 
-    public boolean inheritScale() {
-        return inheritScale;
+    public void scale(float x, float y, float z) {
+        scale(new Vector3f(x, y, z));
     }
 
-    public void setInheritScale(boolean inherit) {
-        inheritScale = inherit;
+    public void yaw(float angle) {
+        rotate(angle, new Vector3f(1.0f, 0.0f, 0.0f));
+    }
+
+    public void pitch(float angle) {
+        rotate(angle, new Vector3f(0.0f, 1.0f, 0.0f));
+    }
+
+    public void roll(float angle) {
+        rotate(angle, new Vector3f(0.0f, 0.0f, 1.0f));
+    }
+
+    public void lookAt(Vector3f target, Vector3f up) {
+        localRotation.lookAlong(target.sub(localPosition), up);
+        notifyUpdate();
+    }
+
+    public void lookAt(Vector3f target) {
+        lookAt(target, new Vector3f(0.0f, 1.0f, 0.0f));
+    }
+
+    public void lookAt(float x, float y, float z) {
+        lookAt(new Vector3f(x, y, z), new Vector3f(0.0f, 1.0f, 0.0f));
+    }
+
+    public void notifyUpdate() {
+        localUpdated = true;
     }
 }

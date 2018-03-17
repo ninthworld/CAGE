@@ -1,11 +1,13 @@
 package cage.core.graphics;
 
+import cage.core.common.IDestroyable;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class Shader {
+public abstract class Shader implements IDestroyable {
 
     protected Map<Integer, UniformBuffer> uniformBuffers;
     protected Map<Integer, Texture> textures;

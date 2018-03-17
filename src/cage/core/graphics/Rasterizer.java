@@ -1,9 +1,10 @@
 package cage.core.graphics;
 
+import cage.core.common.IDestroyable;
 import cage.core.graphics.type.CullType;
 import cage.core.graphics.type.FillType;
 
-public abstract class Rasterizer {
+public abstract class Rasterizer implements IDestroyable {
 
     private FillType fill;
     private CullType cull;

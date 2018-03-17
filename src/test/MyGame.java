@@ -2,42 +2,61 @@ package test;
 
 import cage.core.application.GameEngine;
 
+import cage.core.application.GameWindow;
 import cage.core.application.IGame;
 import cage.core.graphics.type.CullType;
+import cage.core.input.InputState;
 import cage.core.model.Model;
 import cage.core.scene.SceneEntity;
+import cage.core.scene.SceneNode;
+import cage.core.scene.light.Light;
 import cage.core.scene.light.PointLight;
 import cage.core.scene.light.type.AttenuationType;
 import cage.opengl.GLBootstrap;
 import org.joml.Vector3f;
 
 import java.awt.*;
+import java.util.Iterator;
 
 public class MyGame implements IGame {
 
-    private PointLight m_light;
+    private SceneNode rotateNode;
+    private SceneEntity dolphinEntity;
 
     public MyGame(GameEngine engine) {
     }
 
     @Override
     public void initialize(GameEngine engine) {
-
         engine.getGraphicsContext().setClearColor(Color.decode("#6495ed"));
-        engine.getGraphicsDevice().getDefaultRasterizer().setCullType(CullType.NONE);
+        engine.getGraphicsDevice().getDefaultRasterizer().setCullType(CullType.BACK);
 
-        engine.getSceneManager().getDefaultCamera().setLocalPosition(0.0f, 0.0f, 4.0f);
+        engine.getSceneManager().getDefaultCamera().setLocalPosition(0.0f, 0.0f, 8.0f);
 
-        Model sphereModel = engine.getAssetManager().loadOBJModel("sphere/sphere.obj");
-        sphereModel.getMesh(0).getMaterial().setDiffuse(new Vector3f(1.0f, 0.0f, 0.0f));
-        sphereModel.getMesh(0).getMaterial().setSpecular(new Vector3f(1.0f, 1.0f, 1.0f), 16.0f);
-        SceneEntity sphere = engine.getSceneManager().addSceneEntity(sphereModel);
+        rotateNode = engine.getSceneManager().getRootSceneNode().createSceneNode();
 
-        m_light = engine.getSceneManager().createPointLight();
-        m_light.setRange(20.0f);
-        m_light.setAttenuation(AttenuationType.LINEAR);
-        m_light.setDiffuseColor(1.0f, 1.0f, 1.0f);
-        m_light.setSpecularColor(1.0f, 1.0f, 1.0f);
+        Model model = engine.getAssetManager().loadOBJModel("dolphin/dolphinHighPoly.obj");
+        model.getMesh(0).getMaterial().setDiffuse(new Vector3f(1.0f, 0.0f, 0.0f));
+        model.getMesh(0).getMaterial().setSpecular(new Vector3f(1.0f, 1.0f, 1.0f), 16.0f);
+        dolphinEntity = rotateNode.createSceneEntity(model);
+        dolphinEntity.translate(4.0f, 0.0f, 0.0f);
+        dolphinEntity.scale(new Vector3f(2.0f));
+
+        PointLight light = engine.getSceneManager().getRootSceneNode().createPointLight();
+        light.setLocalPosition(1.0f, 0.0f, 0.0f);
+        light.setRange(64.0f);
+        light.setAttenuation(AttenuationType.QUADRATIC);
+        light.setDiffuseColor(1.0f, 1.0f, 1.0f);
+        light.setSpecularColor(1.0f, 1.0f, 1.0f);
+
+        engine.getWindow().addListener((GameWindow.IKeyboardListener) (key, state) -> {
+            if(key == 256) {
+                engine.getWindow().setClosed(true);
+            }
+            if(key == '1' && state == InputState.RELEASED) {
+                engine.getWindow().setFullscreen(!engine.getWindow().isFullscreen());
+            }
+        });
     }
 
     @Override
@@ -46,9 +65,17 @@ public class MyGame implements IGame {
     
     @Override
     public void update(GameEngine engine, double deltaTime) {
-        float angle = m_light.getLocalRotation().y;
-        m_light.setLocalPosition((float)Math.sin(angle) * 8.0f, 4.0f, (float)Math.cos(angle) * 8.0f);
-        m_light.setLocalRotation(0.0f, angle + 0.03f, 0.0f);
+        engine.getWindow().setTitle("FPS: " + engine.getFPS());
+
+        //dolphinEntity.setLocalRotation(dolphinEntity.getLocalRotation().add(0.0f, (float)deltaTime, 0.0f));
+        rotateNode.rotate((float)deltaTime * 0.5f, new Vector3f(0.0f, 1.0f, 0.0f));
+        //dolphinEntity.rotate((float)deltaTime, new Vector3f(0.0f, 1.0f, 0.0f));
+
+        Iterator<Light> it = engine.getSceneManager().getLightIterator();
+        while(it.hasNext()) {
+            Light light = it.next();
+            light.notifyUpdate();
+        }
     }
 
     @Override

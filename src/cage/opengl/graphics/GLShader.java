@@ -3,6 +3,7 @@ package cage.opengl.graphics;
 import cage.core.graphics.Shader;
 import cage.core.graphics.Texture;
 import cage.core.graphics.UniformBuffer;
+import cage.opengl.common.IGLBindable;
 
 import java.util.Map.Entry;
 
@@ -14,7 +15,7 @@ import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.opengl.GL31.*;
 import static org.lwjgl.opengl.GL33.*;
 
-public class GLShader extends Shader implements IGLObject {
+public class GLShader extends Shader implements IGLBindable {
 
     private int programId;
 

@@ -1,24 +1,37 @@
 package cage.core.scene.camera;
 
 import cage.core.scene.Node;
+import cage.core.scene.SceneManager;
 import org.joml.Matrix4f;
 
 public class PerspectiveCamera extends Camera {
 
     private float aspectRatio;
     private float fov;
+    private Matrix4f projMatrix;
 
-    public PerspectiveCamera(Node parent) {
-        super(parent);
+    public PerspectiveCamera(SceneManager sceneManager, Node parent) {
+        super(sceneManager, parent);
         this.aspectRatio = 1.0f;
         this.fov = 45.0f;
+        this.projMatrix = new Matrix4f().identity();
+    }
+
+    @Override
+    protected void updateNode() {
+        super.updateNode();
+
+        projMatrix.identity();
+        projMatrix.perspective(fov, aspectRatio, getZNear(), getZFar());
+
+        projMatrix.get(bufferData);
+        bufferData.position(32);
+        projMatrix.invert().get(bufferData);
+        bufferData.rewind();
     }
 
     @Override
     public Matrix4f getProjectionMatrix() {
-        Matrix4f projMatrix = new Matrix4f();
-        projMatrix.identity();
-        projMatrix.perspective(fov, aspectRatio, getZNear(), getZFar());
         return projMatrix;
     }
 

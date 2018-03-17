@@ -5,7 +5,7 @@ public abstract class GameTimer {
     protected double startTime;
     protected double lastTime;
 
-    protected GameTimer() {
+    public GameTimer() {
         this.startTime = 0.0;
         this.startTime = getTime();
         reset();

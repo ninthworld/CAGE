@@ -1,4 +1,4 @@
-package cage.core.graphics;
+package cage.core.common;
 
 import java.nio.FloatBuffer;
 

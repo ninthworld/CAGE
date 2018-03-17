@@ -1,10 +1,11 @@
 package cage.core.graphics;
 
+import cage.core.common.IDestroyable;
 import cage.core.graphics.config.LayoutConfig;
 
 import java.nio.*;
 
-public abstract class Buffer {
+public abstract class Buffer implements IDestroyable {
 
     private int unitCount;
     private LayoutConfig layout;

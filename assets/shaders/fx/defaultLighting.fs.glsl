@@ -11,13 +11,16 @@ uniform sampler2D specularTexture;
 uniform sampler2D normalTexture;
 uniform sampler2D depthTexture;
 
+#define AMBIENT_TYPE        0.0
+#define POINT_TYPE          1.0
+#define DIRECTIONAL_TYPE    2.0
 struct Light_t {
 	vec4 ambientColor;
     vec4 diffuseColor;
     vec4 specularColor;
     vec4 worldPosition;
+    float type;
     float range;
-    float attConstant;
     float attLinear;
     float attQuadratic;
 };
@@ -47,33 +50,44 @@ void main() {
 	float depth = texture(depthTexture, vs_texCoord).r;
 	vec3 position = worldPosFromDepth(depth);
 
-	vec3 camPosition = -vec3(camera.viewMatrix * vec4(0.0, 0.0, 0.0, 1.0));
+	vec3 camPosition = vec3(camera.viewMatrix * vec4(0.0, 0.0, 0.0, 1.0));
 
 	vec3 color = vec3(0.0, 0.0, 0.0);
 	if(depth < 1.0) {
 		for(int i = 0; i < MAX_LIGHTS; ++i) {
-            // Ambient
-            color += diffuse * light[i].ambientColor.rgb;
+            if(light[i].type == AMBIENT_TYPE) {
+                // Ambient
+                color += diffuse * light[i].ambientColor.rgb;
+            }
+            else {
+                vec3 relLightDir = vec3(0.0, 0.0, 0.0);
+                if(light[i].type == POINT_TYPE) {
+                    relLightDir = -normalize(position - light[i].worldPosition.xyz);
+                }
+                else if(light[i].type == DIRECTIONAL_TYPE) {
+                    relLightDir = normalize(light[i].worldPosition.xyz);
+                }
 
-            // Diffuse
-			float dist = distance(light[i].worldPosition.xyz, position);
-			float cosTheta = dot(normal, normalize(light[i].worldPosition.xyz));
-			float att = 1.0;
-			if(light[i].range > 0.0 && (light[i].attLinear > 0.0 || light[i].attQuadratic > 0.0)) {
-			    att = clamp(1.0 - dist/light[i].range, 0.0, 1.0);
-				if(light[i].attQuadratic > 0.0) {
-					att *= att;
-				}
-			}
-            color += clamp(diffuse * light[i].diffuseColor.rgb * cosTheta * att, 0.0, 1.0);
+                // Diffuse
+                float dist = distance(light[i].worldPosition.xyz, position);
+                float cosTheta = dot(normal, relLightDir);
+                float att = 1.0;
+                if(light[i].range > 0.0 && (light[i].attLinear > 0.0 || light[i].attQuadratic > 0.0)) {
+                    att = clamp(1.0 - dist/light[i].range, 0.0, 1.0);
+                    if(light[i].attQuadratic > 0.0) {
+                        att *= att;
+                    }
+                }
+                color += clamp(diffuse * light[i].diffuseColor.rgb * cosTheta * att, 0.0, 1.0);
 
-            // Specular
-            vec3 vertexToCam = normalize(camPosition - position);
-            vec3 lightReflect = normalize(reflect(-normalize(light[i].worldPosition.xyz), normal));
-            float factor = dot(vertexToCam, lightReflect);
-            if(factor > 0.0) {
-            factor = pow(factor, power);
-                color += clamp(att * specular * light[i].specularColor.rgb * factor, 0.0, 1.0);
+                // Specular
+                vec3 vertexToCam = normalize(camPosition - position);
+                vec3 lightReflect = normalize(reflect(relLightDir, normal));
+                float factor = dot(vertexToCam, lightReflect);
+                if(factor > 0.0) {
+                factor = pow(factor, power);
+                    color += clamp(att * specular * light[i].specularColor.rgb * factor, 0.0, 1.0);
+                }
             }
 		}
 	}

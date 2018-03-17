@@ -1,5 +1,6 @@
 package cage.core.graphics;
 
+import cage.core.common.IDestroyable;
 import cage.core.graphics.type.FormatType;
 
 public interface IGraphicsDevice {
@@ -24,11 +25,18 @@ public interface IGraphicsDevice {
     TextureMS createTextureMS(int width, int height, int samples, FormatType format);
 
     Sampler createSampler();
+
+    RenderTarget2D createRenderTarget2D();
     RenderTarget2D createRenderTarget2D(int width, int height);
+
+    RenderTargetMS createRenderTargetMS(int samples);
     RenderTargetMS createRenderTargetMS(int width, int height, int samples);
+
     VertexArray createVertexArray();
 
     Rasterizer getDefaultRasterizer();
     Sampler getDefaultSampler();
     Blender getDefaultBlender();
+
+    void destroy(IDestroyable object);
 }

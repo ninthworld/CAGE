@@ -13,22 +13,27 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class SceneManager extends SceneNode {
+public class SceneManager {
 
     private GameWindow window;
     private List<Camera> cameras;
     private List<Light> lights;
     private Camera defaultCamera;
     private AmbientLight defaultAmbientLight;
+    private SceneNode rootNode;
 
     public SceneManager(GameWindow window) {
-        super(null);
         this.window = window;
         this.cameras = new ArrayList<>();
         this.lights = new ArrayList<>();
-        this.defaultCamera = createPerspectiveCamera();
-        this.defaultAmbientLight = createAmbientLight();
-        this.defaultAmbientLight.setAmbientColor(0.1f, 0.1f, 0.1f);
+        this.rootNode = new SceneNode(this, null);
+        this.defaultCamera = this.rootNode.createPerspectiveCamera();
+        this.defaultAmbientLight = this.rootNode.createAmbientLight();
+        this.defaultAmbientLight.setAmbientColor(new Vector3f(0.2f));
+    }
+
+    public SceneNode getRootSceneNode() {
+        return rootNode;
     }
 
     public Camera getDefaultCamera() {
@@ -37,35 +42,6 @@ public class SceneManager extends SceneNode {
 
     public AmbientLight getDefaultAmbientLight() {
         return defaultAmbientLight;
-    }
-
-    public PerspectiveCamera createPerspectiveCamera() {
-        PerspectiveCamera camera = new PerspectiveCamera(null);
-        camera.setAspectRatio((float)window.getWidth() / (float)window.getHeight());
-        attachNode(camera);
-        cameras.add(camera);
-        return camera;
-    }
-
-    public OrthographicCamera createOrthographicCamera() {
-        OrthographicCamera camera = new OrthographicCamera(null);
-        attachNode(camera);
-        cameras.add(camera);
-        return camera;
-    }
-
-    public AmbientLight createAmbientLight() {
-        AmbientLight light = new AmbientLight(null);
-        attachNode(light);
-        lights.add(light);
-        return light;
-    }
-
-    public PointLight createPointLight() {
-        PointLight light = new PointLight(null);
-        attachNode(light);
-        lights.add(light);
-        return light;
     }
 
     public int getLightCount() {
@@ -82,5 +58,33 @@ public class SceneManager extends SceneNode {
 
     public Iterator<Camera> getCameraIterator() {
         return cameras.iterator();
+    }
+
+    public GameWindow getWindow() {
+        return window;
+    }
+
+    public void setWindow(GameWindow window) {
+        this.window = window;
+    }
+
+    public void registerLight(Light light) {
+        lights.add(light);
+    }
+
+    public void unregisterLight(Light light) {
+        lights.remove(light);
+    }
+
+    public void registerCamera(Camera camera) {
+        cameras.add(camera);
+    }
+
+    public void unregisterCamera(Camera camera) {
+        cameras.remove(camera);
+    }
+
+    public void update() {
+        rootNode.update(false);
     }
 }

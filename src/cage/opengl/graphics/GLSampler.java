@@ -4,6 +4,7 @@ import cage.core.graphics.Sampler;
 import cage.core.graphics.type.CompareType;
 import cage.core.graphics.type.EdgeType;
 import cage.core.graphics.type.FilterType;
+import cage.opengl.common.IGLBindable;
 
 import java.awt.*;
 
@@ -15,7 +16,7 @@ import static org.lwjgl.opengl.GL14.*;
 import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.opengl.GL33.*;
 
-public class GLSampler extends Sampler implements IGLObject {
+public class GLSampler extends Sampler implements IGLBindable {
 
     private int samplerId;
 

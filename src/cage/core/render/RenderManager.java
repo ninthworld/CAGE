@@ -71,19 +71,19 @@ public class RenderManager {
 	        shader.attachUniformBuffer("Camera", defaultCameraUniformBuffer);
 	        shader.attachUniformBuffer("Entity", defaultEntityUniformBuffer);
 	        shader.attachUniformBuffer("Material", defaultMaterialUniformBuffer);
-	        RenderTarget renderTarget = graphicsDevice.createRenderTarget2D(window.getWidth(), window.getHeight());
-	        renderTarget.attachColorTexture(1, graphicsDevice.createTexture2D(window.getWidth(), window.getHeight()));
-	        renderTarget.attachColorTexture(2, graphicsDevice.createTexture2D(window.getWidth(), window.getHeight()));
+	        RenderTarget renderTarget = graphicsDevice.createRenderTarget2D();
+	        renderTarget.attachColorTexture(1, graphicsDevice.createTexture2D(renderTarget.getWidth(), renderTarget.getHeight()));
+	        renderTarget.attachColorTexture(2, graphicsDevice.createTexture2D(renderTarget.getWidth(), renderTarget.getHeight()));
 	        defaultGeometryRenderStage.setShader(shader);
 	        defaultGeometryRenderStage.setRenderTarget(renderTarget);
-	        defaultGeometryRenderStage.setSceneNode(sceneManager);
+	        defaultGeometryRenderStage.setSceneNode(sceneManager.getRootSceneNode());
 	        defaultGeometryRenderStage.setCamera(sceneManager.getDefaultCamera());
         }
         
         defaultLightingRenderStage = (LightingRenderStage)createFXRenderStage(LightingRenderStage::new);
         {
         	Shader shader = assetManager.getDefaultLightingShader();
-	        RenderTarget renderTarget = graphicsDevice.createRenderTarget2D(window.getWidth(), window.getHeight());
+	        RenderTarget renderTarget = graphicsDevice.createRenderTarget2D();
 	        assetManager.getDefaultLightingShader().attachUniformBuffer("Camera", defaultCameraUniformBuffer);
 	        assetManager.getDefaultLightingShader().attachUniformBuffer("Light", defaultLightUniformBuffer);
 	        defaultLightingRenderStage.setShader(shader);
@@ -101,11 +101,11 @@ public class RenderManager {
         outputStages.forEach((RenderStage stage) -> graphicsContext.resolveToBackBuffer(stage.getRenderTarget()));
     }
 
-    public RenderStage createRenderStage(RenderStageConstructor stage) {
+    public RenderStage createRenderStage(IRenderStageConstructor stage) {
     	return stage.init(null, null, graphicsContext);
     }
 
-    public FXRenderStage createFXRenderStage(FXRenderStageConstructor stage) {
+    public FXRenderStage createFXRenderStage(IFXRenderStageConstructor stage) {
         return stage.init(defaultFXModel, null, null, graphicsContext);
     }
 
@@ -187,11 +187,11 @@ public class RenderManager {
         return quadModel;
     }
     
-    public interface RenderStageConstructor {
+    public interface IRenderStageConstructor {
         RenderStage init(Shader shader, RenderTarget renderTarget, IGraphicsContext graphicsContext);
     }
     
-    public interface FXRenderStageConstructor {
+    public interface IFXRenderStageConstructor {
         FXRenderStage init(Model fxModel, Shader shader, RenderTarget renderTarget, IGraphicsContext graphicsContext);
     }
 }

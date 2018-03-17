@@ -1,5 +1,7 @@
 package cage.opengl.graphics;
 
+import cage.core.application.GameWindow;
+import cage.core.common.IDestroyable;
 import cage.core.graphics.*;
 import cage.core.graphics.type.FormatType;
 import cage.opengl.application.GLGameWindow;
@@ -14,7 +16,8 @@ import static org.lwjgl.glfw.GLFW.*;
 public class GLGraphicsDevice implements IGraphicsDevice {
 
     private GLGraphicsContext graphicsContext;
-    private List<IGLObject> glObjects;
+    private GLGameWindow window;
+    private List<IDestroyable> glObjects;
 
     private GLRasterizer defaultRasterizer;
     private GLSampler defaultSampler;
@@ -26,7 +29,8 @@ public class GLGraphicsDevice implements IGraphicsDevice {
             throw new IllegalStateException("Unable to initialize GLFW");
         }
 
-        window.initialize();
+        this.window = window;
+        this.window.initialize();
         GL.createCapabilities();
 
         this.glObjects = new ArrayList<>();
@@ -35,13 +39,19 @@ public class GLGraphicsDevice implements IGraphicsDevice {
         this.defaultSampler = (GLSampler)createSampler();
         this.defaultBlender = (GLBlender)createBlender();
 
-        this.graphicsContext = new GLGraphicsContext(window);
+        this.graphicsContext = new GLGraphicsContext(this.window);
         this.graphicsContext.bindRasterizer(this.defaultRasterizer);
     }
 
     public void destroy() {
-        glObjects.forEach(IGLObject::destroy);
+        glObjects.forEach(IDestroyable::destroy);
         glfwTerminate();
+    }
+
+    @Override
+    public void destroy(IDestroyable object) {
+        object.destroy();
+        glObjects.remove(object);
     }
 
     @Override
@@ -95,6 +105,7 @@ public class GLGraphicsDevice implements IGraphicsDevice {
     public Texture2D createTexture2D(int width, int height) {
         GLTexture2D glTexture = new GLTexture2D(width, height);
         glTexture.setSampler(defaultSampler);
+
         glObjects.add(glTexture);
         return glTexture;
     }
@@ -145,10 +156,32 @@ public class GLGraphicsDevice implements IGraphicsDevice {
     }
 
     @Override
+    public RenderTarget2D createRenderTarget2D() {
+        GLRenderTarget2D glRenderTarget = new GLRenderTarget2D(window.getWidth(), window.getHeight());
+        glRenderTarget.setWindow(window);
+        glRenderTarget.setResizeListener(glRenderTarget::setSize);
+        glRenderTarget.attachDepthTexture(createTexture2D(window.getWidth(), window.getHeight(), FormatType.DEPTH_24_STENCIL_8));
+        glRenderTarget.attachColorTexture(0, createTexture2D(window.getWidth(), window.getHeight()));
+        glObjects.add(glRenderTarget);
+        return glRenderTarget;
+    }
+
+    @Override
     public RenderTarget2D createRenderTarget2D(int width, int height) {
         GLRenderTarget2D glRenderTarget = new GLRenderTarget2D(width, height);
         glRenderTarget.attachDepthTexture(createTexture2D(width, height, FormatType.DEPTH_24_STENCIL_8));
         glRenderTarget.attachColorTexture(0, createTexture2D(width, height));
+        glObjects.add(glRenderTarget);
+        return glRenderTarget;
+    }
+
+    @Override
+    public RenderTargetMS createRenderTargetMS(int samples) {
+        GLRenderTargetMS glRenderTarget = new GLRenderTargetMS(window.getWidth(), window.getHeight(), samples);
+        glRenderTarget.setWindow(window);
+        glRenderTarget.setResizeListener(glRenderTarget::setSize);
+        glRenderTarget.attachDepthTexture(createTextureMS(window.getWidth(), window.getHeight(), samples, FormatType.DEPTH_24_STENCIL_8));
+        glRenderTarget.attachColorTexture(0, createTextureMS(window.getWidth(), window.getHeight(), samples));
         glObjects.add(glRenderTarget);
         return glRenderTarget;
     }

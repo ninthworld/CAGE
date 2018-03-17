@@ -1,6 +1,7 @@
 package cage.core.scene.camera;
 
 import cage.core.scene.Node;
+import cage.core.scene.SceneManager;
 import org.joml.Matrix4f;
 
 public class OrthographicCamera extends Camera {
@@ -9,21 +10,33 @@ public class OrthographicCamera extends Camera {
     private float right;
     private float bottom;
     private float top;
+    private Matrix4f projMatrix;
 
-    public OrthographicCamera(Node parent) {
-        super(parent);
+    public OrthographicCamera(SceneManager sceneManager, Node parent) {
+        super(sceneManager, parent);
         this.left = -1.0f;
         this.right = 1.0f;
         this.bottom = -1.0f;
         this.top = 1.0f;
+        this.projMatrix = new Matrix4f().identity();
+    }
+
+    @Override
+    protected void updateNode() {
+        super.updateNode();
+
+        projMatrix.identity();
+        projMatrix.ortho(left, right, bottom, top, getZNear(), getZFar());
+
+        projMatrix.get(bufferData);
+        bufferData.position(32);
+        projMatrix.invert().get(bufferData);
+        bufferData.rewind();
     }
 
     @Override
     public Matrix4f getProjectionMatrix() {
-        Matrix4f orthoMatrix = new Matrix4f();
-        orthoMatrix.identity();
-        orthoMatrix.ortho(left, right, bottom, top, getZNear(), getZFar());
-        return orthoMatrix;
+        return projMatrix;
     }
 
     public float getLeft() {

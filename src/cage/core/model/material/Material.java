@@ -1,6 +1,6 @@
 package cage.core.model.material;
 
-import cage.core.graphics.IBufferData;
+import cage.core.common.IBufferData;
 import cage.core.graphics.Texture;
 import cage.core.graphics.config.LayoutConfig;
 import org.joml.Vector3f;

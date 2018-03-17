@@ -1,45 +1,46 @@
 package cage.core.graphics;
 
+import cage.core.application.GameWindow;
+import cage.core.common.IDestroyable;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
-public abstract class RenderTarget<T extends Texture> {
+public abstract class RenderTarget<T extends Texture> implements IDestroyable {
 
     private Map<Integer, T> colorTextures;
     private T depthTexture;
     private int width;
     private int height;
 
+    private GameWindow window;
+    private GameWindow.IWindowResizeListener resizeListener;
+
     public RenderTarget(int width, int height) {
         this.colorTextures = new HashMap<>();
         this.depthTexture = null;
         this.width = width;
         this.height = height;
+        this.window = null;
+        this.resizeListener = null;
     }
 
     public int getWidth() {
         return width;
     }
 
-    public void setWidth(int width) {
-        this.width = width;
-        colorTextures.forEach((Integer i, T t) -> t.setWidth(width));
-        if(containsDepthTexture()) {
-            depthTexture.setWidth(width);
-        }
-    }
-
     public int getHeight() {
         return height;
     }
 
-    public void setHeight(int height) {
+    public void setSize(int width, int height) {
+        this.width = width;
         this.height = height;
-        colorTextures.forEach((Integer i, T t) -> t.setHeight(height));
+        colorTextures.forEach((Integer i, T t) -> t.setSize(width, height));
         if(containsDepthTexture()) {
-            depthTexture.setHeight(height);
+            depthTexture.setSize(width, height);
         }
     }
 
@@ -81,5 +82,40 @@ public abstract class RenderTarget<T extends Texture> {
 
     public T getDepthTexture() {
         return depthTexture;
+    }
+
+    public boolean containsResizeListener() {
+        return resizeListener != null;
+    }
+
+    public GameWindow.IWindowResizeListener getResizeListener() {
+        return resizeListener;
+    }
+
+    public void setResizeListener(GameWindow.IWindowResizeListener resizeListener) {
+        if(resizeListener != null) {
+            if(window != null) {
+                window.removeListener(this.resizeListener);
+                if(!window.containsListener(resizeListener)) {
+                    window.addListener(resizeListener);
+                }
+            }
+            this.resizeListener = resizeListener;
+        }
+    }
+
+    public void removeResizeListener() {
+        if(window != null) {
+            window.removeListener(this.resizeListener);
+        }
+        this.resizeListener = null;
+    }
+
+    public GameWindow getWindow() {
+        return window;
+    }
+
+    public void setWindow(GameWindow window) {
+        this.window = window;
     }
 }

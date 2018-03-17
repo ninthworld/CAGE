@@ -1,0 +1,27 @@
+* ShaderBuffer
+* Send lights in shaderbuffer instead of uniformbuffer for infinite lights
+* InputManager
+* IListener
+* IAction
+* Fix node's world transforms
+* Fix node's update-every-frame to only update when necessary
+* Make SceneManager not a node, but have a single root node
+* Make notifyDetach and notifyDispose?
+* GUI implementation
+* More window properties like fullscreen, generic key and mouse input, icon
+* Texture loading
+* AssetLoader read config file for paths
+* System to resize components with window resize through actions/listeners
+* Add mtl file reading
+* Add geometry, tess eval/ctrl shaders
+* Add terrain
+* Add skybox/dome (geometry based and/or shader based, w/ or w/o texture cubemap)
+* Update readme
+* Javadocs
+* Get programs to work from bat
+* Examples
+* FPCamera, OrbitCamera
+* Server/Client architecture
+* IDisposable on core instead of GL only
+* Physics
+* Audio

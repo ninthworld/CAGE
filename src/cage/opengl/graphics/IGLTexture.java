@@ -1,5 +1,7 @@
 package cage.opengl.graphics;
 
-public interface IGLTexture extends IGLObject {
+import cage.opengl.common.IGLBindable;
+
+public interface IGLTexture extends IGLBindable {
 	int getTextureId();
 }

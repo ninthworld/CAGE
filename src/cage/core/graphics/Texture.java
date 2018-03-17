@@ -1,10 +1,11 @@
 package cage.core.graphics;
 
+import cage.core.common.IDestroyable;
 import cage.core.graphics.type.FormatType;
 
 import java.nio.*;
 
-public abstract class Texture {
+public abstract class Texture implements IDestroyable {
 
     private int width;
     private int height;
@@ -36,15 +37,12 @@ public abstract class Texture {
         return width;
     }
 
-    public void setWidth(int width) {
-        this.width = width;
-    }
-
     public int getHeight() {
         return height;
     }
 
-    public void setHeight(int height) {
+    public void setSize(int width, int height) {
+        this.width = width;
         this.height = height;
     }
 

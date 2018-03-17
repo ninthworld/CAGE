@@ -60,14 +60,8 @@ public class GLTextureMS extends TextureMS implements IGLTexture {
     }
 
     @Override
-    public void setWidth(int width) {
-        super.setWidth(width);
-        initialize();
-    }
-
-    @Override
-    public void setHeight(int height) {
-        super.setHeight(height);
+    public void setSize(int width, int height) {
+        super.setSize(width, height);
         initialize();
     }
 

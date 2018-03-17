@@ -1,9 +1,10 @@
 package cage.core.graphics;
 
+import cage.core.common.IDestroyable;
 import cage.core.graphics.type.BlendOpType;
 import cage.core.graphics.type.BlendType;
 
-public abstract class Blender {
+public abstract class Blender implements IDestroyable {
 
     private boolean alphaToCoverage;
     private int index;

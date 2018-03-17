@@ -1,22 +1,75 @@
 package cage.core.scene;
 
 import cage.core.model.Model;
+import cage.core.scene.camera.OrthographicCamera;
+import cage.core.scene.camera.PerspectiveCamera;
+import cage.core.scene.light.AmbientLight;
+import cage.core.scene.light.DirectionalLight;
+import cage.core.scene.light.PointLight;
 
 public class SceneNode extends Node {
 
-    public SceneNode(Node parent) {
+    private SceneManager sceneManager;
+
+    public SceneNode(SceneManager sceneManager, Node parent) {
         super(parent);
+        this.sceneManager = sceneManager;
     }
 
-    public SceneNode addSceneNode() {
-        SceneNode node = new SceneNode(null);
-        attachNode(node);
+    public SceneNode createSceneNode() {
+        SceneNode node = new SceneNode(sceneManager, this);
         return node;
     }
 
-    public SceneEntity addSceneEntity(Model model) {
-        SceneEntity node = new SceneEntity(null, model);
-        attachNode(node);
+    public SceneEntity createSceneEntity(Model model) {
+        SceneEntity node = new SceneEntity(sceneManager, this, model);
         return node;
+    }
+
+    public PerspectiveCamera createPerspectiveCamera() {
+        PerspectiveCamera camera = new PerspectiveCamera(sceneManager, this);
+        camera.setAspectRatio((float)getSceneManager().getWindow().getWidth() / (float)getSceneManager().getWindow().getHeight());
+        getSceneManager().registerCamera(camera);
+        return camera;
+    }
+
+    public OrthographicCamera createOrthographicCamera() {
+        OrthographicCamera camera = new OrthographicCamera(sceneManager, this);
+        attachNode(camera);
+        getSceneManager().registerCamera(camera);
+        return camera;
+    }
+
+    public AmbientLight createAmbientLight() {
+        AmbientLight light = new AmbientLight(sceneManager, this);
+        getSceneManager().registerLight(light);
+        return light;
+    }
+
+    public PointLight createPointLight() {
+        PointLight light = new PointLight(sceneManager, this);
+        getSceneManager().registerLight(light);
+        return light;
+    }
+
+    public DirectionalLight createDirectionalLight() {
+        DirectionalLight light = new DirectionalLight(sceneManager, this);
+        getSceneManager().registerLight(light);
+        return light;
+    }
+
+    public SceneManager getSceneManager() {
+        return sceneManager;
+    }
+
+    public void setSceneManager(SceneManager sceneManager) {
+        this.sceneManager = sceneManager;
+    }
+
+    @Override
+    public void destroy() {
+        if(getParentNode() != null) {
+            getParentNode().detachNode(this);
+        }
     }
 }

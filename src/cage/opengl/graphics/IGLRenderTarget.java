@@ -1,5 +1,7 @@
 package cage.opengl.graphics;
 
-public interface IGLRenderTarget extends IGLObject {
+import cage.opengl.common.IGLBindable;
+
+public interface IGLRenderTarget extends IGLBindable {
 	int getFramebufferId();
 }
