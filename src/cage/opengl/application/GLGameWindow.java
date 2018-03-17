@@ -16,8 +16,8 @@ public class GLGameWindow extends GameWindow {
 
     private long handle;
 
-    public GLGameWindow(String title, int width, int height, int refreshRate, int samples) {
-        super(title, width, height, refreshRate, samples);
+    public GLGameWindow(String title, int width, int height, boolean vsync, int refreshRate, int samples) {
+        super(title, width, height, vsync, refreshRate, samples);
     }
 
     public void initialize() {
@@ -65,6 +65,10 @@ public class GLGameWindow extends GameWindow {
             public void invoke(long handle, int w, int h) {
                 width = w;
                 height = h;
+                if(!isFullscreen()) {
+                    wWidth = w;
+                    wHeight = h;
+                }
                 Iterator<IListener> it = getListenerIterator();
                 while(it.hasNext()) {
                     IListener listener = it.next();
@@ -80,6 +84,10 @@ public class GLGameWindow extends GameWindow {
             public void invoke(long handle, int x, int y) {
                 posX = x;
                 posY = y;
+                if(!isFullscreen()) {
+                    wPosX = x;
+                    wPosY = y;
+                }
                 Iterator<IListener> it = getListenerIterator();
                 while(it.hasNext()) {
                     IListener listener = it.next();
@@ -156,7 +164,7 @@ public class GLGameWindow extends GameWindow {
         });
 
         glfwMakeContextCurrent(handle);
-        glfwSwapInterval(1);
+        glfwSwapInterval((isVsync() ? 1 : 0));
         glfwShowWindow(handle);
     }
 
@@ -181,9 +189,31 @@ public class GLGameWindow extends GameWindow {
     }
 
     @Override
+    public void setFullscreenSize(int width, int height) {
+        super.setFullscreenSize(width, height);
+        if(isFullscreen()) {
+            setSize(width, height);
+        }
+    }
+
+    @Override
+    public void setWindowedSize(int width, int height) {
+        super.setWindowedSize(width, height);
+        if(!isFullscreen()) {
+            setSize(width, height);
+        }
+    }
+
+    @Override
     public void setPosition(int x, int y) {
         super.setPosition(x, y);
         glfwSetWindowPos(handle, x, y);
+    }
+
+    @Override
+    public void setVsync(boolean vsync) {
+        super.setVsync(vsync);
+        glfwSwapInterval((vsync ? 1 : 0));
     }
 
     @Override
@@ -213,18 +243,10 @@ public class GLGameWindow extends GameWindow {
     public void setFullscreen(boolean fullscreen) {
         super.setFullscreen(fullscreen);
         if(fullscreen) {
-            int x = getPositionX();
-            int y = getPositionY();
-            int w = getWidth();
-            int h = getHeight();
-            setSize(getFullscreenWidth(), getFullscreenHeight());
             glfwSetWindowMonitor(handle, glfwGetPrimaryMonitor(), 0, 0, getFullscreenWidth(), getFullscreenHeight(), getRefreshRate());
-            super.setPosition(x, y);
-            super.setSize(w, h);
         }
         else {
-            setSize(getWidth(), getHeight());
-            glfwSetWindowMonitor(handle, 0, getPositionX(), getPositionY(), getWidth(), getHeight(), getRefreshRate());
+            glfwSetWindowMonitor(handle, 0, getWindowedPositionX(), getWindowedPositionY(), getWindowedWidth(), getWindowedHeight(), getRefreshRate());
         }
     }
 

@@ -37,6 +37,7 @@ public class RenderManager {
     private List<RenderStage> outputStages;
     private GeometryRenderStage defaultGeometryRenderStage;
     private LightingRenderStage defaultLightingRenderStage;
+    private UniformBuffer defaultWindowUniformBuffer;
     private UniformBuffer defaultCameraUniformBuffer;
     private UniformBuffer defaultEntityUniformBuffer;
     private UniformBuffer defaultMaterialUniformBuffer;
@@ -50,6 +51,11 @@ public class RenderManager {
         this.window = window;
         this.sceneManager = sceneManager;
         this.assetManager = assetManager;
+
+        defaultWindowUniformBuffer = graphicsDevice.createUniformBuffer();
+        defaultWindowUniformBuffer.setLayout(GameWindow.BUFFER_LAYOUT);
+        defaultWindowUniformBuffer.setData(window.getBufferData());
+        window.addListener((GameWindow.IWindowResizeListener) (width, height) -> defaultWindowUniformBuffer.setData(window.getBufferData()));
 
         defaultCameraUniformBuffer = graphicsDevice.createUniformBuffer();
         defaultCameraUniformBuffer.setLayout(Camera.BUFFER_LAYOUT);
@@ -115,6 +121,10 @@ public class RenderManager {
 
     public LightingRenderStage getDefaultLightingRenderStage() {
         return defaultLightingRenderStage;
+    }
+
+    public UniformBuffer getDefaultWindowUniformBuffer() {
+        return defaultWindowUniformBuffer;
     }
 
     public UniformBuffer getDefaultCameraUniformBuffer() {

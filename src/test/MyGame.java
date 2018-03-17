@@ -4,9 +4,14 @@ import cage.core.application.GameEngine;
 
 import cage.core.application.GameWindow;
 import cage.core.application.IGame;
+import cage.core.graphics.IGraphicsContext;
+import cage.core.graphics.RenderTarget;
+import cage.core.graphics.Shader;
 import cage.core.graphics.type.CullType;
 import cage.core.input.InputState;
 import cage.core.model.Model;
+import cage.core.render.RenderManager;
+import cage.core.render.stage.FXRenderStage;
 import cage.core.scene.SceneEntity;
 import cage.core.scene.SceneNode;
 import cage.core.scene.light.Light;
@@ -57,6 +62,16 @@ public class MyGame implements IGame {
                 engine.getWindow().setFullscreen(!engine.getWindow().isFullscreen());
             }
         });
+
+        Shader fxaaShader = engine.getAssetManager().loadShader("fx/defaultFX.vs.glsl", "fx/fxaa.fs.glsl");
+        RenderTarget fxaaRenderTarget = engine.getGraphicsDevice().createRenderTarget2D();
+        FXRenderStage fxaaRenderStage = engine.getRenderManager().createFXRenderStage(FXAARenderStage::new);
+        fxaaRenderStage.setShader(fxaaShader);
+        fxaaShader.attachUniformBuffer("Window", engine.getRenderManager().getDefaultWindowUniformBuffer());
+        fxaaRenderStage.setRenderTarget(fxaaRenderTarget);
+        fxaaRenderStage.attachInputStage(engine.getRenderManager().getOutputStage(0));
+        engine.getRenderManager().detachOutputStage(engine.getRenderManager().getOutputStage(0));
+        engine.getRenderManager().attachOutputStage(fxaaRenderStage);
     }
 
     @Override

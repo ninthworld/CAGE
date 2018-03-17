@@ -13,23 +13,25 @@ public class GLBootstrap {
     private String title;
     private int width;
     private int height;
+    private boolean vsync;
     private int refreshRate;
     private int samples;
 
-    public GLBootstrap(String title, int width, int height, int refreshRate, int samples) {
+    public GLBootstrap(String title, int width, int height, boolean vsync, int refreshRate, int samples) {
         this.title = title;
         this.width = width;
         this.height = height;
+        this.vsync = vsync;
         this.refreshRate = refreshRate;
         this.samples = samples;
     }
 
-    public GLBootstrap(String title, int width, int height, int refreshRate) {
-        this(title, width, height, refreshRate, 1);
+    public GLBootstrap(String title, int width, int height, boolean vsync, int refreshRate) {
+        this(title, width, height, vsync, refreshRate, 1);
     }
 
     public GLBootstrap(String title, int width, int height) {
-        this(title, width, height, 60, 1);
+        this(title, width, height, false, 60, 1);
     }
 
     public void run(IGLGameConstructor app) {
@@ -38,7 +40,7 @@ public class GLBootstrap {
         GLGameEngine engine = null;
         IGame game = null;
         try {
-            window = new GLGameWindow(title, width, height, refreshRate, samples);
+            window = new GLGameWindow(title, width, height, vsync, refreshRate, samples);
             engine = new GLGameEngine(window);
             game = app.game(engine);
             engine.run(game);
