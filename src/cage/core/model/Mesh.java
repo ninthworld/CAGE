@@ -1,6 +1,6 @@
 package cage.core.model;
 
-import cage.core.graphics.IndexBuffer;
+import cage.core.graphics.buffer.IndexBuffer;
 import cage.core.model.material.Material;
 
 public class Mesh {

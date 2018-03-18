@@ -1,6 +1,6 @@
 package cage.core.model;
 
-import cage.core.graphics.VertexArray;
+import cage.core.graphics.vertexarray.VertexArray;
 
 import java.util.ArrayList;
 import java.util.Iterator;

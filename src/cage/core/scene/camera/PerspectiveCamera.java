@@ -1,5 +1,6 @@
 package cage.core.scene.camera;
 
+import cage.core.application.GameWindow;
 import cage.core.scene.Node;
 import cage.core.scene.SceneManager;
 import org.joml.Matrix4f;
@@ -10,11 +11,16 @@ public class PerspectiveCamera extends Camera {
     private float fov;
     private Matrix4f projMatrix;
 
+    private GameWindow window;
+    private GameWindow.IWindowResizeListener resizeListener;
+
     public PerspectiveCamera(SceneManager sceneManager, Node parent) {
         super(sceneManager, parent);
         this.aspectRatio = 1.0f;
         this.fov = 45.0f;
         this.projMatrix = new Matrix4f().identity();
+        this.window = null;
+        this.resizeListener = null;
     }
 
     @Override
@@ -49,5 +55,40 @@ public class PerspectiveCamera extends Camera {
 
     public void setFOV(float fov) {
         this.fov = fov;
+    }
+
+    public boolean containsResizeListener() {
+        return resizeListener != null;
+    }
+
+    public GameWindow.IWindowResizeListener getResizeListener() {
+        return resizeListener;
+    }
+
+    public void setResizeListener(GameWindow.IWindowResizeListener resizeListener) {
+        if(resizeListener != null) {
+            if(window != null) {
+                window.removeListener(this.resizeListener);
+                if(!window.containsListener(resizeListener)) {
+                    window.addListener(resizeListener);
+                }
+            }
+            this.resizeListener = resizeListener;
+        }
+    }
+
+    public void removeResizeListener() {
+        if(window != null) {
+            window.removeListener(this.resizeListener);
+        }
+        this.resizeListener = null;
+    }
+
+    public GameWindow getWindow() {
+        return window;
+    }
+
+    public void setWindow(GameWindow window) {
+        this.window = window;
     }
 }

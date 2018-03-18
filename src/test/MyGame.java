@@ -4,14 +4,9 @@ import cage.core.application.GameEngine;
 
 import cage.core.application.GameWindow;
 import cage.core.application.IGame;
-import cage.core.graphics.IGraphicsContext;
-import cage.core.graphics.RenderTarget;
-import cage.core.graphics.Shader;
-import cage.core.graphics.type.CullType;
+import cage.core.graphics.type.FillType;
 import cage.core.input.InputState;
 import cage.core.model.Model;
-import cage.core.render.RenderManager;
-import cage.core.render.stage.FXRenderStage;
 import cage.core.scene.SceneEntity;
 import cage.core.scene.SceneNode;
 import cage.core.scene.light.Light;
@@ -34,22 +29,19 @@ public class MyGame implements IGame {
     @Override
     public void initialize(GameEngine engine) {
         engine.getGraphicsContext().setClearColor(Color.decode("#6495ed"));
-        engine.getGraphicsDevice().getDefaultRasterizer().setCullType(CullType.BACK);
 
         engine.getSceneManager().getDefaultCamera().setLocalPosition(0.0f, 0.0f, 8.0f);
 
         rotateNode = engine.getSceneManager().getRootSceneNode().createSceneNode();
 
         Model model = engine.getAssetManager().loadOBJModel("dolphin/dolphinHighPoly.obj");
-        model.getMesh(0).getMaterial().setDiffuse(new Vector3f(1.0f, 0.0f, 0.0f));
-        model.getMesh(0).getMaterial().setSpecular(new Vector3f(1.0f, 1.0f, 1.0f), 16.0f);
         dolphinEntity = rotateNode.createSceneEntity(model);
         dolphinEntity.translate(4.0f, 0.0f, 0.0f);
         dolphinEntity.scale(new Vector3f(2.0f));
 
         PointLight light = engine.getSceneManager().getRootSceneNode().createPointLight();
-        light.setLocalPosition(1.0f, 0.0f, 0.0f);
-        light.setRange(64.0f);
+        light.setLocalPosition(0.0f, 0.0f, 0.0f);
+        light.setRange(32.0f);
         light.setAttenuation(AttenuationType.QUADRATIC);
         light.setDiffuseColor(1.0f, 1.0f, 1.0f);
         light.setSpecularColor(1.0f, 1.0f, 1.0f);
@@ -62,16 +54,6 @@ public class MyGame implements IGame {
                 engine.getWindow().setFullscreen(!engine.getWindow().isFullscreen());
             }
         });
-
-        Shader fxaaShader = engine.getAssetManager().loadShader("fx/defaultFX.vs.glsl", "fx/fxaa.fs.glsl");
-        RenderTarget fxaaRenderTarget = engine.getGraphicsDevice().createRenderTarget2D();
-        FXRenderStage fxaaRenderStage = engine.getRenderManager().createFXRenderStage(FXAARenderStage::new);
-        fxaaRenderStage.setShader(fxaaShader);
-        fxaaShader.attachUniformBuffer("Window", engine.getRenderManager().getDefaultWindowUniformBuffer());
-        fxaaRenderStage.setRenderTarget(fxaaRenderTarget);
-        fxaaRenderStage.attachInputStage(engine.getRenderManager().getOutputStage(0));
-        engine.getRenderManager().detachOutputStage(engine.getRenderManager().getOutputStage(0));
-        engine.getRenderManager().attachOutputStage(fxaaRenderStage);
     }
 
     @Override

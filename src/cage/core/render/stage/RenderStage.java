@@ -1,8 +1,9 @@
 package cage.core.render.stage;
 
 import cage.core.graphics.IGraphicsContext;
-import cage.core.graphics.RenderTarget;
-import cage.core.graphics.Shader;
+import cage.core.graphics.rasterizer.Rasterizer;
+import cage.core.graphics.rendertarget.RenderTarget;
+import cage.core.graphics.shader.Shader;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -11,14 +12,16 @@ import java.util.List;
 public abstract class RenderStage {
 
     private IGraphicsContext graphicsContext;
+    private Rasterizer rasterizer;
     private List<RenderStage> inputStages;
     private Shader shader;
     private RenderTarget renderTarget;
 
-    public RenderStage(Shader shader, RenderTarget renderTarget, IGraphicsContext graphicsContext) {
+    public RenderStage(Shader shader, RenderTarget renderTarget, Rasterizer rasterizer, IGraphicsContext graphicsContext) {
         this.inputStages = new ArrayList<>();
         this.shader = shader;
         this.renderTarget = renderTarget;
+        this.rasterizer = rasterizer;
         this.graphicsContext = graphicsContext;
     }
 
@@ -28,6 +31,7 @@ public abstract class RenderStage {
     public void render() {
         getInputStageIterator().forEachRemaining(RenderStage::render);
         preRender();
+        graphicsContext.bindRasterizer(rasterizer);
     }
 
     public IGraphicsContext getGraphicsContext() {
@@ -52,6 +56,14 @@ public abstract class RenderStage {
 
     public void setRenderTarget(RenderTarget renderTarget) {
         this.renderTarget = renderTarget;
+    }
+
+    public Rasterizer getRasterizer() {
+        return rasterizer;
+    }
+
+    public void setRasterizer(Rasterizer rasterizer) {
+        this.rasterizer = rasterizer;
     }
 
     public int getInputStageCount() {

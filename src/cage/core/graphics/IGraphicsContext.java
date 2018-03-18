@@ -1,6 +1,12 @@
 package cage.core.graphics;
 
+import cage.core.graphics.blender.Blender;
+import cage.core.graphics.buffer.IndexBuffer;
+import cage.core.graphics.rasterizer.Rasterizer;
+import cage.core.graphics.rendertarget.RenderTarget;
+import cage.core.graphics.shader.Shader;
 import cage.core.graphics.type.PrimitiveType;
+import cage.core.graphics.vertexarray.VertexArray;
 
 import java.awt.*;
 

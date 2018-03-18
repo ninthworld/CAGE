@@ -1,23 +1,24 @@
 package cage.core.render;
 
 import cage.core.application.GameWindow;
-import cage.core.application.IGame;
 import cage.core.asset.AssetManager;
 import cage.core.graphics.*;
+import cage.core.graphics.buffer.IndexBuffer;
+import cage.core.graphics.buffer.UniformBuffer;
+import cage.core.graphics.buffer.VertexBuffer;
 import cage.core.graphics.config.LayoutConfig;
+import cage.core.graphics.rasterizer.Rasterizer;
+import cage.core.graphics.rendertarget.RenderTarget;
+import cage.core.graphics.shader.Shader;
+import cage.core.graphics.vertexarray.VertexArray;
 import cage.core.model.Mesh;
 import cage.core.model.Model;
 import cage.core.model.material.Material;
-import cage.core.render.stage.FXRenderStage;
-import cage.core.render.stage.GeometryRenderStage;
-import cage.core.render.stage.LightingRenderStage;
-import cage.core.render.stage.RenderStage;
+import cage.core.render.stage.*;
 import cage.core.scene.SceneEntity;
 import cage.core.scene.SceneManager;
-import cage.core.scene.SceneNode;
 import cage.core.scene.camera.Camera;
 import cage.core.scene.light.Light;
-import cage.opengl.application.GLGameEngine;
 
 import org.lwjgl.BufferUtils;
 
@@ -37,6 +38,7 @@ public class RenderManager {
     private List<RenderStage> outputStages;
     private GeometryRenderStage defaultGeometryRenderStage;
     private LightingRenderStage defaultLightingRenderStage;
+    private FXAARenderStage defaultFXAARenderStage;
     private UniformBuffer defaultWindowUniformBuffer;
     private UniformBuffer defaultCameraUniformBuffer;
     private UniformBuffer defaultEntityUniformBuffer;
@@ -97,7 +99,17 @@ public class RenderManager {
 	        defaultLightingRenderStage.setSceneManager(sceneManager);
 	        defaultLightingRenderStage.attachInputStage(defaultGeometryRenderStage);
         }
-        attachOutputStage(defaultLightingRenderStage);
+
+        defaultFXAARenderStage = (FXAARenderStage)createFXRenderStage(FXAARenderStage::new);
+        {
+            Shader shader = assetManager.loadShader("fx/fx.vs.glsl", "fx/fxaa.fs.glsl");
+            RenderTarget renderTarget = graphicsDevice.createRenderTarget2D();
+            shader.attachUniformBuffer("Window", getDefaultWindowUniformBuffer());
+            defaultFXAARenderStage.setShader(shader);
+            defaultFXAARenderStage.setRenderTarget(renderTarget);
+            defaultFXAARenderStage.attachInputStage(defaultLightingRenderStage);
+        }
+        attachOutputStage(defaultFXAARenderStage);
     }
 
     public void render() {
@@ -108,11 +120,11 @@ public class RenderManager {
     }
 
     public RenderStage createRenderStage(IRenderStageConstructor stage) {
-    	return stage.init(null, null, graphicsContext);
+    	return stage.init(null, null, graphicsDevice.getDefaultRasterizer(), graphicsContext);
     }
 
     public FXRenderStage createFXRenderStage(IFXRenderStageConstructor stage) {
-        return stage.init(defaultFXModel, null, null, graphicsContext);
+        return stage.init(defaultFXModel, null, null, graphicsDevice.getDefaultFXRasterizer(), graphicsContext);
     }
 
     public GeometryRenderStage getDefaultGeometryRenderStage() {
@@ -198,10 +210,10 @@ public class RenderManager {
     }
     
     public interface IRenderStageConstructor {
-        RenderStage init(Shader shader, RenderTarget renderTarget, IGraphicsContext graphicsContext);
+        RenderStage init(Shader shader, RenderTarget renderTarget, Rasterizer rasterizer, IGraphicsContext graphicsContext);
     }
     
     public interface IFXRenderStageConstructor {
-        FXRenderStage init(Model fxModel, Shader shader, RenderTarget renderTarget, IGraphicsContext graphicsContext);
+        FXRenderStage init(Model fxModel, Shader shader, RenderTarget renderTarget, Rasterizer rasterizer, IGraphicsContext graphicsContext);
     }
 }

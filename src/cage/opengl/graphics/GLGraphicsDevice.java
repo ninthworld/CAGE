@@ -1,10 +1,33 @@
 package cage.opengl.graphics;
 
-import cage.core.application.GameWindow;
 import cage.core.common.IDestroyable;
 import cage.core.graphics.*;
+import cage.core.graphics.blender.Blender;
+import cage.core.graphics.buffer.IndexBuffer;
+import cage.core.graphics.buffer.UniformBuffer;
+import cage.core.graphics.buffer.VertexBuffer;
+import cage.core.graphics.rasterizer.Rasterizer;
+import cage.core.graphics.rendertarget.RenderTarget2D;
+import cage.core.graphics.rendertarget.RenderTargetMS;
+import cage.core.graphics.sampler.Sampler;
+import cage.core.graphics.shader.Shader;
+import cage.core.graphics.texture.Texture2D;
+import cage.core.graphics.texture.TextureMS;
 import cage.core.graphics.type.FormatType;
+import cage.core.graphics.vertexarray.VertexArray;
 import cage.opengl.application.GLGameWindow;
+import cage.opengl.graphics.blender.GLBlender;
+import cage.opengl.graphics.buffer.GLIndexBuffer;
+import cage.opengl.graphics.buffer.GLUniformBuffer;
+import cage.opengl.graphics.buffer.GLVertexBuffer;
+import cage.opengl.graphics.rasterizer.GLRasterizer;
+import cage.opengl.graphics.rendertarget.GLRenderTarget2D;
+import cage.opengl.graphics.rendertarget.GLRenderTargetMS;
+import cage.opengl.graphics.sampler.GLSampler;
+import cage.opengl.graphics.shader.GLShader;
+import cage.opengl.graphics.texture.GLTexture2D;
+import cage.opengl.graphics.texture.GLTextureMS;
+import cage.opengl.graphics.vertexarray.GLVertexArray;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
 
@@ -20,6 +43,7 @@ public class GLGraphicsDevice implements IGraphicsDevice {
     private List<IDestroyable> glObjects;
 
     private GLRasterizer defaultRasterizer;
+    private GLRasterizer defaultFXRasterizer;
     private GLSampler defaultSampler;
     private GLBlender defaultBlender;
 
@@ -36,6 +60,7 @@ public class GLGraphicsDevice implements IGraphicsDevice {
         this.glObjects = new ArrayList<>();
 
         this.defaultRasterizer = (GLRasterizer)createRasterizer();
+        this.defaultFXRasterizer = (GLRasterizer)createRasterizer();
         this.defaultSampler = (GLSampler)createSampler();
         this.defaultBlender = (GLBlender)createBlender();
 
@@ -205,6 +230,11 @@ public class GLGraphicsDevice implements IGraphicsDevice {
     @Override
     public Rasterizer getDefaultRasterizer() {
         return defaultRasterizer;
+    }
+
+    @Override
+    public Rasterizer getDefaultFXRasterizer() {
+        return defaultFXRasterizer;
     }
 
     @Override

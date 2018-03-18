@@ -28,6 +28,8 @@ public class SceneManager {
         this.lights = new ArrayList<>();
         this.rootNode = new SceneNode(this, null);
         this.defaultCamera = this.rootNode.createPerspectiveCamera();
+        ((PerspectiveCamera) this.defaultCamera).setWindow(this.window);
+        ((PerspectiveCamera) this.defaultCamera).setResizeListener((width, height) -> ((PerspectiveCamera) defaultCamera).setAspectRatio((float)width / (float)height));
         this.defaultAmbientLight = this.rootNode.createAmbientLight();
         this.defaultAmbientLight.setAmbientColor(new Vector3f(0.2f));
     }

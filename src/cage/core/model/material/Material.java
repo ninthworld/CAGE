@@ -1,7 +1,7 @@
 package cage.core.model.material;
 
 import cage.core.common.IBufferData;
-import cage.core.graphics.Texture;
+import cage.core.graphics.texture.Texture;
 import cage.core.graphics.config.LayoutConfig;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
@@ -10,24 +10,28 @@ import java.nio.FloatBuffer;
 
 public class Material implements IBufferData {
 
-    public static final int BUFFER_DATA_SIZE = 12;
-    public static final LayoutConfig BUFFER_LAYOUT = new LayoutConfig().float1().float1().float1().float1().float4().float4();
+    public static final int BUFFER_DATA_SIZE = 20;
+    public static final LayoutConfig BUFFER_LAYOUT = new LayoutConfig().float1().float1().float1().float1().float1().float1().float2().float4().float4().float4();
 
     private Vector3f diffuse;
     private Vector3f specular;
-    private float specularExp;
+    private Vector3f emissive;
+    private float shininess;
     private Texture diffuseMap;
     private Texture specularMap;
     private Texture highlightMap;
+    private Texture emissiveMap;
     private Texture normalMap;
 
     public Material() {
         this.diffuse = new Vector3f();
         this.specular = new Vector3f();
-        this.specularExp = 0.0f;
+        this.emissive = new Vector3f();
+        this.shininess = 0.0f;
         this.diffuseMap = null;
         this.specularMap = null;
         this.highlightMap = null;
+        this.emissiveMap = null;
         this.normalMap = null;
     }
 
@@ -40,8 +44,11 @@ public class Material implements IBufferData {
     }
 
     public void setDiffuse(Vector3f diffuse) {
-        this.diffuseMap = null;
         this.diffuse = diffuse;
+    }
+
+    public void setDiffuse(float r, float g, float b) {
+        setDiffuse(new Vector3f(r, g, b));
     }
 
     public void setDiffuse(Texture diffuse) {
@@ -52,28 +59,56 @@ public class Material implements IBufferData {
         return new Vector3f(specular);
     }
 
-    public float getSpecularExponent() {
-        return specularExp;
-    }
-
     public Texture getSpecularTexture() {
         return specularMap;
     }
 
-    public Texture getSpecularHighlightTexture() {
+    public void setSpecular(Vector3f specular) {
+        this.specular = specular;
+    }
+
+    public void setSpecular(float r, float g, float b) {
+        setSpecular(new Vector3f(r, g, b));
+    }
+
+    public void setSpecular(Texture specular) {
+        this.specularMap = specular;
+    }
+
+    public Texture getHighlightTexture() {
         return highlightMap;
     }
 
-    public void setSpecular(Vector3f specular, float exponent) {
-        this.specularMap = null;
-        this.highlightMap = null;
-        this.specular = specular;
-        this.specularExp = exponent;
+    public void setHighlight(Texture highlight) {
+        this.highlightMap = highlight;
     }
 
-    public void setSpecular(Texture specular, Texture highlight) {
-        this.specularMap = specular;
-        this.highlightMap = highlight;
+    public float getShininess() {
+        return shininess;
+    }
+
+    public void setShininess(float shininess) {
+        this.shininess = shininess;
+    }
+
+    public Vector3f getEmissiveColor() {
+        return emissive;
+    }
+
+    public Texture getEmissiveMap() {
+        return emissiveMap;
+    }
+
+    public void setEmissive(Vector3f emissive) {
+        this.emissive = emissive;
+    }
+
+    public void setEmissive(float r, float g, float b) {
+        setEmissive(new Vector3f(r, g, b));
+    }
+
+    public void setEmissive(Texture emissive) {
+        this.emissiveMap = emissive;
     }
 
     public Texture getNormalTexture() {
@@ -89,10 +124,14 @@ public class Material implements IBufferData {
         FloatBuffer buffer = BufferUtils.createFloatBuffer(BUFFER_DATA_SIZE);
         buffer.put(0, (diffuseMap == null ? 0.0f : 1.0f));
         buffer.put(1, (specularMap == null ? 0.0f : 1.0f));
-        buffer.put(2, (normalMap == null ? 0.0f : 1.0f));
-        buffer.put(3, specularExp);
-        diffuse.get(4, buffer).put(7, 1.0f);
-        specular.get(8, buffer).put(11, 1.0f);
+        buffer.put(2, (highlightMap == null ? 0.0f : 1.0f));
+        buffer.put(3, (emissiveMap == null ? 0.0f : 1.0f));
+        buffer.put(4, (normalMap == null ? 0.0f : 1.0f));
+        buffer.put(5, shininess);
+        // 2 Float padding
+        diffuse.get(8, buffer).put(11, 1.0f);
+        specular.get(12, buffer).put(15, 1.0f);
+        emissive.get(16, buffer).put(19, 1.0f);
         buffer.rewind();
         return buffer;
     }

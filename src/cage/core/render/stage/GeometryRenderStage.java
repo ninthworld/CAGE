@@ -1,6 +1,11 @@
 package cage.core.render.stage;
 
 import cage.core.graphics.*;
+import cage.core.graphics.buffer.UniformBuffer;
+import cage.core.graphics.rasterizer.Rasterizer;
+import cage.core.graphics.rendertarget.RenderTarget;
+import cage.core.graphics.shader.Shader;
+import cage.core.graphics.texture.Texture;
 import cage.core.model.Mesh;
 import cage.core.model.Model;
 import cage.core.model.material.Material;
@@ -17,8 +22,8 @@ public class GeometryRenderStage extends RenderStage {
     private Camera camera;
     private SceneNode node;
 
-    public GeometryRenderStage(Shader shader, RenderTarget renderTarget, IGraphicsContext graphicsContext) {
-        super(shader, renderTarget, graphicsContext);
+    public GeometryRenderStage(Shader shader, RenderTarget renderTarget, Rasterizer rasterizer, IGraphicsContext graphicsContext) {
+        super(shader, renderTarget, rasterizer, graphicsContext);
         this.node = null;
         this.camera = null;
     }
@@ -75,8 +80,8 @@ public class GeometryRenderStage extends RenderStage {
                     getShader().attachTexture("specularTexture", material.getSpecularTexture());
                 }
 
-                if(material.getSpecularHighlightTexture() != null) {
-                    getShader().attachTexture("highlightTexture", material.getSpecularHighlightTexture());
+                if(material.getHighlightTexture() != null) {
+                    getShader().attachTexture("highlightTexture", material.getHighlightTexture());
                 }
 
                 getGraphicsContext().bindShader(getShader());
