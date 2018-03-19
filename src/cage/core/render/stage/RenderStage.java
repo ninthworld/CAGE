@@ -1,10 +1,13 @@
 package cage.core.render.stage;
 
+import cage.core.window.Window;
 import cage.core.graphics.IGraphicsContext;
 import cage.core.graphics.rasterizer.Rasterizer;
 import cage.core.graphics.rendertarget.RenderTarget;
 import cage.core.graphics.shader.Shader;
+import cage.core.window.listener.IResizeWindowListener;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -16,6 +19,8 @@ public abstract class RenderStage {
     private List<RenderStage> inputStages;
     private Shader shader;
     private RenderTarget renderTarget;
+    private Rectangle outputDimensions;
+    private boolean rendered;
 
     public RenderStage(Shader shader, RenderTarget renderTarget, Rasterizer rasterizer, IGraphicsContext graphicsContext) {
         this.inputStages = new ArrayList<>();
@@ -23,15 +28,29 @@ public abstract class RenderStage {
         this.renderTarget = renderTarget;
         this.rasterizer = rasterizer;
         this.graphicsContext = graphicsContext;
+        this.outputDimensions = new Rectangle(0, 0, this.renderTarget.getWidth(), this.renderTarget.getHeight());
+        if(this.renderTarget.containsResizeListener()) {
+            this.renderTarget.getWindow().addListener((IResizeWindowListener) (width, height) -> outputDimensions.setSize(width, height));
+        }
+        this.rendered = false;
     }
 
     public void preRender() {
     }
 
     public void render() {
+        if(rendered) {
+            return;
+        }
+        rendered = true;
         getInputStageIterator().forEachRemaining(RenderStage::render);
         preRender();
         graphicsContext.bindRasterizer(rasterizer);
+    }
+
+    public void postRender() {
+        rendered = false;
+        getInputStageIterator().forEachRemaining(RenderStage::postRender);
     }
 
     public IGraphicsContext getGraphicsContext() {
@@ -66,6 +85,14 @@ public abstract class RenderStage {
         this.rasterizer = rasterizer;
     }
 
+    public boolean isRendered() {
+        return rendered;
+    }
+
+    public void setRendered(boolean rendered) {
+        this.rendered = rendered;
+    }
+
     public int getInputStageCount() {
         return inputStages.size();
     }
@@ -88,5 +115,17 @@ public abstract class RenderStage {
 
     public Iterator<RenderStage> getInputStageIterator() {
         return inputStages.iterator();
+    }
+
+    public Rectangle getOutputDimensions() {
+        return outputDimensions;
+    }
+
+    public void setOutputDimensions(Rectangle outputDimensions) {
+        this.outputDimensions = outputDimensions;
+    }
+
+    public void setOutputDimensions(int x, int y, int width, int height) {
+        setOutputDimensions(new Rectangle(x, y, width, height));
     }
 }

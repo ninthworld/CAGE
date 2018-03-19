@@ -1,8 +1,9 @@
 package cage.core.scene.camera;
 
-import cage.core.application.GameWindow;
+import cage.core.window.Window;
 import cage.core.scene.Node;
 import cage.core.scene.SceneManager;
+import cage.core.window.listener.IResizeWindowListener;
 import org.joml.Matrix4f;
 
 public class PerspectiveCamera extends Camera {
@@ -11,8 +12,8 @@ public class PerspectiveCamera extends Camera {
     private float fov;
     private Matrix4f projMatrix;
 
-    private GameWindow window;
-    private GameWindow.IWindowResizeListener resizeListener;
+    private Window window;
+    private IResizeWindowListener resizeListener;
 
     public PerspectiveCamera(SceneManager sceneManager, Node parent) {
         super(sceneManager, parent);
@@ -61,11 +62,11 @@ public class PerspectiveCamera extends Camera {
         return resizeListener != null;
     }
 
-    public GameWindow.IWindowResizeListener getResizeListener() {
+    public IResizeWindowListener getResizeListener() {
         return resizeListener;
     }
 
-    public void setResizeListener(GameWindow.IWindowResizeListener resizeListener) {
+    public void setResizeListener(IResizeWindowListener resizeListener) {
         if(resizeListener != null) {
             if(window != null) {
                 window.removeListener(this.resizeListener);
@@ -84,11 +85,11 @@ public class PerspectiveCamera extends Camera {
         this.resizeListener = null;
     }
 
-    public GameWindow getWindow() {
+    public Window getWindow() {
         return window;
     }
 
-    public void setWindow(GameWindow window) {
+    public void setWindow(Window window) {
         this.window = window;
     }
 }

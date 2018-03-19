@@ -6,6 +6,7 @@ import cage.core.graphics.rasterizer.Rasterizer;
 import cage.core.graphics.rendertarget.RenderTarget;
 import cage.core.graphics.shader.Shader;
 import cage.core.graphics.texture.Texture;
+import cage.core.graphics.texture.Texture2D;
 import cage.core.model.Mesh;
 import cage.core.model.Model;
 import cage.core.model.material.Material;
@@ -56,6 +57,9 @@ public class GeometryRenderStage extends RenderStage {
     }
 
     private void renderNode(Node node) {
+        if(node.isBlocked()) {
+            return;
+        }
         node.getNodeIterator().forEachRemaining(this::renderNode);
         if(node instanceof SceneEntity) {
             SceneEntity entity = (SceneEntity)node;
@@ -68,19 +72,19 @@ public class GeometryRenderStage extends RenderStage {
                 Material material = mesh.getMaterial();
                 materialUniform.setData(material.getBufferData());
 
-                if(material.getDiffuseTexture() != null) {
+                if(material.getDiffuseTexture() != null && material.getDiffuseTexture() instanceof Texture2D) {
                     getShader().attachTexture("diffuseTexture", material.getDiffuseTexture());
                 }
 
-                if(material.getNormalTexture() != null) {
+                if(material.getNormalTexture() != null && material.getNormalTexture() instanceof Texture2D) {
                     getShader().attachTexture("normalTexture", material.getNormalTexture());
                 }
 
-                if(material.getSpecularTexture() != null) {
+                if(material.getSpecularTexture() != null && material.getSpecularTexture() instanceof Texture2D) {
                     getShader().attachTexture("specularTexture", material.getSpecularTexture());
                 }
 
-                if(material.getHighlightTexture() != null) {
+                if(material.getHighlightTexture() != null && material.getHighlightTexture() instanceof Texture2D) {
                     getShader().attachTexture("highlightTexture", material.getHighlightTexture());
                 }
 

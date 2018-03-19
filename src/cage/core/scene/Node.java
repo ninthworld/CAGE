@@ -25,6 +25,7 @@ public abstract class Node implements IDestroyable {
     private List<Node> children;
     private Node parent;
     private boolean localUpdated;
+    private boolean blocked;
 
     protected Node(Node parent) {
         this.worldPosition = new Vector3f();
@@ -39,6 +40,7 @@ public abstract class Node implements IDestroyable {
 
         this.children = new ArrayList<>();
         this.localUpdated = true;
+        this.blocked = false;
         this.parent = parent;
         if(this.parent != null) {
             this.parent.attachNode(this);
@@ -203,11 +205,15 @@ public abstract class Node implements IDestroyable {
         scale(new Vector3f(x, y, z));
     }
 
-    public void yaw(float angle) {
-        rotate(angle, new Vector3f(1.0f, 0.0f, 0.0f));
+    public void scale(float mul) {
+        scale(new Vector3f(mul));
     }
 
     public void pitch(float angle) {
+        rotate(angle, new Vector3f(1.0f, 0.0f, 0.0f));
+    }
+
+    public void yaw(float angle) {
         rotate(angle, new Vector3f(0.0f, 1.0f, 0.0f));
     }
 
@@ -230,5 +236,13 @@ public abstract class Node implements IDestroyable {
 
     public void notifyUpdate() {
         localUpdated = true;
+    }
+
+    public boolean isBlocked() {
+        return blocked;
+    }
+
+    public void setBlocked(boolean blocked) {
+        this.blocked = blocked;
     }
 }

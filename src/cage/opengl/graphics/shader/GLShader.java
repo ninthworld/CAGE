@@ -1,13 +1,18 @@
 package cage.opengl.graphics.shader;
 
+import cage.core.graphics.buffer.ShaderStorageBuffer;
 import cage.core.graphics.shader.Shader;
 import cage.core.graphics.texture.Texture;
 import cage.core.graphics.buffer.UniformBuffer;
 import cage.opengl.common.IGLBindable;
+import cage.opengl.graphics.buffer.GLShaderStorageBuffer;
 import cage.opengl.graphics.sampler.GLSampler;
 import cage.opengl.graphics.buffer.GLUniformBuffer;
 import cage.opengl.graphics.texture.GLTexture2D;
+import cage.opengl.graphics.texture.IGLTexture;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import static cage.opengl.utils.GLUtils.*;
@@ -17,13 +22,20 @@ import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.opengl.GL31.*;
 import static org.lwjgl.opengl.GL33.*;
+import static org.lwjgl.opengl.GL43.*;
 
 public class GLShader extends Shader implements IGLBindable {
 
+    private Map<String, Integer> shaderStorageBindings;
+    private Map<String, Integer> uniformBindings;
+    private Map<String, Integer> textureBindings;
     private int programId;
 
     public GLShader() {
         super();
+        this.shaderStorageBindings = new HashMap<>();
+        this.uniformBindings = new HashMap<>();
+        this.textureBindings = new HashMap<>();
 
         this.programId = glCreateProgram();
         checkError("glCreateProgram");
@@ -33,9 +45,53 @@ public class GLShader extends Shader implements IGLBindable {
         }
     }
 
+    private int getShaderStorageBufferIndex(String name) {
+        int index;
+        if(shaderStorageBindings.containsKey(name)) {
+            index = shaderStorageBindings.get(name);
+        }
+        else {
+            index = glGetProgramResourceIndex(programId, GL_SHADER_STORAGE_BLOCK, name);
+            checkError("glGetProgramResourceIndex");
+        }
+        return index;
+    }
+
+    @Override
+    public void attachShaderStorageBuffer(String name, ShaderStorageBuffer buffer) {
+        int index = getShaderStorageBufferIndex(name);
+        glShaderStorageBlockBinding(programId, index, index);
+        checkError("glShaderStorageBlockBinding");
+        shaderStorageBuffers.put(index, buffer);
+    }
+
+    @Override
+    public void detachShaderStorageBuffer(String name) {
+        int index = getShaderStorageBufferIndex(name);
+        shaderStorageBuffers.remove(index);
+    }
+
+    @Override
+    public boolean containsShaderStorageBuffer(String name) {
+        int index = getShaderStorageBufferIndex(name);
+        return shaderStorageBuffers.containsKey(index);
+    }
+
+    @Override
+    public ShaderStorageBuffer getShaderStorageBuffer(String name) {
+        int index = getShaderStorageBufferIndex(name);
+        return shaderStorageBuffers.get(index);
+    }
+
     private int getUniformBufferIndex(String name) {
-        int index = glGetUniformBlockIndex(programId, name);
-        checkError("glGetUniformBlockIndex");
+        int index;
+        if(uniformBindings.containsKey(name)) {
+            index = uniformBindings.get(name);
+        }
+        else {
+            index = glGetUniformBlockIndex(programId, name);
+            checkError("glGetUniformBlockIndex");
+        }
         return index;
     }
 
@@ -66,8 +122,14 @@ public class GLShader extends Shader implements IGLBindable {
     }
 
     private int getTextureIndex(String name) {
-        int index = glGetUniformLocation(programId, name);
-        checkError("glGetUniformLocation");
+        int index;
+        if(textureBindings.containsKey(name)) {
+            index = textureBindings.get(name);
+        }
+        else {
+            index = glGetUniformLocation(programId, name);
+            checkError("glGetUniformLocation");
+        }
         return index;
     }
 
@@ -107,10 +169,14 @@ public class GLShader extends Shader implements IGLBindable {
     public void bind() {
         glUseProgram(programId);
         checkError("glUseProgram");
-
         uniformBuffers.forEach((Integer i, UniformBuffer buffer) -> {
             if(buffer instanceof GLUniformBuffer) {
                 glBindBufferBase(GL_UNIFORM_BUFFER, i, ((GLUniformBuffer)buffer).getBufferId());
+            }
+        });
+        shaderStorageBuffers.forEach((Integer i, ShaderStorageBuffer buffer) -> {
+            if(buffer instanceof GLShaderStorageBuffer) {
+                glBindBufferBase(GL_SHADER_STORAGE_BUFFER, i, ((GLShaderStorageBuffer)buffer).getBufferId());
             }
         });
     }
@@ -118,13 +184,15 @@ public class GLShader extends Shader implements IGLBindable {
     public void bindTextures() {    	
     	int j = 0;
     	for(Entry<Integer, Texture> entry : textures.entrySet()) {
-    		if(entry.getValue() instanceof GLTexture2D) {
-                GLTexture2D glTexture = (GLTexture2D)entry.getValue();
+    	    Texture texture = entry.getValue();
+    		if(texture instanceof IGLTexture) {
+                IGLTexture glTexture = (IGLTexture)texture;
                 glUniform1i(entry.getKey(), j);
+                checkError("glUniform1i");
                 glActiveTexture(GL_TEXTURE0 + j);
                 glTexture.bind();
-                if(glTexture.getSampler() != null && glTexture.getSampler() instanceof GLSampler) {
-                    glBindSampler(j, ((GLSampler)glTexture.getSampler()).getSamplerId());
+                if(texture.getSampler() != null && texture.getSampler() instanceof GLSampler) {
+                    glBindSampler(j, ((GLSampler)texture.getSampler()).getSamplerId());
                 }
             }
     		++j;

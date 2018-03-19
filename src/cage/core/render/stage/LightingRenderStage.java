@@ -4,6 +4,7 @@ import cage.core.graphics.IGraphicsContext;
 import cage.core.graphics.rasterizer.Rasterizer;
 import cage.core.graphics.rendertarget.RenderTarget;
 import cage.core.graphics.shader.Shader;
+import cage.core.graphics.texture.TextureCubeMap;
 import cage.core.model.Model;
 import cage.core.scene.SceneManager;
 import cage.core.scene.light.Light;
@@ -14,49 +15,39 @@ import java.util.Iterator;
 
 public class LightingRenderStage extends FXRenderStage {
 
-    public static final int MAX_LIGHTS = 3;
-
     private SceneManager sceneManager;
 
     public LightingRenderStage(Model fxModel, Shader shader, RenderTarget renderTarget, Rasterizer rasterizer, IGraphicsContext graphicsContext) {
         super(fxModel, shader, renderTarget, rasterizer, graphicsContext);
         this.sceneManager = null;
     }
-    
-    public SceneManager getSceneManager() {
-    	return sceneManager;
-    }
-    
-    public void setSceneManager(SceneManager sceneManager) {
-    	this.sceneManager = sceneManager;
-    }
 
     @Override
     public void preRender() {
-        if(getInputStageCount() == 1 && getInputStage(0) instanceof GeometryRenderStage) {
+        if(getInputStageCount() > 0 && getInputStage(0) instanceof GeometryRenderStage) {
             GeometryRenderStage renderStage = (GeometryRenderStage)getInputStage(0);
             getShader().attachTexture("diffuseTexture", renderStage.getDiffuseTextureOutput());
             getShader().attachTexture("specularTexture", renderStage.getSpecularTextureOutput());
             getShader().attachTexture("normalTexture", renderStage.getNormalTextureOutput());
             getShader().attachTexture("depthTexture", renderStage.getDepthTextureOutput());
 
-            int capacity = MAX_LIGHTS * Light.BUFFER_DATA_SIZE;
+            int capacity =  sceneManager.getLightCount() * Light.BUFFER_DATA_SIZE;
             FloatBuffer lightBuffer = BufferUtils.createFloatBuffer(capacity);
-            Iterator<Light> it = this.sceneManager.getLightIterator();
+            Iterator<Light> it = sceneManager.getLightIterator();
             while(it.hasNext()) {
-                Light light = it.next();
-                lightBuffer.put(light.getBufferData());
-                int pos = lightBuffer.position() + Light.BUFFER_DATA_SIZE;
-                if(pos < capacity) {
-                    lightBuffer.position(pos);
-                }
-                else {
-                    break;
-                }
+                lightBuffer.put(it.next().getBufferData());
             }
             lightBuffer.flip();
-            getShader().getUniformBuffer("Light").setData(lightBuffer);
+            getShader().getShaderStorageBuffer("Light").setData(lightBuffer);
             getShader().getUniformBuffer("Camera").setData(renderStage.getCamera().getBufferData());
         }
+    }
+
+    public SceneManager getSceneManager() {
+        return sceneManager;
+    }
+
+    public void setSceneManager(SceneManager sceneManager) {
+        this.sceneManager = sceneManager;
     }
 }

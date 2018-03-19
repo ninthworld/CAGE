@@ -12,6 +12,18 @@ import static org.lwjgl.opengl.GL33.*;
 
 public class GLTypeUtils {
 
+    public static int getGLCubeMapFace(CubeFaceType face) {
+        switch (face) {
+            case LEFT: return GL_TEXTURE_CUBE_MAP_NEGATIVE_X;
+            case TOP: return GL_TEXTURE_CUBE_MAP_POSITIVE_Y;
+            case BOTTOM: return GL_TEXTURE_CUBE_MAP_NEGATIVE_Y;
+            case BACK: return GL_TEXTURE_CUBE_MAP_POSITIVE_Z;
+            case FRONT: return GL_TEXTURE_CUBE_MAP_NEGATIVE_Z;
+            case RIGHT:
+            default: return GL_TEXTURE_CUBE_MAP_POSITIVE_X;
+        }
+    }
+
     public static int getGLBlendEquation(BlendOpType func) {
         switch(func) {
             case SUBTRACT: return GL_FUNC_SUBTRACT;

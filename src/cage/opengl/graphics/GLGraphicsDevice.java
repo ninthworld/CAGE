@@ -4,6 +4,7 @@ import cage.core.common.IDestroyable;
 import cage.core.graphics.*;
 import cage.core.graphics.blender.Blender;
 import cage.core.graphics.buffer.IndexBuffer;
+import cage.core.graphics.buffer.ShaderStorageBuffer;
 import cage.core.graphics.buffer.UniformBuffer;
 import cage.core.graphics.buffer.VertexBuffer;
 import cage.core.graphics.rasterizer.Rasterizer;
@@ -12,12 +13,14 @@ import cage.core.graphics.rendertarget.RenderTargetMS;
 import cage.core.graphics.sampler.Sampler;
 import cage.core.graphics.shader.Shader;
 import cage.core.graphics.texture.Texture2D;
+import cage.core.graphics.texture.TextureCubeMap;
 import cage.core.graphics.texture.TextureMS;
 import cage.core.graphics.type.FormatType;
 import cage.core.graphics.vertexarray.VertexArray;
-import cage.opengl.application.GLGameWindow;
+import cage.glfw.window.GLFWWindow;
 import cage.opengl.graphics.blender.GLBlender;
 import cage.opengl.graphics.buffer.GLIndexBuffer;
+import cage.opengl.graphics.buffer.GLShaderStorageBuffer;
 import cage.opengl.graphics.buffer.GLUniformBuffer;
 import cage.opengl.graphics.buffer.GLVertexBuffer;
 import cage.opengl.graphics.rasterizer.GLRasterizer;
@@ -26,6 +29,7 @@ import cage.opengl.graphics.rendertarget.GLRenderTargetMS;
 import cage.opengl.graphics.sampler.GLSampler;
 import cage.opengl.graphics.shader.GLShader;
 import cage.opengl.graphics.texture.GLTexture2D;
+import cage.opengl.graphics.texture.GLTextureCubeMap;
 import cage.opengl.graphics.texture.GLTextureMS;
 import cage.opengl.graphics.vertexarray.GLVertexArray;
 import org.lwjgl.glfw.GLFWErrorCallback;
@@ -39,7 +43,7 @@ import static org.lwjgl.glfw.GLFW.*;
 public class GLGraphicsDevice implements IGraphicsDevice {
 
     private GLGraphicsContext graphicsContext;
-    private GLGameWindow window;
+    private GLFWWindow window;
     private List<IDestroyable> glObjects;
 
     private GLRasterizer defaultRasterizer;
@@ -47,7 +51,7 @@ public class GLGraphicsDevice implements IGraphicsDevice {
     private GLSampler defaultSampler;
     private GLBlender defaultBlender;
 
-    public GLGraphicsDevice(GLGameWindow window) {
+    public GLGraphicsDevice(GLFWWindow window) {
         GLFWErrorCallback.createPrint(System.err);
         if(!glfwInit()) {
             throw new IllegalStateException("Unable to initialize GLFW");
@@ -106,6 +110,13 @@ public class GLGraphicsDevice implements IGraphicsDevice {
     }
 
     @Override
+    public ShaderStorageBuffer createShaderStorageBuffer() {
+        GLShaderStorageBuffer glShaderStorageBuffer = new GLShaderStorageBuffer();
+        glObjects.add(glShaderStorageBuffer);
+        return glShaderStorageBuffer;
+    }
+
+    @Override
     public Shader createShader() {
         GLShader glShader = new GLShader();
         glObjects.add(glShader);
@@ -130,7 +141,6 @@ public class GLGraphicsDevice implements IGraphicsDevice {
     public Texture2D createTexture2D(int width, int height) {
         GLTexture2D glTexture = new GLTexture2D(width, height);
         glTexture.setSampler(defaultSampler);
-
         glObjects.add(glTexture);
         return glTexture;
     }
@@ -154,6 +164,38 @@ public class GLGraphicsDevice implements IGraphicsDevice {
     @Override
     public Texture2D createTexture2D(int width, int height, FormatType format, boolean mipmapping) {
         GLTexture2D glTexture = new GLTexture2D(width, height, format, mipmapping);
+        glTexture.setSampler(defaultSampler);
+        glObjects.add(glTexture);
+        return glTexture;
+    }
+
+    @Override
+    public TextureCubeMap createTextureCubeMap(int width, int height) {
+        GLTextureCubeMap glTexture = new GLTextureCubeMap(width, height);
+        glTexture.setSampler(defaultSampler);
+        glObjects.add(glTexture);
+        return glTexture;
+    }
+
+    @Override
+    public TextureCubeMap createTextureCubeMap(int width, int height, FormatType format) {
+        GLTextureCubeMap glTexture = new GLTextureCubeMap(width, height, format);
+        glTexture.setSampler(defaultSampler);
+        glObjects.add(glTexture);
+        return glTexture;
+    }
+
+    @Override
+    public TextureCubeMap createTextureCubeMap(int width, int height, boolean mipmapping) {
+        GLTextureCubeMap glTexture = new GLTextureCubeMap(width, height, mipmapping);
+        glTexture.setSampler(defaultSampler);
+        glObjects.add(glTexture);
+        return glTexture;
+    }
+
+    @Override
+    public TextureCubeMap createTextureCubeMap(int width, int height, FormatType format, boolean mipmapping) {
+        GLTextureCubeMap glTexture = new GLTextureCubeMap(width, height, format, mipmapping);
         glTexture.setSampler(defaultSampler);
         glObjects.add(glTexture);
         return glTexture;

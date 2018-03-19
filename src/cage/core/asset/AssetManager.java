@@ -6,6 +6,8 @@ import cage.core.graphics.buffer.VertexBuffer;
 import cage.core.graphics.shader.Shader;
 import cage.core.graphics.texture.Texture;
 import cage.core.graphics.texture.Texture2D;
+import cage.core.graphics.texture.TextureCubeMap;
+import cage.core.graphics.type.CubeFaceType;
 import cage.core.graphics.vertexarray.VertexArray;
 import com.owens.oobjloader.builder.Build;
 import com.owens.oobjloader.builder.Face;
@@ -17,17 +19,18 @@ import cage.core.model.Mesh;
 import cage.core.model.Model;
 import cage.core.model.material.Material;
 
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
+import java.nio.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.*;
 
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -36,6 +39,11 @@ import org.lwjgl.stb.STBImage;
 import org.lwjgl.system.MemoryStack;
 
 public class AssetManager {
+
+    static {
+        Logger.getLogger(Parse.class.getName()).setLevel(Level.SEVERE);
+        Logger.getLogger(Build.class.getName()).setLevel(Level.SEVERE);
+    }
 
     public static final String ASSETS_ROOT_DIR = "assets/";
 
@@ -62,37 +70,39 @@ public class AssetManager {
         else {
             try {
                 Build builder = new Build();
-                Parse obj = new Parse(builder, assetsDir.resolve("models/").resolve(file).toString());
+                new Parse(builder, assetsDir.resolve("models/").resolve(file).toString());
 
                 HashMap<FaceVertex, Integer> indexMap = new HashMap<>();
                 ArrayList<FaceVertex> faceVertices = new ArrayList<>();
                 ArrayList<Vector3f> faceTangents = new ArrayList();
                 int index = 0;
                 for (Face face : builder.faces) {
-                    FaceVertex f1 = face.vertices.get(0);
-                    FaceVertex f2 = face.vertices.get(1);
-                    FaceVertex f3 = face.vertices.get(2);
+                    Vector3f tangent = new Vector3f();
+                    if(face.vertices.get(0).t != null) {
+                        FaceVertex f1 = face.vertices.get(0);
+                        FaceVertex f2 = face.vertices.get(1);
+                        FaceVertex f3 = face.vertices.get(2);
 
-                    Vector3f v1 = new Vector3f(f1.v.x, f1.v.y, f1.v.z);
-                    Vector3f v2 = new Vector3f(f2.v.x, f2.v.y, f2.v.z);
-                    Vector3f v3 = new Vector3f(f3.v.x, f3.v.y, f3.v.z);
+                        Vector3f v1 = new Vector3f(f1.v.x, f1.v.y, f1.v.z);
+                        Vector3f v2 = new Vector3f(f2.v.x, f2.v.y, f2.v.z);
+                        Vector3f v3 = new Vector3f(f3.v.x, f3.v.y, f3.v.z);
 
-                    Vector2f w1 = new Vector2f(f1.t.u, f1.t.v);
-                    Vector2f w2 = new Vector2f(f2.t.u, f2.t.v);
-                    Vector2f w3 = new Vector2f(f3.t.u, f3.t.v);
+                        Vector2f w1 = new Vector2f(f1.t.u, f1.t.v);
+                        Vector2f w2 = new Vector2f(f2.t.u, f2.t.v);
+                        Vector2f w3 = new Vector2f(f3.t.u, f3.t.v);
 
-                    Vector3f s1 = v2.sub(v1);
-                    Vector3f s2 = v3.sub(v1);
+                        Vector3f s1 = v2.sub(v1);
+                        Vector3f s2 = v3.sub(v1);
 
-                    Vector2f t1 = w2.sub(w1);
-                    Vector2f t2 = w3.sub(w1);
+                        Vector2f t1 = w2.sub(w1);
+                        Vector2f t2 = w3.sub(w1);
 
-                    float r = 1.0f / (t1.x * t2.y - t2.x * t1.y);
-                    Vector3f tangent = new Vector3f(
-                            t2.y * s1.x - t1.y * s2.x,
-                            t2.y * s1.y - t1.y * s2.y,
-                            t2.y * s1.z - t1.y * s2.z).mul(r);
-
+                        float r = 1.0f / (t1.x * t2.y - t2.x * t1.y);
+                        tangent = new Vector3f(
+                                t2.y * s1.x - t1.y * s2.x,
+                                t2.y * s1.y - t1.y * s2.y,
+                                t2.y * s1.z - t1.y * s2.z).mul(r);
+                    }
                     for (FaceVertex vertex : face.vertices) {
                         if (!indexMap.containsKey(vertex)) {
                             indexMap.put(vertex, index++);
@@ -107,8 +117,18 @@ public class AssetManager {
                     FaceVertex vertex = faceVertices.get(i);
                     Vector3f tangent = faceTangents.get(i);
                     vertices.put(vertex.v.x).put(vertex.v.y).put(vertex.v.z);
-                    vertices.put(vertex.t.u).put(vertex.t.v);
-                    vertices.put(vertex.n.x).put(vertex.n.y).put(vertex.n.z);
+                    if(vertex.t != null) {
+                        vertices.put(vertex.t.u).put(vertex.t.v);
+                    }
+                    else {
+                        vertices.put(0.0f).put(0.0f);
+                    }
+                    if(vertex.n != null) {
+                        vertices.put(vertex.n.x).put(vertex.n.y).put(vertex.n.z);
+                    }
+                    else {
+                        vertices.put(0.0f).put(0.0f).put(0.0f);
+                    }
                     vertices.put(tangent.x).put(tangent.y).put(tangent.z);
                 }
                 vertices.flip();
@@ -192,30 +212,57 @@ public class AssetManager {
         return shader;
     }
 
-    public Texture loadTexture(String file) {
-        if(textures.containsKey(file)) {
-            return textures.get(file);
+    public Texture2D loadTexture(String file) {
+        Texture tex;
+        if(textures.containsKey(file) && (tex = textures.get(file)) instanceof Texture2D) {
+            return (Texture2D)tex;
         }
         else {
-            ByteBuffer image;
-            int width, height;
-            try(MemoryStack stack = MemoryStack.stackPush()) {
-                IntBuffer w = stack.mallocInt(1);
-                IntBuffer h = stack.mallocInt(1);
-                IntBuffer comp = stack.mallocInt(1);
-                STBImage.stbi_set_flip_vertically_on_load(true);
-                image = STBImage.stbi_load(assetsDir.resolve("textures/").resolve(file).toString(), w, h, comp, 4);
-                if(image == null) {
-                    System.err.println("Failed to load texture '" + file + "'\n" + STBImage.stbi_failure_reason());
+            Image img = loadImage(file);
+            if(img == null) {
+                return null;
+            }
+            Texture2D texture = graphicsDevice.createTexture2D(img.width, img.height);
+            if(img.data instanceof ByteBuffer) {
+                texture.setData((ByteBuffer)img.data);
+            }
+            else if(img.data instanceof ShortBuffer) {
+                texture.setData((ShortBuffer)img.data);
+            }
+            textures.put(file, texture);
+            return texture;
+        }
+    }
+
+    public TextureCubeMap loadCubeMap(String rightFile, String leftFile, String topFile, String bottomFile, String backFile, String frontFile) {
+        String[] files = new String[] {
+            rightFile, leftFile, topFile, bottomFile, backFile, frontFile
+        };
+
+        String concat = Arrays.toString(files);
+        Texture tex;
+        if(textures.containsKey(concat) && (tex = textures.get(concat)) instanceof TextureCubeMap) {
+            return (TextureCubeMap)tex;
+        }
+        else {
+            Image[] imgs = new Image[6];
+            for(int i=0; i<imgs.length; ++i) {
+                imgs[i] = loadImage(files[i]);
+                if(imgs[i] == null) {
                     return null;
                 }
-                width = w.get();
-                height = h.get();
             }
-
-            Texture2D texture = graphicsDevice.createTexture2D(width, height);
-            texture.setData(image);
-            textures.put(file, texture);
+            TextureCubeMap texture = graphicsDevice.createTextureCubeMap(imgs[0].width, imgs[0].height);
+            for(int i=0; i<imgs.length; ++i) {
+                texture.setDataCubeFace(CubeFaceType.values()[i]);
+                if(imgs[i].data instanceof ByteBuffer) {
+                    texture.setData((ByteBuffer)imgs[i].data);
+                }
+                else if(imgs[i].data instanceof ShortBuffer) {
+                    texture.setData((ShortBuffer)imgs[i].data);
+                }
+            }
+            textures.put(concat, texture);
             return texture;
         }
     }
@@ -226,5 +273,35 @@ public class AssetManager {
 
     public Shader getDefaultLightingShader() {
         return defaultLightingShader;
+    }
+
+    private Image loadImage(String file) {
+        // TODO: Add support for 16-bit PNG
+        ByteBuffer data;
+        int width, height;
+        try(MemoryStack stack = MemoryStack.stackPush()) {
+            IntBuffer w = stack.mallocInt(1);
+            IntBuffer h = stack.mallocInt(1);
+            IntBuffer comp = stack.mallocInt(1);
+            data = STBImage.stbi_load(assetsDir.resolve("textures/").resolve(file).toString(), w, h, comp, 4);
+            if(data == null) {
+                System.err.println("Failed to load texture '" + file + "'\n" + STBImage.stbi_failure_reason());
+                return null;
+            }
+            width = w.get();
+            height = h.get();
+        }
+
+        Image img = new Image();
+        img.width = width;
+        img.height = height;
+        img.data = data;
+        return img;
+    }
+
+    private class Image {
+        public int width;
+        public int height;
+        public Buffer data;
     }
 }

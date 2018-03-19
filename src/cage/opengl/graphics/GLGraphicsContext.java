@@ -9,7 +9,7 @@ import cage.core.graphics.shader.Shader;
 import cage.core.graphics.texture.Texture;
 import cage.core.graphics.type.PrimitiveType;
 import cage.core.graphics.vertexarray.VertexArray;
-import cage.opengl.application.GLGameWindow;
+import cage.glfw.window.GLFWWindow;
 import cage.opengl.graphics.blender.GLBlender;
 import cage.opengl.graphics.buffer.GLIndexBuffer;
 import cage.opengl.graphics.rasterizer.GLRasterizer;
@@ -29,13 +29,13 @@ import static org.lwjgl.opengl.GL40.*;
 
 public class GLGraphicsContext implements IGraphicsContext {
 
-    private GLGameWindow window;
+    private GLFWWindow window;
     private int primitive;
     private int patchSize;
     private int boundFBOId;
     private int boundShaderId;
 
-    public GLGraphicsContext(GLGameWindow window) {
+    public GLGraphicsContext(GLFWWindow window) {
 		this.window = window;
 		this.primitive = GL_TRIANGLES;
 		this.patchSize = 1;
@@ -144,6 +144,14 @@ public class GLGraphicsContext implements IGraphicsContext {
                 new Rectangle(0, 0, renderTarget.getWidth(), renderTarget.getHeight()),
                 new Rectangle(0, 0, window.getWidth(), window.getHeight()));
     }
+
+	@Override
+	public void resolveToBackBuffer(RenderTarget renderTarget, Rectangle clipTo) {
+		resolveToBackBuffer(
+				renderTarget,
+				new Rectangle(0, 0, renderTarget.getWidth(), renderTarget.getHeight()),
+				clipTo);
+	}
 
 	@Override
 	public void resolveToBackBuffer(RenderTarget renderTarget, Rectangle clipFrom, Rectangle clipTo) {

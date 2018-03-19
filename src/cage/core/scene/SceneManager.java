@@ -1,12 +1,11 @@
 package cage.core.scene;
 
-import cage.core.application.GameWindow;
+import cage.core.scene.controller.NodeController;
+import cage.core.window.Window;
 import cage.core.scene.camera.Camera;
-import cage.core.scene.camera.OrthographicCamera;
 import cage.core.scene.camera.PerspectiveCamera;
 import cage.core.scene.light.AmbientLight;
 import cage.core.scene.light.Light;
-import cage.core.scene.light.PointLight;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
@@ -15,15 +14,17 @@ import java.util.List;
 
 public class SceneManager {
 
-    private GameWindow window;
+    private Window window;
+    private List<NodeController> controllers;
     private List<Camera> cameras;
     private List<Light> lights;
     private Camera defaultCamera;
     private AmbientLight defaultAmbientLight;
     private SceneNode rootNode;
 
-    public SceneManager(GameWindow window) {
+    public SceneManager(Window window) {
         this.window = window;
+        this.controllers = new ArrayList<>();
         this.cameras = new ArrayList<>();
         this.lights = new ArrayList<>();
         this.rootNode = new SceneNode(this, null);
@@ -32,6 +33,11 @@ public class SceneManager {
         ((PerspectiveCamera) this.defaultCamera).setResizeListener((width, height) -> ((PerspectiveCamera) defaultCamera).setAspectRatio((float)width / (float)height));
         this.defaultAmbientLight = this.rootNode.createAmbientLight();
         this.defaultAmbientLight.setAmbientColor(new Vector3f(0.2f));
+    }
+
+    public void update(float deltaTime) {
+        controllers.forEach((NodeController controller) -> controller.update(deltaTime));
+        rootNode.update(false);
     }
 
     public SceneNode getRootSceneNode() {
@@ -62,12 +68,20 @@ public class SceneManager {
         return cameras.iterator();
     }
 
-    public GameWindow getWindow() {
+    public Window getWindow() {
         return window;
     }
 
-    public void setWindow(GameWindow window) {
+    public void setWindow(Window window) {
         this.window = window;
+    }
+
+    public void registerController(NodeController controller) {
+        controllers.add(controller);
+    }
+
+    public void unregisterController(NodeController controller) {
+        controllers.remove(controller);
     }
 
     public void registerLight(Light light) {
@@ -84,9 +98,5 @@ public class SceneManager {
 
     public void unregisterCamera(Camera camera) {
         cameras.remove(camera);
-    }
-
-    public void update() {
-        rootNode.update(false);
     }
 }

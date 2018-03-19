@@ -1,8 +1,9 @@
 package cage.core.graphics.rendertarget;
 
-import cage.core.application.GameWindow;
+import cage.core.window.Window;
 import cage.core.common.IDestroyable;
 import cage.core.graphics.texture.Texture;
+import cage.core.window.listener.IResizeWindowListener;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -15,8 +16,8 @@ public abstract class RenderTarget<T extends Texture> implements IDestroyable {
     private int width;
     private int height;
 
-    private GameWindow window;
-    private GameWindow.IWindowResizeListener resizeListener;
+    private Window window;
+    private IResizeWindowListener resizeListener;
 
     public RenderTarget(int width, int height) {
         this.colorTextures = new HashMap<>();
@@ -88,11 +89,11 @@ public abstract class RenderTarget<T extends Texture> implements IDestroyable {
         return resizeListener != null;
     }
 
-    public GameWindow.IWindowResizeListener getResizeListener() {
+    public IResizeWindowListener getResizeListener() {
         return resizeListener;
     }
 
-    public void setResizeListener(GameWindow.IWindowResizeListener resizeListener) {
+    public void setResizeListener(IResizeWindowListener resizeListener) {
         if(resizeListener != null) {
             if(window != null) {
                 window.removeListener(this.resizeListener);
@@ -111,11 +112,11 @@ public abstract class RenderTarget<T extends Texture> implements IDestroyable {
         this.resizeListener = null;
     }
 
-    public GameWindow getWindow() {
+    public Window getWindow() {
         return window;
     }
 
-    public void setWindow(GameWindow window) {
+    public void setWindow(Window window) {
         this.window = window;
     }
 }

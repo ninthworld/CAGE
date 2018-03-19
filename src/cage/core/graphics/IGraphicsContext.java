@@ -28,6 +28,7 @@ public interface IGraphicsContext {
     void clear();
 
     void resolveToBackBuffer(RenderTarget renderTarget);
+    void resolveToBackBuffer(RenderTarget renderTarget, Rectangle clipTo);
     void resolveToBackBuffer(RenderTarget renderTarget, Rectangle clipFrom, Rectangle clipTo);
     void resolveToRenderTarget(RenderTarget renderTargetFrom, RenderTarget renderTargetTo);
     void resolveToRenderTarget(RenderTarget renderTargetFrom, RenderTarget renderTargetTo, Rectangle clipFrom, Rectangle clipTo);

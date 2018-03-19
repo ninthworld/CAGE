@@ -1,6 +1,7 @@
 package cage.core.graphics.shader;
 
 import cage.core.common.IDestroyable;
+import cage.core.graphics.buffer.ShaderStorageBuffer;
 import cage.core.graphics.buffer.UniformBuffer;
 import cage.core.graphics.texture.Texture;
 
@@ -11,15 +12,55 @@ import java.util.Map;
 
 public abstract class Shader implements IDestroyable {
 
+    protected Map<Integer, ShaderStorageBuffer> shaderStorageBuffers;
     protected Map<Integer, UniformBuffer> uniformBuffers;
     protected Map<Integer, Texture> textures;
     private String vertexShaderSrc;
     private String fragmentShaderSrc;
 
     public Shader() {
+        this.shaderStorageBuffers = new HashMap<>();
         this.uniformBuffers = new HashMap<>();
         this.textures = new HashMap<>();
     }
+
+    public void attachShaderStorageBuffer(int index, ShaderStorageBuffer buffer) {
+        this.shaderStorageBuffers.put(index, buffer);
+    }
+
+    public abstract void attachShaderStorageBuffer(String name, ShaderStorageBuffer buffer);
+
+    public void detachShaderStorageBuffer(int index) {
+        this.shaderStorageBuffers.remove(index);
+    }
+
+    public abstract void detachShaderStorageBuffer(String name);
+
+    public void detachShaderStorageBuffer(ShaderStorageBuffer buffer) {
+        List<Integer> keys = new ArrayList<>();
+        for(Integer i : this.shaderStorageBuffers.keySet()) {
+            if(this.shaderStorageBuffers.get(i).equals(buffer)) {
+                keys.add(i);
+            }
+        }
+        keys.forEach((Integer i) -> this.shaderStorageBuffers.remove(i));
+    }
+
+    public boolean containsShaderStorageBuffer(int index) {
+        return shaderStorageBuffers.containsKey(index);
+    }
+
+    public abstract boolean containsShaderStorageBuffer(String name);
+
+    public boolean containsShaderStorageBuffer(ShaderStorageBuffer buffer) {
+        return shaderStorageBuffers.containsValue(buffer);
+    }
+
+    public ShaderStorageBuffer getShaderStorageBuffer(int index) {
+        return shaderStorageBuffers.get(index);
+    }
+
+    public abstract ShaderStorageBuffer getShaderStorageBuffer(String name);
 
     public void attachUniformBuffer(int index, UniformBuffer buffer) {
         this.uniformBuffers.put(index, buffer);

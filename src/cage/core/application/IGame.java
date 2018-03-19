@@ -1,10 +1,12 @@
 package cage.core.application;
 
+import cage.core.engine.Engine;
+
 public interface IGame {
 
-    void initialize(GameEngine engine);
-    void destroy(GameEngine engine);
+    void initialize(Engine engine);
+    void destroy(Engine engine);
 
-    void update(GameEngine engine, double deltaTime);
-    void render(GameEngine engine);
+    void update(Engine engine, float deltaTime);
+    void render(Engine engine);
 }
