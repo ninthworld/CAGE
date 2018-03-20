@@ -177,12 +177,20 @@ public class RenderManager {
         outputStages.remove(stage);
     }
 
+    public void detachAllOutputStages() {
+        this.outputStages.forEach(this::detachOutputStage);
+    }
+
     public boolean containsOutputStage(RenderStage stage) {
         return outputStages.contains(stage);
     }
 
     public RenderStage getOutputStage(int index) {
         return outputStages.get(index);
+    }
+
+    public void setOutputStage(int index, RenderStage renderStage) {
+        outputStages.add(index, renderStage);
     }
 
     public Iterator<RenderStage> getOutputStageIterator() {

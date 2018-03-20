@@ -105,6 +105,10 @@ public abstract class RenderStage {
         inputStages.remove(stage);
     }
 
+    public void detachAllInputStages() {
+        inputStages.forEach(this::detachInputStage);
+    }
+
     public void containsInputStage(RenderStage stage) {
         inputStages.contains(stage);
     }

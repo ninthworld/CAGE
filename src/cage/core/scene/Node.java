@@ -12,6 +12,10 @@ import java.util.function.Consumer;
 
 public abstract class Node implements IDestroyable {
 
+    public static final Vector3f FORWARD = new Vector3f(0.0f, 0.0f, 1.0f);
+    public static final Vector3f RIGHT = new Vector3f(-1.0f, 0.0f, 0.0f);
+    public static final Vector3f UP = new Vector3f(0.0f, 1.0f, 0.0f);
+
     private Vector3f worldPosition;
     private Vector3f worldScale;
     private Matrix3f worldRotation;
@@ -25,7 +29,7 @@ public abstract class Node implements IDestroyable {
     private List<Node> children;
     private Node parent;
     private boolean localUpdated;
-    private boolean blocked;
+    private boolean enabled;
 
     protected Node(Node parent) {
         this.worldPosition = new Vector3f();
@@ -40,7 +44,7 @@ public abstract class Node implements IDestroyable {
 
         this.children = new ArrayList<>();
         this.localUpdated = true;
-        this.blocked = false;
+        this.enabled = true;
         this.parent = parent;
         if(this.parent != null) {
             this.parent.attachNode(this);
@@ -100,6 +104,10 @@ public abstract class Node implements IDestroyable {
     public void detachNode(Node node) {
         children.remove(node);
         node.parent = null;
+    }
+
+    public void detachAllNodes() {
+        children.forEach((Node node) -> detachNode(node));
     }
 
     public boolean containsNode(Node node) {
@@ -166,6 +174,18 @@ public abstract class Node implements IDestroyable {
         return localTransform;
     }
 
+    public Vector3f getLocalRight() {
+        return localRotation.getRow(0, new Vector3f());
+    }
+
+    public Vector3f getLocalForward() {
+        return localRotation.getRow(2, new Vector3f()).mul(-1.0f);
+    }
+
+    public Vector3f getLocalUp() {
+        return localRotation.getRow(1, new Vector3f());
+    }
+
     public Vector3f getWorldPosition() {
         return new Vector3f(worldPosition);
     }
@@ -182,6 +202,18 @@ public abstract class Node implements IDestroyable {
         return worldTransform;
     }
 
+    public Vector3f getWorldRight() {
+        return worldRotation.getRow(0, new Vector3f());
+    }
+
+    public Vector3f getWorldForward() {
+        return worldRotation.getRow(1, new Vector3f());
+    }
+
+    public Vector3f getWorldUp() {
+        return worldRotation.getRow(2, new Vector3f());
+    }
+
     public void translate(Vector3f offset) {
         localPosition.add(offset);
         notifyUpdate();
@@ -189,6 +221,30 @@ public abstract class Node implements IDestroyable {
 
     public void translate(float x, float y, float z) {
         translate(new Vector3f(x, y, z));
+    }
+
+    public void moveForward(float amount) {
+        translate(getLocalForward().mul(amount));
+    }
+
+    public void moveBackward(float amount) {
+        translate(getLocalForward().mul(-amount));
+    }
+
+    public void moveRight(float amount) {
+        translate(getLocalRight().mul(amount));
+    }
+
+    public void moveLeft(float amount) {
+        translate(getLocalRight().mul(-amount));
+    }
+
+    public void moveUp(float amount) {
+        translate(getLocalUp().mul(amount));
+    }
+
+    public void moveDown(float amount) {
+        translate(getLocalUp().mul(-amount));
     }
 
     public void rotate(float angle, Vector3f axis) {
@@ -210,15 +266,15 @@ public abstract class Node implements IDestroyable {
     }
 
     public void pitch(float angle) {
-        rotate(angle, new Vector3f(1.0f, 0.0f, 0.0f));
+        rotate(angle, RIGHT);
     }
 
     public void yaw(float angle) {
-        rotate(angle, new Vector3f(0.0f, 1.0f, 0.0f));
+        rotate(angle, UP);
     }
 
     public void roll(float angle) {
-        rotate(angle, new Vector3f(0.0f, 0.0f, 1.0f));
+        rotate(angle, FORWARD);
     }
 
     public void lookAt(Vector3f target, Vector3f up) {
@@ -227,22 +283,22 @@ public abstract class Node implements IDestroyable {
     }
 
     public void lookAt(Vector3f target) {
-        lookAt(target, new Vector3f(0.0f, 1.0f, 0.0f));
+        lookAt(target, UP);
     }
 
     public void lookAt(float x, float y, float z) {
-        lookAt(new Vector3f(x, y, z), new Vector3f(0.0f, 1.0f, 0.0f));
+        lookAt(new Vector3f(x, y, z), UP);
     }
 
     public void notifyUpdate() {
         localUpdated = true;
     }
 
-    public boolean isBlocked() {
-        return blocked;
+    public boolean isEnabled() {
+        return enabled;
     }
 
-    public void setBlocked(boolean blocked) {
-        this.blocked = blocked;
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }

@@ -8,11 +8,16 @@ import cage.core.input.controller.KeyboardController;
 import cage.core.input.controller.MouseController;
 import cage.core.input.type.ActionType;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 public abstract class InputManager {
 
+    private List<ActionState> actions;
+
     public InputManager() {
+        this.actions = new ArrayList<>();
     }
 
     public abstract void update(float deltaTime);
@@ -28,10 +33,16 @@ public abstract class InputManager {
     public ActionState registerAction(InputController controller, IComponent component, ActionType actionType, IAction action) {
         ActionState actionState = new ActionState(action, controller, component, actionType);
         controller.registerAction(actionState);
+        actions.add(actionState);
         return actionState;
     }
 
     public void unregisterAction(ActionState actionState) {
         actionState.getController().unregisterAction(actionState);
+        actions.remove(actionState);
+    }
+
+    public void unregisterAllActions() {
+        actions.forEach(this::unregisterAction);
     }
 }

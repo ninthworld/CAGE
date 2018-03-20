@@ -31,7 +31,6 @@ public class GLFWJoystickController extends JoystickController {
 
     @Override
     public void update(float deltaTime) {
-
         Map<Axis, Float> axisValues = new HashMap<>();
         FloatBuffer axes = glfwGetJoystickAxes(GLFW_JOYSTICK_1 + getIndex());
         for(int i=0; i<axes.capacity(); ++i) {
@@ -82,7 +81,9 @@ public class GLFWJoystickController extends JoystickController {
             }
             else if(actionState.getComponent() instanceof Button) {
                 if(buttonActions.containsKey(actionState.getComponent())) {
-                    if(buttonActions.get(actionState.getComponent()) == actionState.getActionType()) {
+                    ActionType actionUsed = buttonActions.get(actionState.getComponent());
+                    if(actionUsed == actionState.getActionType() ||
+                            (actionState.getActionType() == ActionType.REPEAT && actionUsed == ActionType.PRESS )) {
                         actionState.getAction().performAction(deltaTime, new IEvent() {
                             @Override
                             public IComponent getComponent() {

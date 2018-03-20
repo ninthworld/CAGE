@@ -18,7 +18,9 @@
         <JAVADOC>
           <root url="jar://$MODULE_DIR$/lib/lwjgl-stb/lwjgl-stb-javadoc.jar!/" />
         </JAVADOC>
-        <SOURCES />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/lwjgl-stb/lwjgl-stb-sources.jar!/" />
+        </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
@@ -29,8 +31,12 @@
           <root url="jar://$MODULE_DIR$/lib/lwjgl-opengl/lwjgl-opengl-natives-macos.jar!/" />
           <root url="jar://$MODULE_DIR$/lib/lwjgl-opengl/lwjgl-opengl-natives-windows.jar!/" />
         </CLASSES>
-        <JAVADOC />
-        <SOURCES />
+        <JAVADOC>
+          <root url="jar://$MODULE_DIR$/lib/lwjgl-opengl/lwjgl-opengl-javadoc.jar!/" />
+        </JAVADOC>
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/lwjgl-opengl/lwjgl-opengl-sources.jar!/" />
+        </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
@@ -44,7 +50,9 @@
         <JAVADOC>
           <root url="jar://$MODULE_DIR$/lib/lwjgl-glfw/lwjgl-glfw-javadoc.jar!/" />
         </JAVADOC>
-        <SOURCES />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/lwjgl-glfw/lwjgl-glfw-sources.jar!/" />
+        </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
@@ -58,22 +66,15 @@
         <JAVADOC>
           <root url="jar://$MODULE_DIR$/lib/lwjgl/lwjgl-javadoc.jar!/" />
         </JAVADOC>
-        <SOURCES />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/lwjgl/lwjgl-sources.jar!/" />
+        </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/jbullet/jbullet.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/jinput/jinput.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -95,6 +96,38 @@
         </CLASSES>
         <JAVADOC />
         <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/lwjgl-nuklear/lwjgl-nuklear-natives-linux.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/lwjgl-nuklear/lwjgl-nuklear-natives-macos.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/lwjgl-nuklear/lwjgl-nuklear-natives-windows.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/lwjgl-nuklear/lwjgl-nuklear.jar!/" />
+        </CLASSES>
+        <JAVADOC>
+          <root url="jar://$MODULE_DIR$/lib/lwjgl-nuklear/lwjgl-nuklear-javadoc.jar!/" />
+        </JAVADOC>
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/lwjgl-nuklear/lwjgl-nuklear-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/lwjgl-nanovg/lwjgl-nanovg-natives-linux.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/lwjgl-nanovg/lwjgl-nanovg-natives-macos.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/lwjgl-nanovg/lwjgl-nanovg-natives-windows.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/lwjgl-nanovg/lwjgl-nanovg.jar!/" />
+        </CLASSES>
+        <JAVADOC>
+          <root url="jar://$MODULE_DIR$/lib/lwjgl-nanovg/lwjgl-nanovg-javadoc.jar!/" />
+        </JAVADOC>
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/lwjgl-nanovg/lwjgl-nanovg-sources.jar!/" />
+        </SOURCES>
       </library>
     </orderEntry>
   </component>

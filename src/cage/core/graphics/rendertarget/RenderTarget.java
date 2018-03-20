@@ -57,6 +57,10 @@ public abstract class RenderTarget<T extends Texture> implements IDestroyable {
         colorTextures.remove(index);
     }
 
+    public void detachAllColorTextures() {
+        colorTextures.clear();
+    }
+
     public Iterator<Map.Entry<Integer, T>> getColorTextureIterator() {
         return colorTextures.entrySet().iterator();
     }

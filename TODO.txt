@@ -1,6 +1,3 @@
-* InputManager
-* IListener
-* IAction
 * GUI implementation
 * More window properties like icon
 * 16bit Texture loading
@@ -14,6 +11,5 @@
 * Examples
 * FPCamera, OrbitCamera
 * Server/Client architecture
-* IDisposable on core instead of GL only
 * Physics
 * Audio

@@ -46,6 +46,10 @@ public abstract class Shader implements IDestroyable {
         keys.forEach((Integer i) -> this.shaderStorageBuffers.remove(i));
     }
 
+    public void detachAllShaderStorageBuffers() {
+        this.shaderStorageBuffers.clear();
+    }
+
     public boolean containsShaderStorageBuffer(int index) {
         return shaderStorageBuffers.containsKey(index);
     }
@@ -84,6 +88,10 @@ public abstract class Shader implements IDestroyable {
         keys.forEach((Integer i) -> this.uniformBuffers.remove(i));
     }
 
+    public void detachAllUniformBuffers() {
+        this.uniformBuffers.clear();
+    }
+
     public boolean containsUniformBuffer(int index) {
         return uniformBuffers.containsKey(index);
     }
@@ -120,6 +128,10 @@ public abstract class Shader implements IDestroyable {
             }
         }
         keys.forEach((Integer i) -> this.textures.remove(i));
+    }
+
+    public void detachAllTextures() {
+        this.textures.clear();
     }
 
     public boolean containsTexture(int index) {

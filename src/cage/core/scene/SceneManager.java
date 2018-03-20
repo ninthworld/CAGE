@@ -84,6 +84,10 @@ public class SceneManager {
         controllers.remove(controller);
     }
 
+    public void unregisterAllControllers() {
+        controllers.forEach(this::unregisterController);
+    }
+
     public void registerLight(Light light) {
         lights.add(light);
     }
@@ -92,11 +96,19 @@ public class SceneManager {
         lights.remove(light);
     }
 
+    public void unregisterAllLights() {
+        lights.forEach(this::unregisterLight);
+    }
+
     public void registerCamera(Camera camera) {
         cameras.add(camera);
     }
 
     public void unregisterCamera(Camera camera) {
         cameras.remove(camera);
+    }
+
+    public void unregisterAllCameras() {
+        cameras.forEach(this::unregisterCamera);
     }
 }

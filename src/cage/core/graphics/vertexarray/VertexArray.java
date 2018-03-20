@@ -29,6 +29,10 @@ public abstract class VertexArray implements IDestroyable {
 
     public abstract void detachVertexBuffer(VertexBuffer buffer);
 
+    public void detachAllVertexBuffers() {
+        vertexBuffers.forEach(this::detachVertexBuffer);
+    }
+
     public Iterator<VertexBuffer> getVertexBufferIterator() {
         return vertexBuffers.iterator();
     }

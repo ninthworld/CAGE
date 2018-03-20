@@ -5,6 +5,7 @@ import cage.core.input.action.IEvent;
 import cage.core.input.component.Axis;
 import cage.core.input.component.Button;
 import cage.core.input.component.IComponent;
+import cage.core.input.component.Key;
 import cage.core.input.controller.MouseController;
 import cage.core.input.type.ActionType;
 import cage.glfw.utils.GLFWUtils;
@@ -18,48 +19,20 @@ public class GLFWMouseController extends MouseController {
 
     private long handle;
     private float deltaTime;
-    private int mouseX, mouseY;
+    private int[] lastButtons;
+    private double lastX, lastY;
 
     public GLFWMouseController(long handle, int index, String name) {
         super(index, name);
         this.handle = handle;
         this.deltaTime = 0.0f;
+        this.lastButtons = new int[GLFW_MOUSE_BUTTON_LAST + 1];
 
         double[] mX = new double[1];
         double[] mY = new double[1];
         glfwGetCursorPos(handle, mX, mY);
-        this.mouseX = (int)mX[0];
-        this.mouseY = (int)mY[0];
-
-        glfwSetMouseButtonCallback(handle, new GLFWMouseButtonCallback() {
-            @Override
-            public void invoke(long handle, int button, int action, int mods) {
-                Iterator<ActionState> it = getActionStateIterator();
-                while(it.hasNext()) {
-                    ActionState actionState = it.next();
-                    if(actionState.getComponent() instanceof Button) {
-                        Button buttonUsed = GLFWUtils.getMouseButton(button);
-                        ActionType actionUsed = GLFWUtils.getAction(action);
-                        if(buttonUsed == actionState.getComponent() &&
-                                (actionUsed == actionState.getActionType() ||
-                                        (actionState.getActionType() == ActionType.PRESS_AND_RELEASE &&
-                                                (actionUsed == ActionType.PRESS || actionUsed == ActionType.RELEASE)))) {
-                            actionState.getAction().performAction(deltaTime, new IEvent() {
-                                @Override
-                                public IComponent getComponent() {
-                                    return actionState.getComponent();
-                                }
-
-                                @Override
-                                public float getValue() {
-                                    return 0.0f;
-                                }
-                            });
-                        }
-                    }
-                }
-            }
-        });
+        this.lastX = mX[0];
+        this.lastY = mY[0];
 
         glfwSetScrollCallback(handle, new GLFWScrollCallback() {
             @Override
@@ -102,9 +75,8 @@ public class GLFWMouseController extends MouseController {
         glfwSetCursorPosCallback(handle, new GLFWCursorPosCallback() {
             @Override
             public void invoke(long handle, double x, double y) {
-                float dx = (float)(x - mouseX);
-                float dy = (float)(y - mouseY);
-
+                float dx = (float)(x - lastX);
+                float dy = (float)(y - lastY);
                 Iterator<ActionState> it = getActionStateIterator();
                 while(it.hasNext()) {
                     ActionState actionState = it.next();
@@ -149,7 +121,56 @@ public class GLFWMouseController extends MouseController {
         double[] mX = new double[1];
         double[] mY = new double[1];
         glfwGetCursorPos(handle, mX, mY);
-        mouseX = (int)mX[0];
-        mouseY = (int)mY[0];
+        lastX = mX[0];
+        lastY = mY[0];
+
+        int[] currButtons = new int[lastButtons.length];
+        for(int i=0; i<currButtons.length; ++i) {
+            currButtons[i] = glfwGetMouseButton(handle, i);
+        }
+
+        Iterator<ActionState> it = getActionStateIterator();
+        while(it.hasNext()) {
+            ActionState actionState = it.next();
+            if (actionState.getComponent() instanceof Button) {
+                int button = GLFWUtils.getGLFWMouseButton((Button)actionState.getComponent());
+                int lastInput = lastButtons[button];
+                int currInput = currButtons[button];
+
+                ActionType actionUsed = ActionType.NONE;
+                if(lastInput > 0) {
+                    if(currInput > 0) {
+                        actionUsed = ActionType.REPEAT;
+                    }
+                    else {
+                        actionUsed = ActionType.RELEASE;
+                        if(actionState.getActionType() == ActionType.RELEASE) {
+                            int i = 0;
+                        }
+                    }
+                }
+                else if(currInput > 0) {
+                    actionUsed = ActionType.PRESS;
+                }
+
+                if(actionUsed == actionState.getActionType() ||
+                        (actionState.getActionType() == ActionType.REPEAT && actionUsed == ActionType.PRESS)) {
+
+                    actionState.getAction().performAction(deltaTime, new IEvent() {
+                        @Override
+                        public IComponent getComponent() {
+                            return actionState.getComponent();
+                        }
+
+                        @Override
+                        public float getValue() {
+                            return 0.0f;
+                        }
+                    });
+                }
+            }
+        }
+
+        lastButtons = currButtons;
     }
 }

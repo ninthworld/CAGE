@@ -57,7 +57,7 @@ public class GeometryRenderStage extends RenderStage {
     }
 
     private void renderNode(Node node) {
-        if(node.isBlocked()) {
+        if(!node.isEnabled()) {
             return;
         }
         node.getNodeIterator().forEachRemaining(this::renderNode);

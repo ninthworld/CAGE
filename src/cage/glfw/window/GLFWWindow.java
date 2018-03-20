@@ -193,10 +193,10 @@ public class GLFWWindow extends Window {
     public void setMouseVisible(boolean mouseVisible) {
         super.setMouseVisible(mouseVisible);
         if(mouseVisible) {
-            glfwSetCursor(handle, GLFW_ARROW_CURSOR);
+            glfwSetInputMode(handle, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         }
         else {
-            glfwSetCursor(handle, GLFW_CURSOR_HIDDEN);
+            glfwSetInputMode(handle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         }
     }
 

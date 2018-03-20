@@ -36,6 +36,10 @@ public abstract class NodeController {
         nodes.remove(node);
     }
 
+    public void detachAllNodes() {
+        nodes.forEach(this::detachNode);
+    }
+
     public boolean containsNode(Node node) {
         return nodes.contains(node);
     }

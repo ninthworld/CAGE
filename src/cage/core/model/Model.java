@@ -36,6 +36,10 @@ public class Model {
         this.meshes.remove(mesh);
     }
 
+    public void detachAllMeshes() {
+        this.meshes.forEach(this::detachMesh);
+    }
+
     public Iterator<Mesh> getMeshIterator() {
         return meshes.iterator();
     }
