@@ -1,13 +1,13 @@
 package cage.core.graphics.vertexarray;
 
-import cage.core.common.IDestroyable;
+import cage.core.common.Destroyable;
 import cage.core.graphics.buffer.VertexBuffer;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public abstract class VertexArray implements IDestroyable {
+public abstract class VertexArray implements Destroyable {
 
     protected List<VertexBuffer> vertexBuffers;
     protected int attributeCount;

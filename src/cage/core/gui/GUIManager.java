@@ -1,9 +1,9 @@
 package cage.core.gui;
 
-import cage.core.common.IDestroyable;
+import cage.core.common.Destroyable;
 import cage.core.gui.component.Container;
 
-public abstract class GUIManager implements IDestroyable {
+public abstract class GUIManager implements Destroyable {
 
     private GUIGraphics graphics;
     private Container rootContainer;

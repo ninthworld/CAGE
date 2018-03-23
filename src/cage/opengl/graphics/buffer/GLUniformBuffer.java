@@ -8,7 +8,7 @@ import static cage.opengl.utils.GLUtils.*;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL31.*;
 
-public class GLUniformBuffer extends UniformBuffer implements IGLBuffer {
+public class GLUniformBuffer extends UniformBuffer implements GLBuffer {
 
     private int bufferId;
 

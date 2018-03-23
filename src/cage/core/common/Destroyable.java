@@ -1,5 +1,5 @@
 package cage.core.common;
 
-public interface IDestroyable {
+public interface Destroyable {
     void destroy();
 }

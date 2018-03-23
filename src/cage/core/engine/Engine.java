@@ -2,11 +2,11 @@ package cage.core.engine;
 
 import cage.core.gui.GUIManager;
 import cage.core.window.Window;
-import cage.core.application.IGame;
-import cage.core.application.ITimer;
+import cage.core.application.Game;
+import cage.core.application.Timer;
 import cage.core.asset.AssetManager;
-import cage.core.graphics.IGraphicsContext;
-import cage.core.graphics.IGraphicsDevice;
+import cage.core.graphics.GraphicsContext;
+import cage.core.graphics.GraphicsDevice;
 import cage.core.input.InputManager;
 import cage.core.render.RenderManager;
 import cage.core.scene.SceneManager;
@@ -14,8 +14,8 @@ import cage.core.scene.SceneManager;
 public abstract class Engine {
 
     private Window window;
-    private IGraphicsDevice graphicsDevice;
-    private IGraphicsContext graphicsContext;
+    private GraphicsDevice graphicsDevice;
+    private GraphicsContext graphicsContext;
     private AssetManager assetManager;
     private SceneManager sceneManager;
     private RenderManager renderManager;
@@ -23,7 +23,7 @@ public abstract class Engine {
     private GUIManager guiManager;
     protected int fps;
 
-    public Engine(Window window, InputManager inputManager, GUIManager guiManager, IGraphicsDevice graphicsDevice) {
+    public Engine(Window window, InputManager inputManager, GUIManager guiManager, GraphicsDevice graphicsDevice) {
         this.window = window;
         this.inputManager = inputManager;
         this.guiManager = guiManager;
@@ -35,17 +35,17 @@ public abstract class Engine {
         this.fps = 0;
     }
 
-    public abstract void run(IGame game);
+    public abstract void run(Game game);
 
     public Window getWindow() {
         return window;
     }
 
-    public IGraphicsDevice getGraphicsDevice() {
+    public GraphicsDevice getGraphicsDevice() {
         return graphicsDevice;
     }
 
-    public IGraphicsContext getGraphicsContext() {
+    public GraphicsContext getGraphicsContext() {
         return graphicsContext;
     }
 
@@ -73,5 +73,5 @@ public abstract class Engine {
         return fps;
     }
 
-    public abstract ITimer createTimer();
+    public abstract Timer createTimer();
 }

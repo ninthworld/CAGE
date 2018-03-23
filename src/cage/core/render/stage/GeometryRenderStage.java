@@ -23,7 +23,7 @@ public class GeometryRenderStage extends RenderStage {
     private Camera camera;
     private SceneNode node;
 
-    public GeometryRenderStage(Shader shader, RenderTarget renderTarget, Rasterizer rasterizer, IGraphicsContext graphicsContext) {
+    public GeometryRenderStage(Shader shader, RenderTarget renderTarget, Rasterizer rasterizer, GraphicsContext graphicsContext) {
         super(shader, renderTarget, rasterizer, graphicsContext);
         this.node = null;
         this.camera = null;

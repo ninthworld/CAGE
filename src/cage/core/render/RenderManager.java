@@ -32,8 +32,8 @@ import java.util.List;
 
 public class RenderManager {
 
-    private IGraphicsDevice graphicsDevice;
-    private IGraphicsContext graphicsContext;
+    private GraphicsDevice graphicsDevice;
+    private GraphicsContext graphicsContext;
     private Window window;
     private SceneManager sceneManager;
     private AssetManager assetManager;
@@ -48,7 +48,7 @@ public class RenderManager {
     private ShaderStorageBuffer defaultLightShaderStorageBuffer;
     private Model defaultFXModel;
 
-    public RenderManager(IGraphicsDevice graphicsDevice, IGraphicsContext graphicsContext, Window window, SceneManager sceneManager, AssetManager assetManager) {
+    public RenderManager(GraphicsDevice graphicsDevice, GraphicsContext graphicsContext, Window window, SceneManager sceneManager, AssetManager assetManager) {
         this.outputStages = new ArrayList<>();
         this.graphicsDevice = graphicsDevice;
         this.graphicsContext = graphicsContext;
@@ -224,10 +224,10 @@ public class RenderManager {
     }
     
     public interface IRenderStageConstructor {
-        RenderStage init(Shader shader, RenderTarget renderTarget, Rasterizer rasterizer, IGraphicsContext graphicsContext);
+        RenderStage init(Shader shader, RenderTarget renderTarget, Rasterizer rasterizer, GraphicsContext graphicsContext);
     }
     
     public interface IFXRenderStageConstructor {
-        FXRenderStage init(Model fxModel, Shader shader, RenderTarget renderTarget, Rasterizer rasterizer, IGraphicsContext graphicsContext);
+        FXRenderStage init(Model fxModel, Shader shader, RenderTarget renderTarget, Rasterizer rasterizer, GraphicsContext graphicsContext);
     }
 }

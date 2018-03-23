@@ -10,7 +10,7 @@ import static cage.opengl.utils.GLUtils.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL32.*;
 
-public class GLTextureMS extends TextureMS implements IGLTexture {
+public class GLTextureMS extends TextureMS implements GLTexture {
 
     private int textureId;
 

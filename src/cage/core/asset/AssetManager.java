@@ -19,7 +19,6 @@ import cage.core.model.Mesh;
 import cage.core.model.Model;
 import cage.core.model.material.Material;
 
-import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.*;
@@ -47,14 +46,14 @@ public class AssetManager {
 
     public static final String ASSETS_ROOT_DIR = "assets/";
 
-    private IGraphicsDevice graphicsDevice;
+    private GraphicsDevice graphicsDevice;
     private Path assetsDir;
     private Map<String, Model> models;
     private Map<String, Texture> textures;
     private Shader defaultGeometryShader;
     private Shader defaultLightingShader;
 
-    public AssetManager(IGraphicsDevice graphicsDevice) {
+    public AssetManager(GraphicsDevice graphicsDevice) {
         this.graphicsDevice = graphicsDevice;
         this.assetsDir = Paths.get(ASSETS_ROOT_DIR);
         this.models = new HashMap<>();

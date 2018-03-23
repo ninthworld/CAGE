@@ -1,6 +1,6 @@
 package cage.glfw;
 
-import cage.core.application.IGame;
+import cage.core.application.Game;
 import cage.core.gui.GUIManager;
 import cage.core.input.InputManager;
 import cage.nanovg.gui.NVGGUIManager;
@@ -61,7 +61,7 @@ public class GLFWBootstrap {
     public void run(IGLGameConstructor app) {
         GLFWWindow window = null;
         GLEngine engine = null;
-        IGame game = null;
+        Game game = null;
         try {
             window = new GLFWWindow(title, width, height, vsync, refreshRate, samples);
             engine = new GLEngine(window, inputManager, guiManager);
@@ -80,6 +80,6 @@ public class GLFWBootstrap {
     }
 
     public interface IGLGameConstructor {
-        IGame initialize(GLEngine engine);
+        Game initialize(GLEngine engine);
     }
 }

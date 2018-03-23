@@ -1,7 +1,6 @@
 package cage.core.render.stage;
 
-import cage.core.window.Window;
-import cage.core.graphics.IGraphicsContext;
+import cage.core.graphics.GraphicsContext;
 import cage.core.graphics.rasterizer.Rasterizer;
 import cage.core.graphics.rendertarget.RenderTarget;
 import cage.core.graphics.shader.Shader;
@@ -14,7 +13,7 @@ import java.util.List;
 
 public abstract class RenderStage {
 
-    private IGraphicsContext graphicsContext;
+    private GraphicsContext graphicsContext;
     private Rasterizer rasterizer;
     private List<RenderStage> inputStages;
     private Shader shader;
@@ -22,7 +21,7 @@ public abstract class RenderStage {
     private Rectangle outputDimensions;
     private boolean rendered;
 
-    public RenderStage(Shader shader, RenderTarget renderTarget, Rasterizer rasterizer, IGraphicsContext graphicsContext) {
+    public RenderStage(Shader shader, RenderTarget renderTarget, Rasterizer rasterizer, GraphicsContext graphicsContext) {
         this.inputStages = new ArrayList<>();
         this.shader = shader;
         this.renderTarget = renderTarget;
@@ -53,11 +52,11 @@ public abstract class RenderStage {
         getInputStageIterator().forEachRemaining(RenderStage::postRender);
     }
 
-    public IGraphicsContext getGraphicsContext() {
+    public GraphicsContext getGraphicsContext() {
     	return graphicsContext;
     }
     
-    public void setGraphicsContext(IGraphicsContext graphicsContext) {
+    public void setGraphicsContext(GraphicsContext graphicsContext) {
     	this.graphicsContext = graphicsContext;
     }
     

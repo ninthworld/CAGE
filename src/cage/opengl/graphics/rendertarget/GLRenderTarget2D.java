@@ -14,7 +14,7 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
 
-public class GLRenderTarget2D extends RenderTarget2D implements IGLRenderTarget {
+public class GLRenderTarget2D extends RenderTarget2D implements GLRenderTarget {
 
     private int framebufferId;
 

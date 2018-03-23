@@ -1,6 +1,6 @@
 package cage.opengl.common;
 
-public interface IGLBindable {
+public interface GLBindable {
     void bind();
     void unbind();
 }

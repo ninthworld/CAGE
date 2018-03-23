@@ -3,7 +3,7 @@ package cage.opengl.graphics.vertexarray;
 import cage.core.graphics.vertexarray.VertexArray;
 import cage.core.graphics.buffer.VertexBuffer;
 import cage.core.graphics.type.LayoutType;
-import cage.opengl.common.IGLBindable;
+import cage.opengl.common.GLBindable;
 import cage.opengl.graphics.buffer.GLVertexBuffer;
 
 import static cage.core.graphics.type.LayoutType.*;
@@ -13,7 +13,7 @@ import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
 
-public class GLVertexArray extends VertexArray implements IGLBindable {
+public class GLVertexArray extends VertexArray implements GLBindable {
 
     private int vertexArrayId;
 

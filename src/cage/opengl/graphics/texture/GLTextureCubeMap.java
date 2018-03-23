@@ -14,7 +14,7 @@ import static org.lwjgl.opengl.GL13.GL_TEXTURE_CUBE_MAP;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE_CUBE_MAP_POSITIVE_X;
 import static org.lwjgl.opengl.GL30.glGenerateMipmap;
 
-public class GLTextureCubeMap extends TextureCubeMap implements IGLTexture {
+public class GLTextureCubeMap extends TextureCubeMap implements GLTexture {
 
     private int textureId;
 

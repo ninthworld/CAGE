@@ -1,10 +1,9 @@
 package cage.core.render.stage;
 
-import cage.core.graphics.IGraphicsContext;
+import cage.core.graphics.GraphicsContext;
 import cage.core.graphics.rasterizer.Rasterizer;
 import cage.core.graphics.rendertarget.RenderTarget;
 import cage.core.graphics.shader.Shader;
-import cage.core.graphics.texture.TextureCubeMap;
 import cage.core.model.Model;
 import cage.core.scene.SceneManager;
 import cage.core.scene.light.Light;
@@ -17,7 +16,7 @@ public class LightingRenderStage extends FXRenderStage {
 
     private SceneManager sceneManager;
 
-    public LightingRenderStage(Model fxModel, Shader shader, RenderTarget renderTarget, Rasterizer rasterizer, IGraphicsContext graphicsContext) {
+    public LightingRenderStage(Model fxModel, Shader shader, RenderTarget renderTarget, Rasterizer rasterizer, GraphicsContext graphicsContext) {
         super(fxModel, shader, renderTarget, rasterizer, graphicsContext);
         this.sceneManager = null;
     }
