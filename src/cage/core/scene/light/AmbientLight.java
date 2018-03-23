@@ -19,10 +19,9 @@ public class AmbientLight extends Light {
     @Override
     protected void updateNode() {
         super.updateNode();
-
-        ambient.get(0, bufferData).put(3, 1.0f);
-        bufferData.put(16, 0.0f);
-        bufferData.rewind();
+        ambient.get(0, buffer).put(3, 1.0f);
+        buffer.put(16, 0.0f);
+        buffer.rewind();
     }
 
     public Vector3f getAmbientColor() {

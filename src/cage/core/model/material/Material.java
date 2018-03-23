@@ -1,17 +1,18 @@
 package cage.core.model.material;
 
-import cage.core.common.IBufferData;
+import cage.core.common.Readable;
 import cage.core.graphics.texture.Texture;
 import cage.core.graphics.config.LayoutConfig;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
+import org.lwjgl.system.MemoryUtil;
 
 import java.nio.FloatBuffer;
 
-public class Material implements IBufferData {
+public class Material implements Readable {
 
-    public static final int BUFFER_DATA_SIZE = 20;
-    public static final LayoutConfig BUFFER_LAYOUT = new LayoutConfig().float1().float1().float1().float1().float1().float1().float2().float4().float4().float4();
+    public static final LayoutConfig READ_LAYOUT = new LayoutConfig().float1().float1().float1().float1().float1().float1().float2().float4().float4().float4();
+    public static final int READ_SIZE = READ_LAYOUT.getUnitSize() / 4;
 
     private Vector3f diffuse;
     private Vector3f specular;
@@ -22,6 +23,7 @@ public class Material implements IBufferData {
     private Texture highlightMap;
     private Texture emissiveMap;
     private Texture normalMap;
+    private FloatBuffer buffer;
 
     public Material() {
         this.diffuse = new Vector3f();
@@ -33,6 +35,7 @@ public class Material implements IBufferData {
         this.highlightMap = null;
         this.emissiveMap = null;
         this.normalMap = null;
+        this.buffer = BufferUtils.createFloatBuffer(READ_SIZE);
     }
 
     public Vector3f getDiffuseColor() {
@@ -120,8 +123,7 @@ public class Material implements IBufferData {
     }
 
     @Override
-    public FloatBuffer getBufferData() {
-        FloatBuffer buffer = BufferUtils.createFloatBuffer(BUFFER_DATA_SIZE);
+    public FloatBuffer readData() {
         buffer.put(0, (diffuseMap == null ? 0.0f : 1.0f));
         buffer.put(1, (specularMap == null ? 0.0f : 1.0f));
         buffer.put(2, (highlightMap == null ? 0.0f : 1.0f));

@@ -143,11 +143,11 @@ public class AssetManager {
                 VertexBuffer vertexBuffer = graphicsDevice.createVertexBuffer();
                 vertexBuffer.setLayout(new LayoutConfig().float3().float2().float3().float3());
                 vertexBuffer.setUnitCount(index);
-                vertexBuffer.setData(vertices);
+                vertexBuffer.writeData(vertices);
 
                 IndexBuffer indexBuffer = graphicsDevice.createIndexBuffer();
                 indexBuffer.setUnitCount(builder.faces.size() * 3);
-                indexBuffer.setData(indices);
+                indexBuffer.writeData(indices);
 
                 VertexArray vertexArray = graphicsDevice.createVertexArray();
                 vertexArray.attachVertexBuffer(vertexBuffer);
@@ -223,10 +223,10 @@ public class AssetManager {
             }
             Texture2D texture = graphicsDevice.createTexture2D(img.width, img.height);
             if(img.data instanceof ByteBuffer) {
-                texture.setData((ByteBuffer)img.data);
+                texture.writeData((ByteBuffer)img.data);
             }
             else if(img.data instanceof ShortBuffer) {
-                texture.setData((ShortBuffer)img.data);
+                texture.writeData((ShortBuffer)img.data);
             }
             textures.put(file, texture);
             return texture;
@@ -255,10 +255,10 @@ public class AssetManager {
             for(int i=0; i<imgs.length; ++i) {
                 texture.setDataCubeFace(CubeFaceType.values()[i]);
                 if(imgs[i].data instanceof ByteBuffer) {
-                    texture.setData((ByteBuffer)imgs[i].data);
+                    texture.writeData((ByteBuffer)imgs[i].data);
                 }
                 else if(imgs[i].data instanceof ShortBuffer) {
-                    texture.setData((ShortBuffer)imgs[i].data);
+                    texture.writeData((ShortBuffer)imgs[i].data);
                 }
             }
             textures.put(concat, texture);

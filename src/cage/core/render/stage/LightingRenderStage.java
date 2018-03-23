@@ -30,15 +30,15 @@ public class LightingRenderStage extends FXRenderStage {
             getShader().attachTexture("normalTexture", renderStage.getNormalTextureOutput());
             getShader().attachTexture("depthTexture", renderStage.getDepthTextureOutput());
 
-            int capacity =  sceneManager.getLightCount() * Light.BUFFER_DATA_SIZE;
+            int capacity =  sceneManager.getLightCount() * Light.READ_SIZE;
             FloatBuffer lightBuffer = BufferUtils.createFloatBuffer(capacity);
             Iterator<Light> it = sceneManager.getLightIterator();
             while(it.hasNext()) {
-                lightBuffer.put(it.next().getBufferData());
+                lightBuffer.put(it.next().readData());
             }
             lightBuffer.flip();
-            getShader().getShaderStorageBuffer("Light").setData(lightBuffer);
-            getShader().getUniformBuffer("Camera").setData(renderStage.getCamera().getBufferData());
+            getShader().getShaderStorageBuffer("Light").writeData(lightBuffer);
+            getShader().getUniformBuffer("Camera").writeData(renderStage.getCamera().readData());
         }
     }
 

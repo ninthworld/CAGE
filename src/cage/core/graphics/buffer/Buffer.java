@@ -1,11 +1,12 @@
 package cage.core.graphics.buffer;
 
 import cage.core.common.Destroyable;
+import cage.core.common.Writable;
 import cage.core.graphics.config.LayoutConfig;
 
 import java.nio.*;
 
-public abstract class Buffer implements Destroyable {
+public abstract class Buffer implements Destroyable, Writable {
 
     private int unitCount;
     private LayoutConfig layout;
@@ -30,11 +31,4 @@ public abstract class Buffer implements Destroyable {
     public void setLayout(LayoutConfig layout) {
         this.layout = layout;
     }
-
-    public abstract void setData(ByteBuffer data);
-    public abstract void setData(ShortBuffer data);
-    public abstract void setData(IntBuffer data);
-    public abstract void setData(FloatBuffer data);
-    public abstract void setData(DoubleBuffer data);
-    public abstract void setData(LongBuffer data);
 }

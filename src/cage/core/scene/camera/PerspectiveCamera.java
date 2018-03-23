@@ -31,10 +31,10 @@ public class PerspectiveCamera extends Camera {
         projMatrix.identity();
         projMatrix.perspective(fov, aspectRatio, getZNear(), getZFar());
 
-        projMatrix.get(bufferData);
-        bufferData.position(32);
-        projMatrix.invert().get(bufferData);
-        bufferData.rewind();
+        projMatrix.get(buffer);
+        buffer.position(32);
+        projMatrix.invert().get(buffer);
+        buffer.rewind();
     }
 
     @Override

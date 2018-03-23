@@ -107,7 +107,7 @@ public class GLTextureCubeMap extends TextureCubeMap implements GLTexture {
     }
     
     @Override
-    public void setData(ByteBuffer data) {
+    public void writeData(ByteBuffer data) {
         bind();
         glTexSubImage2D(
                 getGLCubeMapFace(getDataCubeFace()),
@@ -122,7 +122,7 @@ public class GLTextureCubeMap extends TextureCubeMap implements GLTexture {
     }
 
     @Override
-    public void setData(ShortBuffer data) {
+    public void writeData(ShortBuffer data) {
         bind();
         glTexSubImage2D(
                 getGLCubeMapFace(getDataCubeFace()),
@@ -137,7 +137,7 @@ public class GLTextureCubeMap extends TextureCubeMap implements GLTexture {
     }
 
     @Override
-    public void setData(IntBuffer data) {
+    public void writeData(IntBuffer data) {
         bind();
         glTexSubImage2D(
                 getGLCubeMapFace(getDataCubeFace()),
@@ -152,7 +152,7 @@ public class GLTextureCubeMap extends TextureCubeMap implements GLTexture {
     }
 
     @Override
-    public void setData(FloatBuffer data) {
+    public void writeData(FloatBuffer data) {
         bind();
         glTexSubImage2D(
                 getGLCubeMapFace(getDataCubeFace()),
@@ -167,7 +167,7 @@ public class GLTextureCubeMap extends TextureCubeMap implements GLTexture {
     }
 
     @Override
-    public void setData(DoubleBuffer data) {
+    public void writeData(DoubleBuffer data) {
         bind();
         glTexSubImage2D(
                 getGLCubeMapFace(getDataCubeFace()),

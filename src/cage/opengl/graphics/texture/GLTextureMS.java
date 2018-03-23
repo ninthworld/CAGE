@@ -78,23 +78,23 @@ public class GLTextureMS extends TextureMS implements GLTexture {
     }
 
     @Override
-    public void setData(ByteBuffer data) {
+    public void writeData(ByteBuffer data) {
     }
 
     @Override
-    public void setData(ShortBuffer data) {
+    public void writeData(ShortBuffer data) {
     }
 
     @Override
-    public void setData(IntBuffer data) {
+    public void writeData(IntBuffer data) {
     }
 
     @Override
-    public void setData(FloatBuffer data) {
+    public void writeData(FloatBuffer data) {
     }
 
     @Override
-    public void setData(DoubleBuffer data) {
+    public void writeData(DoubleBuffer data) {
     }
 
     @Override

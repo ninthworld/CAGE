@@ -13,8 +13,7 @@ public class DirectionalLight extends Light {
     @Override
     protected void updateNode() {
         super.updateNode();
-
-        bufferData.put(16, 2.0f);
-        bufferData.rewind();
+        buffer.put(16, 2.0f);
+        buffer.rewind();
     }
 }

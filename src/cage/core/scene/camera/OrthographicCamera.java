@@ -28,10 +28,10 @@ public class OrthographicCamera extends Camera {
         projMatrix.identity();
         projMatrix.ortho(left, right, bottom, top, getZNear(), getZFar());
 
-        projMatrix.get(bufferData);
-        bufferData.position(32);
-        projMatrix.invert().get(bufferData);
-        bufferData.rewind();
+        projMatrix.get(buffer);
+        buffer.position(32);
+        projMatrix.invert().get(buffer);
+        buffer.rewind();
     }
 
     @Override

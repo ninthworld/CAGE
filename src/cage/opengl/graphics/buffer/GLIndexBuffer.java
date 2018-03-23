@@ -42,7 +42,7 @@ public class GLIndexBuffer extends IndexBuffer implements GLBuffer {
     }
 
     @Override
-    public void setData(ByteBuffer data) {
+    public void writeData(ByteBuffer data) {
         bind();
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, data, GL_STATIC_DRAW);
         checkError("glBufferData");
@@ -50,7 +50,7 @@ public class GLIndexBuffer extends IndexBuffer implements GLBuffer {
     }
 
     @Override
-    public void setData(ShortBuffer data) {
+    public void writeData(ShortBuffer data) {
         bind();
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, data, GL_STATIC_DRAW);
         checkError("glBufferData");
@@ -58,7 +58,7 @@ public class GLIndexBuffer extends IndexBuffer implements GLBuffer {
     }
 
     @Override
-    public void setData(IntBuffer data) {
+    public void writeData(IntBuffer data) {
         bind();
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, data, GL_STATIC_DRAW);
         checkError("glBufferData");
@@ -66,7 +66,7 @@ public class GLIndexBuffer extends IndexBuffer implements GLBuffer {
     }
 
     @Override
-    public void setData(FloatBuffer data) {
+    public void writeData(FloatBuffer data) {
         bind();
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, data, GL_STATIC_DRAW);
         checkError("glBufferData");
@@ -74,15 +74,7 @@ public class GLIndexBuffer extends IndexBuffer implements GLBuffer {
     }
 
     @Override
-    public void setData(DoubleBuffer data) {
-        bind();
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, data, GL_STATIC_DRAW);
-        checkError("glBufferData");
-        unbind();
-    }
-
-    @Override
-    public void setData(LongBuffer data) {
+    public void writeData(DoubleBuffer data) {
         bind();
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, data, GL_STATIC_DRAW);
         checkError("glBufferData");

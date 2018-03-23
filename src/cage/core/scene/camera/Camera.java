@@ -1,6 +1,6 @@
 package cage.core.scene.camera;
 
-import cage.core.common.IBufferData;
+import cage.core.common.Readable;
 import cage.core.graphics.config.LayoutConfig;
 import cage.core.scene.Node;
 import cage.core.scene.SceneManager;
@@ -10,22 +10,22 @@ import org.lwjgl.BufferUtils;
 
 import java.nio.FloatBuffer;
 
-public abstract class Camera extends SceneNode implements IBufferData {
+public abstract class Camera extends SceneNode implements Readable {
 
-    public static final int BUFFER_DATA_SIZE = 64;
-    public static final LayoutConfig BUFFER_LAYOUT = new LayoutConfig().mat4().mat4().mat4().mat4();
+    public static final LayoutConfig READ_LAYOUT = new LayoutConfig().mat4().mat4().mat4().mat4();
+    public static final int READ_SIZE = READ_LAYOUT.getUnitSize() / 4;
 
     private float zNear;
     private float zFar;
     private Matrix4f viewMatrix;
-    protected FloatBuffer bufferData;
+    protected FloatBuffer buffer;
 
     public Camera(SceneManager sceneManager, Node parent) {
         super(sceneManager, parent);
         this.zNear = 0.1f;
         this.zFar = 1000.0f;
         this.viewMatrix = new Matrix4f().identity();
-        this.bufferData = BufferUtils.createFloatBuffer(BUFFER_DATA_SIZE);
+        this.buffer = BufferUtils.createFloatBuffer(READ_SIZE);
     }
 
     @Override
@@ -36,12 +36,12 @@ public abstract class Camera extends SceneNode implements IBufferData {
         viewMatrix.mul(new Matrix4f().identity().set(getWorldRotation()));
         viewMatrix.translate(getWorldPosition().mul(-1.0f));
 
-        bufferData.clear();
-        bufferData.position(16);
-        viewMatrix.get(bufferData);
-        bufferData.position(48);
-        viewMatrix.invert().get(bufferData);
-        bufferData.rewind();
+        buffer.clear();
+        buffer.position(16);
+        viewMatrix.get(buffer);
+        buffer.position(48);
+        viewMatrix.invert().get(buffer);
+        buffer.rewind();
     }
 
     public Matrix4f getViewMatrix() {
@@ -67,8 +67,8 @@ public abstract class Camera extends SceneNode implements IBufferData {
     }
 
     @Override
-    public FloatBuffer getBufferData() {
-        return bufferData;
+    public FloatBuffer readData() {
+        return buffer;
     }
 
     @Override

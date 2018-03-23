@@ -57,21 +57,21 @@ public class RenderManager {
         this.assetManager = assetManager;
 
         defaultWindowUniformBuffer = graphicsDevice.createUniformBuffer();
-        defaultWindowUniformBuffer.setLayout(Window.BUFFER_LAYOUT);
-        defaultWindowUniformBuffer.setData(window.getBufferData());
-        window.addListener((IResizeWindowListener) (width, height) -> defaultWindowUniformBuffer.setData(window.getBufferData()));
+        defaultWindowUniformBuffer.setLayout(Window.READ_LAYOUT);
+        defaultWindowUniformBuffer.writeData(window.readData());
+        window.addListener((IResizeWindowListener) (width, height) -> defaultWindowUniformBuffer.writeData(window.readData()));
 
         defaultCameraUniformBuffer = graphicsDevice.createUniformBuffer();
-        defaultCameraUniformBuffer.setLayout(Camera.BUFFER_LAYOUT);
+        defaultCameraUniformBuffer.setLayout(Camera.READ_LAYOUT);
 
         defaultEntityUniformBuffer = graphicsDevice.createUniformBuffer();
-        defaultEntityUniformBuffer.setLayout(SceneEntity.BUFFER_LAYOUT);
+        defaultEntityUniformBuffer.setLayout(SceneEntity.READ_LAYOUT);
 
         defaultMaterialUniformBuffer = graphicsDevice.createUniformBuffer();
-        defaultMaterialUniformBuffer.setLayout(Material.BUFFER_LAYOUT);
+        defaultMaterialUniformBuffer.setLayout(Material.READ_LAYOUT);
 
         defaultLightShaderStorageBuffer = graphicsDevice.createShaderStorageBuffer();
-        defaultLightShaderStorageBuffer.setLayout(Light.BUFFER_LAYOUT);
+        defaultLightShaderStorageBuffer.setLayout(Light.READ_LAYOUT);
 
         defaultFXModel = createDefaultFXModel();
 
@@ -207,12 +207,12 @@ public class RenderManager {
         VertexBuffer quadVertexBuffer = graphicsDevice.createVertexBuffer();
         quadVertexBuffer.setLayout(new LayoutConfig().float2());
         quadVertexBuffer.setUnitCount(quadPositions.length / 2);
-        quadVertexBuffer.setData((FloatBuffer) BufferUtils.createFloatBuffer(quadPositions.length).put(quadPositions).rewind());
+        quadVertexBuffer.writeData((FloatBuffer) BufferUtils.createFloatBuffer(quadPositions.length).put(quadPositions).rewind());
 
         int[] quadIndices = new int[] { 0, 1, 2, 2, 3, 0 };
         IndexBuffer quadIndexBuffer = graphicsDevice.createIndexBuffer();
         quadIndexBuffer.setUnitCount(quadIndices.length);
-        quadIndexBuffer.setData((IntBuffer)BufferUtils.createIntBuffer(quadIndices.length).put(quadIndices).rewind());
+        quadIndexBuffer.writeData((IntBuffer)BufferUtils.createIntBuffer(quadIndices.length).put(quadIndices).rewind());
 
         VertexArray quadVertexArray = graphicsDevice.createVertexArray();
         quadVertexArray.attachVertexBuffer(quadVertexBuffer);

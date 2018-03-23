@@ -1,12 +1,13 @@
 package cage.core.graphics.texture;
 
 import cage.core.common.Destroyable;
+import cage.core.common.Writable;
 import cage.core.graphics.sampler.Sampler;
 import cage.core.graphics.type.FormatType;
 
 import java.nio.*;
 
-public abstract class Texture implements Destroyable {
+public abstract class Texture implements Destroyable, Writable {
 
     private int width;
     private int height;
@@ -70,10 +71,4 @@ public abstract class Texture implements Destroyable {
     public void setSampler(Sampler sampler) {
         this.sampler = sampler;
     }
-
-    public abstract void setData(ByteBuffer data);
-    public abstract void setData(ShortBuffer data);
-    public abstract void setData(IntBuffer data);
-    public abstract void setData(FloatBuffer data);
-    public abstract void setData(DoubleBuffer data);
 }

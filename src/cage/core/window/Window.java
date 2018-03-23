@@ -1,6 +1,6 @@
 package cage.core.window;
 
-import cage.core.common.IBufferData;
+import cage.core.common.Readable;
 import cage.core.graphics.config.LayoutConfig;
 import cage.core.window.listener.IWindowListener;
 import org.lwjgl.BufferUtils;
@@ -10,10 +10,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public abstract class Window implements IBufferData {
+public abstract class Window implements Readable {
 
-    public static final int BUFFER_DATA_SIZE = 4;
-    public static final LayoutConfig BUFFER_LAYOUT = new LayoutConfig().float2().float2();
+    public static final LayoutConfig READ_LAYOUT = new LayoutConfig().float2().float2();
+    public static final int READ_SIZE = READ_LAYOUT.getUnitSize() / 4;
 
     private String title;
 
@@ -38,6 +38,7 @@ public abstract class Window implements IBufferData {
     protected boolean maximized;
     protected boolean closed;
     private List<IWindowListener> listeners;
+    private FloatBuffer buffer;
 
     public Window(String title, int width, int height, boolean vsync, int refreshRate, int samples) {
         this.title = title;
@@ -63,6 +64,7 @@ public abstract class Window implements IBufferData {
         this.maximized = false;
         this.closed = false;
         this.listeners = new ArrayList<>();
+        this.buffer = BufferUtils.createFloatBuffer(READ_SIZE);
     }
 
     public abstract void update();
@@ -232,11 +234,9 @@ public abstract class Window implements IBufferData {
     }
 
     @Override
-    public FloatBuffer getBufferData() {
+    public FloatBuffer readData() {
         float width = getWidth();
         float height = getHeight();
-
-        FloatBuffer buffer = BufferUtils.createFloatBuffer(BUFFER_DATA_SIZE);
         buffer.put(0, width);
         buffer.put(1, height);
         buffer.put(2, 1.0f / width);

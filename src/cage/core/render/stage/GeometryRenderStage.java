@@ -43,7 +43,7 @@ public class GeometryRenderStage extends RenderStage {
             materialUniform = getShader().getUniformBuffer("Material");
         }
 
-        cameraUniform.setData(camera.getBufferData());
+        cameraUniform.writeData(camera.readData());
     }
 
     @Override
@@ -65,12 +65,12 @@ public class GeometryRenderStage extends RenderStage {
             SceneEntity entity = (SceneEntity)node;
             Model model = entity.getModel();
 
-            entityUniform.setData(entity.getBufferData());
+            entityUniform.writeData(entity.readData());
 
             getGraphicsContext().bindVertexArray(model.getVertexArray());
             model.getMeshIterator().forEachRemaining((Mesh mesh) -> {
                 Material material = mesh.getMaterial();
-                materialUniform.setData(material.getBufferData());
+                materialUniform.writeData(material.readData());
 
                 if(material.getDiffuseTexture() != null && material.getDiffuseTexture() instanceof Texture2D) {
                     getShader().attachTexture("diffuseTexture", material.getDiffuseTexture());
