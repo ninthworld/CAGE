@@ -1,5 +1,5 @@
 * Remove I from interfaces
-* Add Movable and Sizable and Updatable
+* Add Movable and Sizable
 * Add ResizeListener and MoveListener
 * Add SizableParent and MovableParent
 * Add Readable and Writable instead of BufferData
@@ -14,3 +14,6 @@
 * Create examples that run/compile with bat
 * Add readme with screenshot from example
 * Add javadocs support
+
+* protected abstract constructors
+* normalize "this."

@@ -1,5 +1,5 @@
 package cage.core.window.listener;
 
-public interface IFocusWindowListener extends IWindowListener {
+public interface FocusWindowListener extends WindowListener {
     void onWindowFocus(boolean focused);
 }

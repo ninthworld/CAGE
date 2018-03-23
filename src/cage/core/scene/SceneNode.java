@@ -28,7 +28,8 @@ public class SceneNode extends Node {
 
     public PerspectiveCamera createPerspectiveCamera() {
         PerspectiveCamera camera = new PerspectiveCamera(sceneManager, this);
-        camera.setAspectRatio((float)getSceneManager().getWindow().getWidth() / (float)getSceneManager().getWindow().getHeight());
+        camera.setSize(getSceneManager().getWindow().getWidth(), getSceneManager().getWindow().getHeight());
+        camera.setSizableParent(getSceneManager().getWindow());
         getSceneManager().registerCamera(camera);
         return camera;
     }

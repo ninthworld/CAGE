@@ -1,27 +1,45 @@
 package cage.core.scene.camera;
 
-import cage.core.window.Window;
+import cage.core.common.Sizable;
+import cage.core.common.listener.Listener;
+import cage.core.common.listener.ResizeListener;
 import cage.core.scene.Node;
 import cage.core.scene.SceneManager;
-import cage.core.window.listener.IResizeWindowListener;
 import org.joml.Matrix4f;
 
-public class PerspectiveCamera extends Camera {
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
-    private float aspectRatio;
+public class PerspectiveCamera extends Camera implements Sizable {
+
+    private int width;
+    private int height;
+    private Sizable sizableParent;
+    private ResizeListener resizeListener;
+    private List<Listener> listeners;
+
     private float fov;
     private Matrix4f projMatrix;
 
-    private Window window;
-    private IResizeWindowListener resizeListener;
-
     public PerspectiveCamera(SceneManager sceneManager, Node parent) {
         super(sceneManager, parent);
-        this.aspectRatio = 1.0f;
         this.fov = 45.0f;
         this.projMatrix = new Matrix4f().identity();
-        this.window = null;
+
+        this.width = 1;
+        this.height = 1;
+        this.sizableParent = null;
         this.resizeListener = null;
+        this.listeners = new ArrayList<>();
+    }
+
+    public float getFOV() {
+        return fov;
+    }
+
+    public void setFOV(float fov) {
+        this.fov = fov;
     }
 
     @Override
@@ -29,7 +47,7 @@ public class PerspectiveCamera extends Camera {
         super.updateNode();
 
         projMatrix.identity();
-        projMatrix.perspective(fov, aspectRatio, getZNear(), getZFar());
+        projMatrix.perspective(fov, (float)width / (float)height, getZNear(), getZFar());
 
         projMatrix.get(buffer);
         buffer.position(32);
@@ -42,54 +60,106 @@ public class PerspectiveCamera extends Camera {
         return projMatrix;
     }
 
-    public float getAspectRatio() {
-        return aspectRatio;
+    @Override
+    public int getWidth() {
+        return width;
     }
 
-    public void setAspectRatio(float aspectRatio) {
-        this.aspectRatio = aspectRatio;
+    @Override
+    public int getHeight() {
+        return height;
     }
 
-    public float getFOV() {
-        return fov;
+    @Override
+    public void setSize(int width, int height) {
+        this.width = width;
+        this.height = height;
+        notifyResize();
     }
 
-    public void setFOV(float fov) {
-        this.fov = fov;
+    @Override
+    public void notifyResize() {
+        for(Listener listener : listeners) {
+            if(listener instanceof ResizeListener) {
+                ((ResizeListener) listener).onResize(width, height);
+            }
+        }
     }
 
-    public boolean containsResizeListener() {
-        return resizeListener != null;
+    @Override
+    public Sizable getSizableParent() {
+        return sizableParent;
     }
 
-    public IResizeWindowListener getResizeListener() {
+    @Override
+    public ResizeListener getSizableParentListener() {
         return resizeListener;
     }
 
-    public void setResizeListener(IResizeWindowListener resizeListener) {
-        if(resizeListener != null) {
-            if(window != null) {
-                window.removeListener(this.resizeListener);
-                if(!window.containsListener(resizeListener)) {
-                    window.addListener(resizeListener);
-                }
-            }
-            this.resizeListener = resizeListener;
-        }
+    @Override
+    public void setSizableParent(Sizable parent) {
+        setSizableParent(parent, this::setSize);
     }
 
-    public void removeResizeListener() {
-        if(window != null) {
-            window.removeListener(this.resizeListener);
+    @Override
+    public void setSizableParent(Sizable parent, ResizeListener listener) {
+        if(hasSizableParent()) {
+            removeSizableParent();
         }
+        this.sizableParent = parent;
+        this.resizeListener = listener;
+        this.sizableParent.addListener(this.resizeListener);
+    }
+
+    @Override
+    public void removeSizableParent() {
+        this.sizableParent.removeListener(resizeListener);
+        this.sizableParent = null;
         this.resizeListener = null;
     }
 
-    public Window getWindow() {
-        return window;
+    @Override
+    public boolean hasSizableParent() {
+        return sizableParent != null;
     }
 
-    public void setWindow(Window window) {
-        this.window = window;
+    @Override
+    public void addListener(Listener listener) {
+        this.listeners.add(listener);
+    }
+
+    @Override
+    public void removeListener(Listener listener) {
+        this.listeners.remove(listener);
+    }
+
+    @Override
+    public void removeListener(int index) {
+        this.listeners.remove(index);
+    }
+
+    @Override
+    public void removeAllListeners() {
+        this.listeners.clear();
+    }
+
+    @Override
+    public int getListenerCount() {
+        return listeners.size();
+    }
+
+    @Override
+    public boolean containsListener(Listener listener) {
+        return listeners.contains(listener);
+    }
+
+    @Override
+    public Listener getListener(int index) {
+        return listeners.get(index);
+    }
+
+    @Override
+    public Iterator<Listener> getListenerIterator() {
+        return listeners.iterator();
     }
 }

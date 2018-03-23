@@ -1,52 +1,33 @@
 package cage.core.graphics.rendertarget;
 
 import cage.core.common.Sizable;
-import cage.core.window.Window;
+import cage.core.common.listener.Listener;
+import cage.core.common.listener.ResizeListener;
 import cage.core.common.Destroyable;
 import cage.core.graphics.texture.Texture;
-import cage.core.window.listener.IResizeWindowListener;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 public abstract class RenderTarget<T extends Texture> implements Destroyable, Sizable {
 
-    private Map<Integer, T> colorTextures;
-    private T depthTexture;
     private int width;
     private int height;
+    private Sizable sizableParent;
+    private ResizeListener resizeListener;
+    private List<Listener> listeners;
 
-    private Window window;
-    private IResizeWindowListener resizeListener;
+    private Map<Integer, T> colorTextures;
+    private T depthTexture;
 
     public RenderTarget(int width, int height) {
         this.colorTextures = new HashMap<>();
         this.depthTexture = null;
+
         this.width = width;
         this.height = height;
-        this.window = null;
+        this.sizableParent = null;
         this.resizeListener = null;
-    }
-
-    @Override
-    public int getWidth() {
-        return width;
-    }
-
-    @Override
-    public int getHeight() {
-        return height;
-    }
-
-    @Override
-    public void setSize(int width, int height) {
-        this.width = width;
-        this.height = height;
-        colorTextures.forEach((Integer i, T t) -> t.setSize(width, height));
-        if(containsDepthTexture()) {
-            depthTexture.setSize(width, height);
-        }
+        this.listeners = new ArrayList<>();
     }
 
     public int getColorTextureCount() {
@@ -55,6 +36,7 @@ public abstract class RenderTarget<T extends Texture> implements Destroyable, Si
 
     public void attachColorTexture(int index, T colorTexture) {
         colorTextures.put(index, colorTexture);
+        colorTexture.setSizableParent(this);
     }
 
     public void detachColorTexture(int index) {
@@ -79,6 +61,7 @@ public abstract class RenderTarget<T extends Texture> implements Destroyable, Si
 
     public void attachDepthTexture(T depthTexture) {
         this.depthTexture = depthTexture;
+        depthTexture.setSizableParent(this);
     }
 
     public void detachDepthTexture(T depthTexture) {
@@ -93,38 +76,110 @@ public abstract class RenderTarget<T extends Texture> implements Destroyable, Si
         return depthTexture;
     }
 
-    public boolean containsResizeListener() {
-        return resizeListener != null;
+    @Override
+    public int getWidth() {
+        return width;
     }
 
-    public IResizeWindowListener getResizeListener() {
+    @Override
+    public int getHeight() {
+        return height;
+    }
+
+    @Override
+    public void setSize(int width, int height) {
+        this.width = width;
+        this.height = height;
+        notifyResize();
+    }
+
+    @Override
+    public void notifyResize() {
+        for(Listener listener : listeners) {
+            if(listener instanceof ResizeListener) {
+                ((ResizeListener) listener).onResize(width, height);
+            }
+        }
+    }
+
+    @Override
+    public Sizable getSizableParent() {
+        return sizableParent;
+    }
+
+    @Override
+    public ResizeListener getSizableParentListener() {
         return resizeListener;
     }
 
-    public void setResizeListener(IResizeWindowListener resizeListener) {
-        if(resizeListener != null) {
-            if(window != null) {
-                window.removeListener(this.resizeListener);
-                if(!window.containsListener(resizeListener)) {
-                    window.addListener(resizeListener);
-                }
-            }
-            this.resizeListener = resizeListener;
-        }
+    @Override
+    public void setSizableParent(Sizable parent) {
+        setSizableParent(parent, this::setSize);
     }
 
-    public void removeResizeListener() {
-        if(window != null) {
-            window.removeListener(this.resizeListener);
+    @Override
+    public void setSizableParent(Sizable parent, ResizeListener listener) {
+        if(hasSizableParent()) {
+            removeSizableParent();
         }
+        this.sizableParent = parent;
+        this.resizeListener = listener;
+        this.sizableParent.addListener(this.resizeListener);
+    }
+
+    @Override
+    public void removeSizableParent() {
+        this.sizableParent.removeListener(resizeListener);
+        this.sizableParent = null;
         this.resizeListener = null;
     }
 
-    public Window getWindow() {
-        return window;
+    @Override
+    public boolean hasSizableParent() {
+        return sizableParent != null;
     }
 
-    public void setWindow(Window window) {
-        this.window = window;
+    @Override
+    public void addListener(Listener listener) {
+        this.listeners.add(listener);
+    }
+
+    @Override
+    public void removeListener(Listener listener) {
+        this.listeners.remove(listener);
+    }
+
+    @Override
+    public void removeListener(int index) {
+        this.listeners.remove(index);
+    }
+
+    @Override
+    public void removeAllListeners() {
+        this.listeners.clear();
+    }
+
+    @Override
+    public int getListenerCount() {
+        return listeners.size();
+    }
+
+    @Override
+    public boolean containsListener(Listener listener) {
+        return listeners.contains(listener);
+    }
+
+    @Override
+    public Listener getListener(int index) {
+        return listeners.get(index);
+    }
+
+    @Override
+    public Iterator<Listener> getListenerIterator() {
+        return listeners.iterator();
+    }
+
+    @Override
+    public void destroy() {
     }
 }

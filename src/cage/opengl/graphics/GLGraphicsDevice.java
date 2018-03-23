@@ -225,10 +225,9 @@ public class GLGraphicsDevice implements GraphicsDevice {
     @Override
     public RenderTarget2D createRenderTarget2D() {
         GLRenderTarget2D glRenderTarget = new GLRenderTarget2D(window.getWidth(), window.getHeight());
-        glRenderTarget.setWindow(window);
-        glRenderTarget.setResizeListener(glRenderTarget::setSize);
-        glRenderTarget.attachDepthTexture(createTexture2D(window.getWidth(), window.getHeight(), FormatType.DEPTH_24_STENCIL_8));
-        glRenderTarget.attachColorTexture(0, createTexture2D(window.getWidth(), window.getHeight()));
+        glRenderTarget.setSizableParent(window);
+        glRenderTarget.attachDepthTexture(createTexture2D(glRenderTarget.getWidth(), glRenderTarget.getHeight(), FormatType.DEPTH_24_STENCIL_8));
+        glRenderTarget.attachColorTexture(0, createTexture2D(glRenderTarget.getWidth(), glRenderTarget.getHeight()));
         glObjects.add(glRenderTarget);
         return glRenderTarget;
     }
@@ -245,10 +244,9 @@ public class GLGraphicsDevice implements GraphicsDevice {
     @Override
     public RenderTargetMS createRenderTargetMS(int samples) {
         GLRenderTargetMS glRenderTarget = new GLRenderTargetMS(window.getWidth(), window.getHeight(), samples);
-        glRenderTarget.setWindow(window);
-        glRenderTarget.setResizeListener(glRenderTarget::setSize);
-        glRenderTarget.attachDepthTexture(createTextureMS(window.getWidth(), window.getHeight(), samples, FormatType.DEPTH_24_STENCIL_8));
-        glRenderTarget.attachColorTexture(0, createTextureMS(window.getWidth(), window.getHeight(), samples));
+        glRenderTarget.setSizableParent(window);
+        glRenderTarget.attachDepthTexture(createTextureMS(glRenderTarget.getWidth(), glRenderTarget.getHeight(), samples, FormatType.DEPTH_24_STENCIL_8));
+        glRenderTarget.attachColorTexture(0, createTextureMS(glRenderTarget.getWidth(), glRenderTarget.getHeight(), samples));
         glObjects.add(glRenderTarget);
         return glRenderTarget;
     }

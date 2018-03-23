@@ -3,8 +3,11 @@ package cage.core.window;
 import cage.core.common.Movable;
 import cage.core.common.Readable;
 import cage.core.common.Sizable;
+import cage.core.common.listener.Listener;
+import cage.core.common.listener.MoveListener;
+import cage.core.common.listener.ResizeListener;
 import cage.core.graphics.config.LayoutConfig;
-import cage.core.window.listener.IWindowListener;
+import cage.core.window.listener.WindowListener;
 import org.lwjgl.BufferUtils;
 
 import java.nio.FloatBuffer;
@@ -17,20 +20,24 @@ public abstract class Window implements Sizable, Movable, Readable {
     public static final LayoutConfig READ_LAYOUT = new LayoutConfig().float2().float2();
     public static final int READ_SIZE = READ_LAYOUT.getUnitSize() / 4;
 
-    private String title;
-
-    protected int width;
-    protected int height;
-    protected int fsWidth;
-    protected int fsHeight;
-    protected int wWidth;
-    protected int wHeight;
-
     protected int posX;
     protected int posY;
-    protected int wPosX;
-    protected int wPosY;
+    private Movable movableParent;
+    private MoveListener moveListener;
+    protected int width;
+    protected int height;
+    private Sizable sizableParent;
+    private ResizeListener resizeListener;
+    private List<Listener> listeners;
 
+    protected int windowedPosX;
+    protected int windowedPosY;
+    protected int fullscreenWidth;
+    protected int fullscreenHeight;
+    protected int windowedWidth;
+    protected int windowedHeight;
+
+    private String title;
     private int refreshRate;
     private int samples;
     private boolean vsync;
@@ -39,24 +46,10 @@ public abstract class Window implements Sizable, Movable, Readable {
     private boolean fullscreen;
     protected boolean maximized;
     protected boolean closed;
-    private List<IWindowListener> listeners;
     private FloatBuffer buffer;
 
     public Window(String title, int width, int height, boolean vsync, int refreshRate, int samples) {
         this.title = title;
-
-        this.width = width;
-        this.height = height;
-        this.fsWidth = width;
-        this.fsHeight = height;
-        this.wWidth = width;
-        this.wHeight = height;
-
-        this.posX = 0;
-        this.posY = 0;
-        this.wPosX = 0;
-        this.wPosY = 0;
-
         this.refreshRate = refreshRate;
         this.samples = samples;
         this.vsync = vsync;
@@ -67,6 +60,23 @@ public abstract class Window implements Sizable, Movable, Readable {
         this.closed = false;
         this.listeners = new ArrayList<>();
         this.buffer = BufferUtils.createFloatBuffer(READ_SIZE);
+
+        this.windowedPosX = 0;
+        this.windowedPosY = 0;
+        this.fullscreenWidth = width;
+        this.fullscreenHeight = height;
+        this.windowedWidth = width;
+        this.windowedHeight = height;
+
+        this.posX = 0;
+        this.posY = 0;
+        this.movableParent = null;
+        this.moveListener = null;
+        this.width = width;
+        this.height = height;
+        this.sizableParent = null;
+        this.resizeListener = null;
+        this.listeners = new ArrayList<>();
     }
 
     public abstract void update();
@@ -79,72 +89,38 @@ public abstract class Window implements Sizable, Movable, Readable {
         this.title = title;
     }
 
-    @Override
-    public int getWidth() {
-        return width;
-    }
-
-    @Override
-    public int getHeight() {
-        return height;
-    }
-
-    @Override
-    public void setSize(int width, int height) {
-        this.width = width;
-        this.height = height;
-        if(isFullscreen()) {
-            this.fsWidth = width;
-            this.fsHeight = height;
-        }
-        else {
-            this.wWidth = width;
-            this.wHeight = height;
-        }
-    }
-
     public int getFullscreenWidth() {
-        return fsWidth;
+        return fullscreenWidth;
     }
 
     public int getFullscreenHeight() {
-        return fsHeight;
+        return fullscreenHeight;
     }
 
     public void setFullscreenSize(int width, int height) {
-        this.fsWidth = width;
-        this.fsHeight = height;
+        this.fullscreenWidth = width;
+        this.fullscreenHeight = height;
     }
 
     public int getWindowedWidth() {
-        return wWidth;
+        return windowedWidth;
     }
 
     public int getWindowedHeight() {
-        return wHeight;
+        return windowedHeight;
     }
 
     public void setWindowedSize(int width, int height) {
-        this.wWidth = width;
-        this.wHeight = height;
-    }
-
-    @Override
-    public int getX() {
-        return posX;
-    }
-
-    @Override
-    public int getY() {
-        return posY;
+        this.windowedWidth = width;
+        this.windowedHeight = height;
     }
 
     public int getWindowedPositionX() {
-        return wPosX;
+        return windowedPosX;
     }
 
     public int getWindowedPositionY() {
-        return wPosY;
+        return windowedPosY;
     }
 
     public boolean isVsync() {
@@ -153,16 +129,6 @@ public abstract class Window implements Sizable, Movable, Readable {
 
     public void setVsync(boolean vsync) {
         this.vsync = vsync;
-    }
-
-    @Override
-    public void setPosition(int x, int y) {
-        this.posX = x;
-        this.posY = y;
-        if(!isFullscreen()) {
-            this.wPosX = x;
-            this.wPosY = y;
-        }
     }
 
     public int getRefreshRate() {
@@ -217,30 +183,6 @@ public abstract class Window implements Sizable, Movable, Readable {
         this.maximized = maximized;
     }
 
-    public void addListener(IWindowListener listener) {
-        listeners.add(listener);
-    }
-
-    public int getListenerSize() {
-        return listeners.size();
-    }
-
-    public Iterator<IWindowListener> getListenerIterator() {
-        return listeners.iterator();
-    }
-
-    public boolean containsListener(IWindowListener listener) {
-        return listeners.contains(listener);
-    }
-
-    public IWindowListener getListener(int index) {
-        return listeners.get(index);
-    }
-
-    public void removeListener(IWindowListener listener) {
-        listeners.remove(listener);
-    }
-
     @Override
     public FloatBuffer readData() {
         float width = getWidth();
@@ -251,5 +193,183 @@ public abstract class Window implements Sizable, Movable, Readable {
         buffer.put(3, 1.0f / height);
         buffer.rewind();
         return buffer;
+    }
+
+    @Override
+    public int getX() {
+        return posX;
+    }
+
+    @Override
+    public int getY() {
+        return posY;
+    }
+
+    @Override
+    public void setPosition(int x, int y) {
+        this.posX = x;
+        this.posY = y;
+        if(!isFullscreen()) {
+            this.windowedPosX = x;
+            this.windowedPosY = y;
+        }
+        notifyMove();
+    }
+
+    @Override
+    public void notifyMove() {
+        for(Listener listener : listeners) {
+            if(listener instanceof MoveListener) {
+                ((MoveListener) listener).onMove(posX, posY);
+            }
+        }
+    }
+
+    @Override
+    public Movable getMovableParent() {
+        return movableParent;
+    }
+
+    @Override
+    public MoveListener getMovableParentListener() {
+        return moveListener;
+    }
+
+    @Override
+    public void setMovableParent(Movable parent) {
+        setMovableParent(parent, this::setPosition);
+    }
+
+    @Override
+    public void setMovableParent(Movable parent, MoveListener listener) {
+        if(hasMovableParent()) {
+            removeMovableParent();
+        }
+        this.movableParent = parent;
+        this.moveListener = listener;
+        this.movableParent.addListener(this.moveListener);
+    }
+
+    @Override
+    public void removeMovableParent() {
+        this.movableParent.removeListener(moveListener);
+        this.movableParent = null;
+        this.moveListener = null;
+    }
+
+    @Override
+    public boolean hasMovableParent() {
+        return movableParent != null;
+    }
+
+    @Override
+    public int getWidth() {
+        return width;
+    }
+
+    @Override
+    public int getHeight() {
+        return height;
+    }
+
+    @Override
+    public void setSize(int width, int height) {
+        this.width = width;
+        this.height = height;
+        if(isFullscreen()) {
+            this.fullscreenWidth = width;
+            this.fullscreenHeight = height;
+        }
+        else {
+            this.windowedWidth = width;
+            this.windowedHeight = height;
+        }
+        notifyResize();
+    }
+
+    @Override
+    public void notifyResize() {
+        for(Listener listener : listeners) {
+            if(listener instanceof ResizeListener) {
+                ((ResizeListener) listener).onResize(width, height);
+            }
+        }
+    }
+
+    @Override
+    public Sizable getSizableParent() {
+        return sizableParent;
+    }
+
+    @Override
+    public ResizeListener getSizableParentListener() {
+        return resizeListener;
+    }
+
+    @Override
+    public void setSizableParent(Sizable parent) {
+        setSizableParent(parent, this::setSize);
+    }
+
+    @Override
+    public void setSizableParent(Sizable parent, ResizeListener listener) {
+        if(hasSizableParent()) {
+            removeSizableParent();
+        }
+        this.sizableParent = parent;
+        this.resizeListener = listener;
+        this.sizableParent.addListener(this.resizeListener);
+    }
+
+    @Override
+    public void removeSizableParent() {
+        this.sizableParent.removeListener(resizeListener);
+        this.sizableParent = null;
+        this.resizeListener = null;
+    }
+
+    @Override
+    public boolean hasSizableParent() {
+        return sizableParent != null;
+    }
+
+    @Override
+    public void addListener(Listener listener) {
+        this.listeners.add(listener);
+    }
+
+    @Override
+    public void removeListener(Listener listener) {
+        this.listeners.remove(listener);
+    }
+
+    @Override
+    public void removeListener(int index) {
+        this.listeners.remove(index);
+    }
+
+    @Override
+    public void removeAllListeners() {
+        this.listeners.clear();
+    }
+
+    @Override
+    public int getListenerCount() {
+        return listeners.size();
+    }
+
+    @Override
+    public boolean containsListener(Listener listener) {
+        return listeners.contains(listener);
+    }
+
+    @Override
+    public Listener getListener(int index) {
+        return listeners.get(index);
+    }
+
+    @Override
+    public Iterator<Listener> getListenerIterator() {
+        return listeners.iterator();
     }
 }

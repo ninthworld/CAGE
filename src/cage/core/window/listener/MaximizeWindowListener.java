@@ -1,5 +1,5 @@
 package cage.core.window.listener;
 
-public interface IMaximizeWindowListener extends IWindowListener {
+public interface MaximizeWindowListener extends WindowListener {
     void onWindowMaximize(boolean maximized);
 }

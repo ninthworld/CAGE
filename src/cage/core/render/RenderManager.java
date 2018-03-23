@@ -1,5 +1,6 @@
 package cage.core.render;
 
+import cage.core.common.listener.ResizeListener;
 import cage.core.graphics.GraphicsDevice;
 import cage.core.window.Window;
 import cage.core.asset.AssetManager;
@@ -22,7 +23,6 @@ import cage.core.scene.SceneManager;
 import cage.core.scene.camera.Camera;
 import cage.core.scene.light.Light;
 
-import cage.core.window.listener.IResizeWindowListener;
 import org.lwjgl.BufferUtils;
 
 import java.awt.*;
@@ -61,7 +61,7 @@ public class RenderManager {
         defaultWindowUniformBuffer = graphicsDevice.createUniformBuffer();
         defaultWindowUniformBuffer.setLayout(Window.READ_LAYOUT);
         defaultWindowUniformBuffer.writeData(window.readData());
-        window.addListener((IResizeWindowListener) (width, height) -> defaultWindowUniformBuffer.writeData(window.readData()));
+        window.addListener((ResizeListener) (width, height) -> defaultWindowUniformBuffer.writeData(window.readData()));
 
         defaultCameraUniformBuffer = graphicsDevice.createUniformBuffer();
         defaultCameraUniformBuffer.setLayout(Camera.READ_LAYOUT);
@@ -101,12 +101,16 @@ public class RenderManager {
 
     public RenderStage createRenderStage(IRenderStageConstructor stage) {
         RenderTarget renderTarget = graphicsDevice.createRenderTarget2D();
-    	return stage.init(null, renderTarget, graphicsDevice.getDefaultRasterizer(), graphicsContext);
+    	RenderStage renderStage = stage.init(null, renderTarget, graphicsDevice.getDefaultRasterizer(), graphicsContext);
+    	renderStage.setSizableParent(window);
+    	return renderStage;
     }
 
     public FXRenderStage createFXRenderStage(IFXRenderStageConstructor stage) {
         RenderTarget renderTarget = graphicsDevice.createRenderTarget2D();
-        return stage.init(defaultFXModel, null, renderTarget, graphicsDevice.getDefaultFXRasterizer(), graphicsContext);
+        FXRenderStage renderStage = stage.init(defaultFXModel, null, renderTarget, graphicsDevice.getDefaultFXRasterizer(), graphicsContext);
+        renderStage.setSizableParent(window);
+        return renderStage;
     }
 
     public GeometryRenderStage createGeometryRenderStage(Camera camera) {

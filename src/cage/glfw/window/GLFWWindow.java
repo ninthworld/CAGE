@@ -1,5 +1,6 @@
 package cage.glfw.window;
 
+import cage.core.common.listener.Listener;
 import cage.core.window.Window;
 import cage.core.window.listener.*;
 import org.lwjgl.glfw.*;
@@ -50,11 +51,11 @@ public class GLFWWindow extends Window {
             @Override
             public void invoke(long handle) {
                 closed = true;
-                Iterator<IWindowListener> it = getListenerIterator();
+                Iterator<Listener> it = getListenerIterator();
                 while(it.hasNext()) {
-                    IWindowListener listener = it.next();
-                    if(listener instanceof ICloseWindowListener) {
-                        ((ICloseWindowListener)listener).onWindowClose();
+                    Listener listener = it.next();
+                    if(listener instanceof CloseWindowListener) {
+                        ((CloseWindowListener)listener).onWindowClose();
                     }
                 }
             }
@@ -66,16 +67,10 @@ public class GLFWWindow extends Window {
                 width = w;
                 height = h;
                 if(!isFullscreen()) {
-                    wWidth = w;
-                    wHeight = h;
+                    windowedWidth = w;
+                    windowedHeight = h;
                 }
-                Iterator<IWindowListener> it = getListenerIterator();
-                while(it.hasNext()) {
-                    IWindowListener listener = it.next();
-                    if(listener instanceof IResizeWindowListener) {
-                        ((IResizeWindowListener)listener).onWindowResize(w, h);
-                    }
-                }
+                notifyResize();
             }
         });
 
@@ -85,16 +80,10 @@ public class GLFWWindow extends Window {
                 posX = x;
                 posY = y;
                 if(!isFullscreen()) {
-                    wPosX = x;
-                    wPosY = y;
+                    windowedPosX = x;
+                    windowedPosY = y;
                 }
-                Iterator<IWindowListener> it = getListenerIterator();
-                while(it.hasNext()) {
-                    IWindowListener listener = it.next();
-                    if(listener instanceof IMoveWindowListener) {
-                        ((IMoveWindowListener)listener).onWindowMove(x, y);
-                    }
-                }
+                notifyMove();
             }
         });
 
@@ -102,11 +91,11 @@ public class GLFWWindow extends Window {
             @Override
             public void invoke(long handle, boolean maximize) {
                 maximized = maximize;
-                Iterator<IWindowListener> it = getListenerIterator();
+                Iterator<Listener> it = getListenerIterator();
                 while(it.hasNext()) {
-                    IWindowListener listener = it.next();
-                    if(listener instanceof IMaximizeWindowListener) {
-                        ((IMaximizeWindowListener)listener).onWindowMaximize(maximize);
+                    Listener listener = it.next();
+                    if(listener instanceof MaximizeWindowListener) {
+                        ((MaximizeWindowListener)listener).onWindowMaximize(maximize);
                     }
                 }
             }
@@ -115,11 +104,11 @@ public class GLFWWindow extends Window {
         glfwSetWindowFocusCallback(handle, new GLFWWindowFocusCallback() {
             @Override
             public void invoke(long handle, boolean focused) {
-                Iterator<IWindowListener> it = getListenerIterator();
+                Iterator<Listener> it = getListenerIterator();
                 while(it.hasNext()) {
-                    IWindowListener listener = it.next();
-                    if(listener instanceof IFocusWindowListener) {
-                        ((IFocusWindowListener)listener).onWindowFocus(focused);
+                    Listener listener = it.next();
+                    if(listener instanceof FocusWindowListener) {
+                        ((FocusWindowListener)listener).onWindowFocus(focused);
                     }
                 }
             }
