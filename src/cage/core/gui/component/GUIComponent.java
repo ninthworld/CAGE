@@ -1,6 +1,6 @@
 package cage.core.gui.component;
 
-import cage.core.gui.GUIGraphics;
+import cage.core.gui.graphics.GUIGraphics;
 
 public abstract class GUIComponent {
 

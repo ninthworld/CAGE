@@ -72,15 +72,11 @@ public class GLGraphicsDevice implements GraphicsDevice {
         this.graphicsContext.bindRasterizer(this.defaultRasterizer);
     }
 
+    @Override
     public void destroy() {
         glObjects.forEach(Destroyable::destroy);
+        glObjects.clear();
         glfwTerminate();
-    }
-
-    @Override
-    public void destroy(Destroyable object) {
-        object.destroy();
-        glObjects.remove(object);
     }
 
     @Override

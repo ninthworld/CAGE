@@ -193,8 +193,4 @@ public abstract class RenderTarget<T extends Texture> implements Destroyable, Si
     public Iterator<Listener> getListenerIterator() {
         return listeners.iterator();
     }
-
-    @Override
-    public void destroy() {
-    }
 }

@@ -9,6 +9,9 @@ import cage.core.graphics.texture.Texture2D;
 import cage.core.graphics.texture.TextureCubeMap;
 import cage.core.graphics.type.CubeFaceType;
 import cage.core.graphics.vertexarray.VertexArray;
+import cage.core.gui.graphics.GUIFont;
+import cage.core.gui.graphics.GUIImage;
+import cage.core.gui.GUIManager;
 import com.owens.oobjloader.builder.Build;
 import com.owens.oobjloader.builder.Face;
 import com.owens.oobjloader.builder.FaceVertex;
@@ -19,8 +22,7 @@ import cage.core.model.Mesh;
 import cage.core.model.Model;
 import cage.core.model.material.Material;
 
-import java.io.BufferedReader;
-import java.io.IOException;
+import java.io.*;
 import java.nio.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -34,6 +36,7 @@ import java.util.logging.*;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
+import org.lwjgl.stb.STBEasyFont;
 import org.lwjgl.stb.STBImage;
 import org.lwjgl.system.MemoryStack;
 
@@ -47,19 +50,72 @@ public class AssetManager {
     public static final String ASSETS_ROOT_DIR = "assets/";
 
     private GraphicsDevice graphicsDevice;
+    private GUIManager guiManager;
     private Path assetsDir;
-    private Map<String, Model> models;
-    private Map<String, Texture> textures;
     private Shader defaultGeometryShader;
     private Shader defaultLightingShader;
+    private Map<String, Model> models;
+    private Map<String, Texture> textures;
+    private Map<String, GUIFont> fonts;
+    private Map<String, GUIImage> images;
 
-    public AssetManager(GraphicsDevice graphicsDevice) {
+    public AssetManager(GraphicsDevice graphicsDevice, GUIManager guiManager) {
         this.graphicsDevice = graphicsDevice;
+        this.guiManager = guiManager;
         this.assetsDir = Paths.get(ASSETS_ROOT_DIR);
+
         this.models = new HashMap<>();
         this.textures = new HashMap<>();
+        this.fonts = new HashMap<>();
+        this.images = new HashMap<>();
+
         this.defaultGeometryShader = loadShader("geometry/material.vs.glsl", "geometry/material.fs.glsl");
         this.defaultLightingShader = loadShader("fx/fx.vs.glsl", "fx/lighting.fs.glsl");
+    }
+
+    public Shader getDefaultGeometryShader() {
+        return defaultGeometryShader;
+    }
+
+    public Shader getDefaultLightingShader() {
+        return defaultLightingShader;
+    }
+
+    public GUIFont loadFont(String name, String file) {
+        String concat = file.concat(name);
+        if(fonts.containsKey(concat)) {
+            return fonts.get(concat);
+        }
+        else {
+            try {
+                Path path = assetsDir.resolve("fonts/").resolve(file);
+                byte[] data = Files.readAllBytes(path);
+                ByteBuffer buffer = BufferUtils.createByteBuffer(data.length);
+                buffer.put(data);
+                buffer.flip();
+                GUIFont font = guiManager.createFont(name, buffer);
+                fonts.put(concat, font);
+                return font;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+    }
+
+    public GUIImage loadImage(String file) {
+        if(images.containsKey(file)) {
+            return images.get(file);
+        }
+        else {
+            ImageData img = getImageData(assetsDir.resolve("images/").resolve(file).toString());
+            if(img == null) {
+                return null;
+            }
+            GUIImage image = guiManager.createImage(img.width, img.height, (ByteBuffer)img.data);
+            images.put(file, image);
+            return image;
+        }
     }
 
     public Model loadOBJModel(String file) {
@@ -217,7 +273,7 @@ public class AssetManager {
             return (Texture2D)tex;
         }
         else {
-            Image img = loadImage(file);
+            ImageData img = getImageData(assetsDir.resolve("textures/").resolve(file).toString());
             if(img == null) {
                 return null;
             }
@@ -244,9 +300,9 @@ public class AssetManager {
             return (TextureCubeMap)tex;
         }
         else {
-            Image[] imgs = new Image[6];
+            ImageData[] imgs = new ImageData[6];
             for(int i=0; i<imgs.length; ++i) {
-                imgs[i] = loadImage(files[i]);
+                imgs[i] = getImageData(assetsDir.resolve("textures/").resolve(files[i]).toString());
                 if(imgs[i] == null) {
                     return null;
                 }
@@ -266,15 +322,7 @@ public class AssetManager {
         }
     }
 
-    public Shader getDefaultGeometryShader() {
-        return defaultGeometryShader;
-    }
-
-    public Shader getDefaultLightingShader() {
-        return defaultLightingShader;
-    }
-
-    private Image loadImage(String file) {
+    private ImageData getImageData(String file) {
         // TODO: Add support for 16-bit PNG
         ByteBuffer data;
         int width, height;
@@ -282,7 +330,7 @@ public class AssetManager {
             IntBuffer w = stack.mallocInt(1);
             IntBuffer h = stack.mallocInt(1);
             IntBuffer comp = stack.mallocInt(1);
-            data = STBImage.stbi_load(assetsDir.resolve("textures/").resolve(file).toString(), w, h, comp, 4);
+            data = STBImage.stbi_load(file, w, h, comp, 4);
             if(data == null) {
                 System.err.println("Failed to load texture '" + file + "'\n" + STBImage.stbi_failure_reason());
                 return null;
@@ -291,14 +339,14 @@ public class AssetManager {
             height = h.get();
         }
 
-        Image img = new Image();
+        ImageData img = new ImageData();
         img.width = width;
         img.height = height;
         img.data = data;
         return img;
     }
 
-    private class Image {
+    private class ImageData {
         public int width;
         public int height;
         public Buffer data;

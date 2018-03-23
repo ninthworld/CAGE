@@ -3,8 +3,6 @@ package test;
 import cage.core.engine.Engine;
 
 import cage.core.application.Game;
-import cage.core.gui.GUIGraphics;
-import cage.core.gui.component.GUIComponent;
 import cage.core.input.action.CloseWindowAction;
 import cage.core.input.action.InputAction;
 import cage.core.input.component.Axis;
@@ -27,25 +25,22 @@ public class MyGame implements Game {
 
     private SceneNode rotateNode;
     private SceneEntity dolphinEntity;
+    private FPSMonitor monitor;
+    private boolean canLook;
 
     public MyGame(Engine engine) {
+        this.monitor = new FPSMonitor(engine.createTimer());
+        this.canLook = false;
     }
 
-    boolean canLook = false;
 
     @Override
     public void initialize(Engine engine) {
         engine.getGraphicsContext().setClearColor(Color.decode("#6495ed"));
         engine.getInputManager().addAction(engine.getInputManager().getKeyboardController(), Key.ESCAPE, InputActionType.PRESS, new CloseWindowAction(engine.getWindow()));
 
-        engine.getGUIManager().getRootContainer().addComponent(new GUIComponent() {
-            @Override
-            public void render(GUIGraphics g) {
-                g.setFill(0.8f, 0.2f, 0.1f, 1.0f);
-                g.rect(0.0f, 0.0f, 100.0f, 100.0f);
-                g.fill();
-            }
-        });
+        engine.getAssetManager().loadFont("Arial", "arial.ttf");
+        engine.getGUIManager().getRootContainer().addComponent(monitor);
 
         rotateNode = engine.getSceneManager().getRootSceneNode().createSceneNode();
 
@@ -109,13 +104,13 @@ public class MyGame implements Game {
 
     @Override
     public void update(Engine engine, float deltaTime) {
-        engine.getWindow().setTitle("FPS: " + engine.getFPS());
-
         Iterator<Light> it = engine.getSceneManager().getLightIterator();
         while(it.hasNext()) {
             Light light = it.next();
             light.notifyUpdate();
         }
+
+        monitor.update(deltaTime);
     }
 
     @Override
@@ -123,6 +118,6 @@ public class MyGame implements Game {
     }
 
     public static void main(String[] args) {
-        new GLFWBootstrap("Test Game", 1600, 900).run(MyGame::new);
+        new GLFWBootstrap("Test Game", 1600, 900).setSamples(2).run(MyGame::new);
     }
 }

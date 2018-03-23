@@ -20,7 +20,6 @@ public class GLRasterizer extends Rasterizer implements GLBindable {
 
     @Override
     public void bind() {
-
     	glEnable(GL_TEXTURE_2D);
     	
         if(getFillType() == FillType.SOLID) {

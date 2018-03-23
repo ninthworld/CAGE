@@ -1,5 +1,6 @@
 package cage.core.engine;
 
+import cage.core.common.Destroyable;
 import cage.core.gui.GUIManager;
 import cage.core.window.Window;
 import cage.core.application.Game;
@@ -11,7 +12,7 @@ import cage.core.input.InputManager;
 import cage.core.render.RenderManager;
 import cage.core.scene.SceneManager;
 
-public abstract class Engine {
+public abstract class Engine implements Destroyable {
 
     private Window window;
     private GraphicsDevice graphicsDevice;
@@ -21,7 +22,6 @@ public abstract class Engine {
     private RenderManager renderManager;
     private InputManager inputManager;
     private GUIManager guiManager;
-    protected int fps;
 
     public Engine(Window window, InputManager inputManager, GUIManager guiManager, GraphicsDevice graphicsDevice) {
         this.window = window;
@@ -29,10 +29,9 @@ public abstract class Engine {
         this.guiManager = guiManager;
         this.graphicsDevice = graphicsDevice;
         this.graphicsContext = graphicsDevice.getGraphicsContext();
-        this.assetManager = new AssetManager(graphicsDevice);
+        this.assetManager = new AssetManager(graphicsDevice, guiManager);
         this.sceneManager = new SceneManager(window);
         this.renderManager = new RenderManager(this.graphicsDevice, this.graphicsContext, this.window, this.sceneManager, this.assetManager);
-        this.fps = 0;
     }
 
     public abstract void run(Game game);
@@ -69,9 +68,11 @@ public abstract class Engine {
         return guiManager;
     }
 
-    public int getFPS() {
-        return fps;
-    }
-
     public abstract Timer createTimer();
+
+    @Override
+    public void destroy() {
+        guiManager.destroy();
+        graphicsDevice.destroy();
+    }
 }

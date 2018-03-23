@@ -11,6 +11,9 @@ import cage.glfw.window.GLFWWindow;
 import cage.opengl.graphics.GLGraphicsDevice;
 import cage.glfw.input.GLFWInputManager;
 
+import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL11.glEnable;
+
 public class GLEngine extends Engine {
 
     private GLTimer timer;
@@ -31,8 +34,6 @@ public class GLEngine extends Engine {
         game.initialize(this);
         getSceneManager().update(0.0f);
 
-        int frames = 0;
-        GLTimer fpsTimer = (GLTimer)createTimer();
         float deltaTime;
         while(!getWindow().isClosed()) {
             deltaTime = timer.getElapsedTime();
@@ -47,24 +48,11 @@ public class GLEngine extends Engine {
 
             getWindow().update();
             getInputManager().update(deltaTime);
-
-            if(fpsTimer.getElapsedTime() > 1.0) {
-                fps = frames;
-                frames = 0;
-                fpsTimer.reset();
-            }
-            else {
-                ++frames;
-            }
         }
     }
 
     @Override
     public Timer createTimer() {
         return new GLTimer();
-    }
-
-    public void destroy() {
-        ((GLGraphicsDevice)getGraphicsDevice()).destroy();
     }
 }

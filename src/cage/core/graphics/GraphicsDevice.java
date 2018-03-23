@@ -17,7 +17,7 @@ import cage.core.graphics.texture.TextureMS;
 import cage.core.graphics.type.FormatType;
 import cage.core.graphics.vertexarray.VertexArray;
 
-public interface GraphicsDevice {
+public interface GraphicsDevice extends Destroyable {
 
     GraphicsContext getGraphicsContext();
 
@@ -56,6 +56,4 @@ public interface GraphicsDevice {
     Rasterizer getDefaultFXRasterizer();
     Sampler getDefaultSampler();
     Blender getDefaultBlender();
-
-    void destroy(Destroyable object);
 }

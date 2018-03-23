@@ -175,8 +175,4 @@ public abstract class Texture implements Destroyable, Sizable, Writable {
     public Iterator<Listener> getListenerIterator() {
         return listeners.iterator();
     }
-
-    @Override
-    public void destroy() {
-    }
 }

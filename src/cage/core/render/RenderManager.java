@@ -199,6 +199,10 @@ public class RenderManager {
         return outputStages.get(index);
     }
 
+    public void setOutputRenderStage(int index, RenderStage renderStage) {
+        outputStages.set(index, renderStage);
+    }
+
     public Iterator<RenderStage> getOutputRenderStageIterator() {
         return outputStages.iterator();
     }

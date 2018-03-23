@@ -91,6 +91,8 @@ public class GeometryRenderStage extends RenderStage {
                 getGraphicsContext().bindShader(getShader());
                 getGraphicsContext().drawIndexed(mesh.getIndexBuffer());
             });
+            getGraphicsContext().unbindShader(getShader());
+            getGraphicsContext().unbindVertexArray(model.getVertexArray());
         }
     }
 
