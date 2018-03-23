@@ -1,10 +1,10 @@
 package cage.glfw.input.controller;
 
 import cage.core.input.ActionState;
-import cage.core.input.action.IInputEvent;
+import cage.core.input.action.InputEvent;
 import cage.core.input.component.Axis;
 import cage.core.input.component.Button;
-import cage.core.input.component.IInputComponent;
+import cage.core.input.component.InputComponent;
 import cage.core.input.controller.JoystickController;
 import cage.core.input.type.InputActionType;
 import cage.glfw.utils.GLFWUtils;
@@ -66,9 +66,9 @@ public class GLFWJoystickController extends JoystickController {
             ActionState actionState = it.next();
             if(actionState.getComponent() instanceof Axis) {
                 if(axisValues.containsKey(actionState.getComponent())) {
-                    actionState.getAction().performAction(deltaTime, new IInputEvent() {
+                    actionState.getAction().performAction(deltaTime, new InputEvent() {
                         @Override
-                        public IInputComponent getComponent() {
+                        public InputComponent getComponent() {
                             return actionState.getComponent();
                         }
 
@@ -84,9 +84,9 @@ public class GLFWJoystickController extends JoystickController {
                     InputActionType actionUsed = buttonActions.get(actionState.getComponent());
                     if(actionUsed == actionState.getActionType() ||
                             (actionState.getActionType() == InputActionType.REPEAT && actionUsed == InputActionType.PRESS )) {
-                        actionState.getAction().performAction(deltaTime, new IInputEvent() {
+                        actionState.getAction().performAction(deltaTime, new InputEvent() {
                             @Override
-                            public IInputComponent getComponent() {
+                            public InputComponent getComponent() {
                                 return actionState.getComponent();
                             }
 

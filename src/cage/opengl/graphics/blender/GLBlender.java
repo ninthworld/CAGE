@@ -1,7 +1,7 @@
 package cage.opengl.graphics.blender;
 
 import cage.core.graphics.blender.Blender;
-import cage.opengl.common.IGLBindable;
+import cage.opengl.common.GLBindable;
 
 import static cage.opengl.graphics.type.GLTypeUtils.*;
 import static cage.opengl.graphics.type.GLTypeUtils.getGLBlendEquation;
@@ -10,7 +10,7 @@ import static org.lwjgl.opengl.GL13.*;
 import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.opengl.GL40.*;
 
-public class GLBlender extends Blender implements IGLBindable {
+public class GLBlender extends Blender implements GLBindable {
 
     public GLBlender() {
         super();

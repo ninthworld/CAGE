@@ -8,7 +8,7 @@ import static cage.opengl.utils.GLUtils.checkError;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL43.GL_SHADER_STORAGE_BUFFER;
 
-public class GLShaderStorageBuffer extends ShaderStorageBuffer implements IGLBuffer {
+public class GLShaderStorageBuffer extends ShaderStorageBuffer implements GLBuffer {
 
     private int bufferId;
 

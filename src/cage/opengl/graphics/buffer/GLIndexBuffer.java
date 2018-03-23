@@ -7,7 +7,7 @@ import java.nio.*;
 import static cage.opengl.utils.GLUtils.*;
 import static org.lwjgl.opengl.GL15.*;
 
-public class GLIndexBuffer extends IndexBuffer implements IGLBuffer {
+public class GLIndexBuffer extends IndexBuffer implements GLBuffer {
 
     private int bufferId;
 

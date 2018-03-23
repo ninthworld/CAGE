@@ -2,11 +2,11 @@ package test;
 
 import cage.core.engine.Engine;
 
-import cage.core.application.IGame;
+import cage.core.application.Game;
 import cage.core.gui.GUIGraphics;
 import cage.core.gui.component.GUIComponent;
 import cage.core.input.action.CloseWindowAction;
-import cage.core.input.action.IInputAction;
+import cage.core.input.action.InputAction;
 import cage.core.input.component.Axis;
 import cage.core.input.component.Button;
 import cage.core.input.component.Key;
@@ -23,7 +23,7 @@ import org.joml.Vector3f;
 import java.awt.*;
 import java.util.Iterator;
 
-public class MyGame implements IGame {
+public class MyGame implements Game {
 
     private SceneNode rotateNode;
     private SceneEntity dolphinEntity;
@@ -61,7 +61,7 @@ public class MyGame implements IGame {
         light.setDiffuseColor(1.0f, 1.0f, 1.0f);
         light.setSpecularColor(1.0f, 1.0f, 1.0f);
 
-        IInputAction mouseAction = (deltaTime, event) -> {
+        InputAction mouseAction = (deltaTime, event) -> {
             if(canLook) {
                 if (event.getComponent() == Axis.LEFT_X) {
                     engine.getSceneManager().getDefaultCamera().rotate(0.5f * deltaTime * event.getValue(), new Vector3f(0.0f, 1.0f, 0.0f));

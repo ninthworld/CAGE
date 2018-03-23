@@ -1,7 +1,7 @@
 package cage.opengl.graphics.buffer;
 
-import cage.opengl.common.IGLBindable;
+import cage.opengl.common.GLBindable;
 
-public interface IGLBuffer extends IGLBindable {
+public interface GLBuffer extends GLBindable {
     int getBufferId();
 }

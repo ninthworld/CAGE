@@ -1,10 +1,10 @@
 package cage.opengl.application;
 
-import cage.core.application.ITimer;
+import cage.core.application.Timer;
 
 import static org.lwjgl.glfw.GLFW.glfwGetTime;
 
-public class GLTimer implements ITimer {
+public class GLTimer implements Timer {
 
     private float startTime;
     private float lastTime;

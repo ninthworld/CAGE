@@ -1,8 +1,8 @@
 package cage.core.gui;
 
-import cage.core.common.IDestroyable;
+import cage.core.common.Destroyable;
 
-public interface GUIGraphics extends IDestroyable {
+public interface GUIGraphics extends Destroyable {
     void beginPath();
     void closePath();
     void save();

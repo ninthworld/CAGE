@@ -1,6 +1,6 @@
 package cage.core.graphics;
 
-import cage.core.common.IDestroyable;
+import cage.core.common.Destroyable;
 import cage.core.graphics.blender.Blender;
 import cage.core.graphics.buffer.IndexBuffer;
 import cage.core.graphics.buffer.ShaderStorageBuffer;
@@ -17,9 +17,9 @@ import cage.core.graphics.texture.TextureMS;
 import cage.core.graphics.type.FormatType;
 import cage.core.graphics.vertexarray.VertexArray;
 
-public interface IGraphicsDevice {
+public interface GraphicsDevice {
 
-    IGraphicsContext getGraphicsContext();
+    GraphicsContext getGraphicsContext();
 
     IndexBuffer createIndexBuffer();
     VertexBuffer createVertexBuffer();
@@ -57,5 +57,5 @@ public interface IGraphicsDevice {
     Sampler getDefaultSampler();
     Blender getDefaultBlender();
 
-    void destroy(IDestroyable object);
+    void destroy(Destroyable object);
 }

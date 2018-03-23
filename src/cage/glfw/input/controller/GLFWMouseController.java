@@ -1,10 +1,10 @@
 package cage.glfw.input.controller;
 
 import cage.core.input.ActionState;
-import cage.core.input.action.IInputEvent;
+import cage.core.input.action.InputEvent;
 import cage.core.input.component.Axis;
 import cage.core.input.component.Button;
-import cage.core.input.component.IInputComponent;
+import cage.core.input.component.InputComponent;
 import cage.core.input.controller.MouseController;
 import cage.core.input.type.InputActionType;
 import cage.glfw.utils.GLFWUtils;
@@ -41,9 +41,9 @@ public class GLFWMouseController extends MouseController {
                     ActionState actionState = it.next();
                     if(actionState.getComponent() instanceof Axis) {
                         if(actionState.getComponent() == Axis.RIGHT_X && xOffset != 0.0) {
-                            actionState.getAction().performAction(deltaTime, new IInputEvent() {
+                            actionState.getAction().performAction(deltaTime, new InputEvent() {
                                 @Override
-                                public IInputComponent getComponent() {
+                                public InputComponent getComponent() {
                                     return actionState.getComponent();
                                 }
 
@@ -54,9 +54,9 @@ public class GLFWMouseController extends MouseController {
                             });
                         }
                         if(actionState.getComponent() == Axis.RIGHT_Y && yOffset != 0.0) {
-                            actionState.getAction().performAction(deltaTime, new IInputEvent() {
+                            actionState.getAction().performAction(deltaTime, new InputEvent() {
                                 @Override
-                                public IInputComponent getComponent() {
+                                public InputComponent getComponent() {
                                     return actionState.getComponent();
                                 }
 
@@ -81,9 +81,9 @@ public class GLFWMouseController extends MouseController {
                     ActionState actionState = it.next();
                     if(actionState.getComponent() instanceof Axis) {
                         if(actionState.getComponent() == Axis.LEFT_X && dx != 0.0f) {
-                            actionState.getAction().performAction(deltaTime, new IInputEvent() {
+                            actionState.getAction().performAction(deltaTime, new InputEvent() {
                                 @Override
-                                public IInputComponent getComponent() {
+                                public InputComponent getComponent() {
                                     return actionState.getComponent();
                                 }
 
@@ -94,9 +94,9 @@ public class GLFWMouseController extends MouseController {
                             });
                         }
                         if(actionState.getComponent() == Axis.LEFT_Y && dy != 0.0) {
-                            actionState.getAction().performAction(deltaTime, new IInputEvent() {
+                            actionState.getAction().performAction(deltaTime, new InputEvent() {
                                 @Override
-                                public IInputComponent getComponent() {
+                                public InputComponent getComponent() {
                                     return actionState.getComponent();
                                 }
 
@@ -155,9 +155,9 @@ public class GLFWMouseController extends MouseController {
                 if(actionUsed == actionState.getActionType() ||
                         (actionState.getActionType() == InputActionType.REPEAT && actionUsed == InputActionType.PRESS)) {
 
-                    actionState.getAction().performAction(deltaTime, new IInputEvent() {
+                    actionState.getAction().performAction(deltaTime, new InputEvent() {
                         @Override
-                        public IInputComponent getComponent() {
+                        public InputComponent getComponent() {
                             return actionState.getComponent();
                         }
 

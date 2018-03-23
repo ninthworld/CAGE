@@ -7,7 +7,7 @@ import java.nio.*;
 import static cage.opengl.utils.GLUtils.*;
 import static org.lwjgl.opengl.GL15.*;
 
-public class GLVertexBuffer extends VertexBuffer implements IGLBuffer {
+public class GLVertexBuffer extends VertexBuffer implements GLBuffer {
 
     private int bufferId;
 

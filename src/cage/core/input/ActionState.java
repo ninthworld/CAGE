@@ -1,29 +1,29 @@
 package cage.core.input;
 
-import cage.core.input.action.IInputAction;
-import cage.core.input.component.IInputComponent;
+import cage.core.input.action.InputAction;
+import cage.core.input.component.InputComponent;
 import cage.core.input.controller.InputController;
 import cage.core.input.type.InputActionType;
 
 public class ActionState {
 
-    private IInputAction action;
+    private InputAction action;
     private InputController controller;
-    private IInputComponent component;
+    private InputComponent component;
     private InputActionType actionType;
 
-    public ActionState(IInputAction action, InputController controller, IInputComponent component, InputActionType actionType) {
+    public ActionState(InputAction action, InputController controller, InputComponent component, InputActionType actionType) {
         this.action = action;
         this.controller = controller;
         this.component = component;
         this.actionType = actionType;
     }
 
-    public IInputAction getAction() {
+    public InputAction getAction() {
         return action;
     }
 
-    public void setAction(IInputAction action) {
+    public void setAction(InputAction action) {
         this.action = action;
     }
 
@@ -31,11 +31,11 @@ public class ActionState {
         return controller;
     }
 
-    public IInputComponent getComponent() {
+    public InputComponent getComponent() {
         return component;
     }
 
-    public void setComponent(IInputComponent component) {
+    public void setComponent(InputComponent component) {
         this.component = component;
     }
 

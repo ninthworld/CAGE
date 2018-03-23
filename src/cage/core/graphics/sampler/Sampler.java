@@ -1,13 +1,13 @@
 package cage.core.graphics.sampler;
 
-import cage.core.common.IDestroyable;
+import cage.core.common.Destroyable;
 import cage.core.graphics.type.CompareType;
 import cage.core.graphics.type.EdgeType;
 import cage.core.graphics.type.FilterType;
 
 import java.awt.*;
 
-public abstract class Sampler implements IDestroyable {
+public abstract class Sampler implements Destroyable {
 
     private EdgeType edgeU;
     private EdgeType edgeV;

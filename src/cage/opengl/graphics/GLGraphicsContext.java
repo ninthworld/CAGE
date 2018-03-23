@@ -13,7 +13,7 @@ import cage.glfw.window.GLFWWindow;
 import cage.opengl.graphics.blender.GLBlender;
 import cage.opengl.graphics.buffer.GLIndexBuffer;
 import cage.opengl.graphics.rasterizer.GLRasterizer;
-import cage.opengl.graphics.rendertarget.IGLRenderTarget;
+import cage.opengl.graphics.rendertarget.GLRenderTarget;
 import cage.opengl.graphics.shader.GLShader;
 import cage.opengl.graphics.vertexarray.GLVertexArray;
 
@@ -27,7 +27,7 @@ import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.opengl.GL31.*;
 import static org.lwjgl.opengl.GL40.*;
 
-public class GLGraphicsContext implements IGraphicsContext {
+public class GLGraphicsContext implements GraphicsContext {
 
     private GLFWWindow window;
     private int primitive;
@@ -155,8 +155,8 @@ public class GLGraphicsContext implements IGraphicsContext {
 
 	@Override
 	public void resolveToBackBuffer(RenderTarget renderTarget, Rectangle clipFrom, Rectangle clipTo) {
-		if(renderTarget instanceof IGLRenderTarget) {
-            glBindFramebuffer(GL_READ_FRAMEBUFFER, ((IGLRenderTarget)renderTarget).getFramebufferId());            
+		if(renderTarget instanceof GLRenderTarget) {
+            glBindFramebuffer(GL_READ_FRAMEBUFFER, ((GLRenderTarget)renderTarget).getFramebufferId());
 	        glReadBuffer(GL_COLOR_ATTACHMENT0);
 	        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 	        glDrawBuffer(GL_BACK);
@@ -183,11 +183,11 @@ public class GLGraphicsContext implements IGraphicsContext {
 
 	@Override
 	public void resolveToRenderTarget(RenderTarget renderTargetFrom, RenderTarget renderTargetTo, Rectangle clipFrom, Rectangle clipTo) {
-		if(renderTargetFrom instanceof IGLRenderTarget && renderTargetTo instanceof IGLRenderTarget) {
+		if(renderTargetFrom instanceof GLRenderTarget && renderTargetTo instanceof GLRenderTarget) {
             ((RenderTarget<Texture>)renderTargetFrom).getColorTextureIterator().forEachRemaining((Map.Entry<Integer, Texture> entry) -> {
-	        	glBindFramebuffer(GL_READ_FRAMEBUFFER, ((IGLRenderTarget)renderTargetFrom).getFramebufferId());
+	        	glBindFramebuffer(GL_READ_FRAMEBUFFER, ((GLRenderTarget)renderTargetFrom).getFramebufferId());
 	            glReadBuffer(GL_COLOR_ATTACHMENT0 + entry.getKey());
-	            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, ((IGLRenderTarget)renderTargetTo).getFramebufferId());
+	            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, ((GLRenderTarget)renderTargetTo).getFramebufferId());
 	            glDrawBuffer(GL_COLOR_ATTACHMENT0 + entry.getKey());
 
 	            glBlitFramebuffer(
@@ -218,10 +218,10 @@ public class GLGraphicsContext implements IGraphicsContext {
 
 	@Override
 	public void bindRenderTarget(RenderTarget renderTarget) {
-        if(renderTarget instanceof IGLRenderTarget) {
-            ((IGLRenderTarget) renderTarget).bind();
+        if(renderTarget instanceof GLRenderTarget) {
+            ((GLRenderTarget) renderTarget).bind();
             setViewport(new Rectangle(0, 0, renderTarget.getWidth(), renderTarget.getHeight()));
-            boundFBOId = ((IGLRenderTarget) renderTarget).getFramebufferId();
+            boundFBOId = ((GLRenderTarget) renderTarget).getFramebufferId();
         }
 	}
 

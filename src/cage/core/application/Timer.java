@@ -1,6 +1,6 @@
 package cage.core.application;
 
-public interface ITimer {
+public interface Timer {
     void reset();
     float getElapsedTime();
     float getCurrentTime();

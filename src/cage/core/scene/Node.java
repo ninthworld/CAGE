@@ -1,6 +1,6 @@
 package cage.core.scene;
 
-import cage.core.common.IDestroyable;
+import cage.core.common.Destroyable;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -8,9 +8,8 @@ import org.joml.Vector3f;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.function.Consumer;
 
-public abstract class Node implements IDestroyable {
+public abstract class Node implements Destroyable {
 
     public static final Vector3f FORWARD = new Vector3f(0.0f, 0.0f, 1.0f);
     public static final Vector3f RIGHT = new Vector3f(-1.0f, 0.0f, 0.0f);

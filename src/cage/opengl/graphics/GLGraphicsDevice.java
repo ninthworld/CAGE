@@ -1,6 +1,6 @@
 package cage.opengl.graphics;
 
-import cage.core.common.IDestroyable;
+import cage.core.common.Destroyable;
 import cage.core.graphics.*;
 import cage.core.graphics.blender.Blender;
 import cage.core.graphics.buffer.IndexBuffer;
@@ -40,11 +40,11 @@ import java.util.List;
 
 import static org.lwjgl.glfw.GLFW.*;
 
-public class GLGraphicsDevice implements IGraphicsDevice {
+public class GLGraphicsDevice implements GraphicsDevice {
 
     private GLGraphicsContext graphicsContext;
     private GLFWWindow window;
-    private List<IDestroyable> glObjects;
+    private List<Destroyable> glObjects;
 
     private GLRasterizer defaultRasterizer;
     private GLRasterizer defaultFXRasterizer;
@@ -73,12 +73,12 @@ public class GLGraphicsDevice implements IGraphicsDevice {
     }
 
     public void destroy() {
-        glObjects.forEach(IDestroyable::destroy);
+        glObjects.forEach(Destroyable::destroy);
         glfwTerminate();
     }
 
     @Override
-    public void destroy(IDestroyable object) {
+    public void destroy(Destroyable object) {
         object.destroy();
         glObjects.remove(object);
     }

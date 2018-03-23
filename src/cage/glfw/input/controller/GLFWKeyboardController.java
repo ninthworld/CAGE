@@ -1,8 +1,8 @@
 package cage.glfw.input.controller;
 
 import cage.core.input.ActionState;
-import cage.core.input.action.IInputEvent;
-import cage.core.input.component.IInputComponent;
+import cage.core.input.action.InputEvent;
+import cage.core.input.component.InputComponent;
 import cage.core.input.component.Key;
 import cage.core.input.controller.KeyboardController;
 import cage.core.input.type.InputActionType;
@@ -54,9 +54,9 @@ public class GLFWKeyboardController extends KeyboardController {
 
                 if(actionUsed == actionState.getActionType() ||
                         (actionState.getActionType() == InputActionType.REPEAT && actionUsed == InputActionType.PRESS)) {
-                    actionState.getAction().performAction(deltaTime, new IInputEvent() {
+                    actionState.getAction().performAction(deltaTime, new InputEvent() {
                         @Override
-                        public IInputComponent getComponent() {
+                        public InputComponent getComponent() {
                             return actionState.getComponent();
                         }
 

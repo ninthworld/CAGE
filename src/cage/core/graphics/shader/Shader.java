@@ -1,6 +1,6 @@
 package cage.core.graphics.shader;
 
-import cage.core.common.IDestroyable;
+import cage.core.common.Destroyable;
 import cage.core.graphics.buffer.ShaderStorageBuffer;
 import cage.core.graphics.buffer.UniformBuffer;
 import cage.core.graphics.texture.Texture;
@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class Shader implements IDestroyable {
+public abstract class Shader implements Destroyable {
 
     protected Map<Integer, ShaderStorageBuffer> shaderStorageBuffers;
     protected Map<Integer, UniformBuffer> uniformBuffers;

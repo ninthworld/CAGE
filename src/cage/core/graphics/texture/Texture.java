@@ -1,12 +1,12 @@
 package cage.core.graphics.texture;
 
-import cage.core.common.IDestroyable;
+import cage.core.common.Destroyable;
 import cage.core.graphics.sampler.Sampler;
 import cage.core.graphics.type.FormatType;
 
 import java.nio.*;
 
-public abstract class Texture implements IDestroyable {
+public abstract class Texture implements Destroyable {
 
     private int width;
     private int height;

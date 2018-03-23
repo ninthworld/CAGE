@@ -11,7 +11,7 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.*;
 import static org.lwjgl.opengl.GL30.*;
 
-public class GLTexture2D extends Texture2D implements IGLTexture {
+public class GLTexture2D extends Texture2D implements GLTexture {
 
     private int textureId;
 

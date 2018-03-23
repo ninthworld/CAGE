@@ -3,12 +3,12 @@ package cage.opengl.graphics.rasterizer;
 import cage.core.graphics.rasterizer.Rasterizer;
 import cage.core.graphics.type.CullType;
 import cage.core.graphics.type.FillType;
-import cage.opengl.common.IGLBindable;
+import cage.opengl.common.GLBindable;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.*;
 
-public class GLRasterizer extends Rasterizer implements IGLBindable {
+public class GLRasterizer extends Rasterizer implements GLBindable {
 
     public GLRasterizer() {
         super();

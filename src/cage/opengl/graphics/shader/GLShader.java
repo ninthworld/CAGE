@@ -4,12 +4,11 @@ import cage.core.graphics.buffer.ShaderStorageBuffer;
 import cage.core.graphics.shader.Shader;
 import cage.core.graphics.texture.Texture;
 import cage.core.graphics.buffer.UniformBuffer;
-import cage.opengl.common.IGLBindable;
+import cage.opengl.common.GLBindable;
 import cage.opengl.graphics.buffer.GLShaderStorageBuffer;
 import cage.opengl.graphics.sampler.GLSampler;
 import cage.opengl.graphics.buffer.GLUniformBuffer;
-import cage.opengl.graphics.texture.GLTexture2D;
-import cage.opengl.graphics.texture.IGLTexture;
+import cage.opengl.graphics.texture.GLTexture;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,7 +23,7 @@ import static org.lwjgl.opengl.GL31.*;
 import static org.lwjgl.opengl.GL33.*;
 import static org.lwjgl.opengl.GL43.*;
 
-public class GLShader extends Shader implements IGLBindable {
+public class GLShader extends Shader implements GLBindable {
 
     private Map<String, Integer> shaderStorageBindings;
     private Map<String, Integer> uniformBindings;
@@ -185,8 +184,8 @@ public class GLShader extends Shader implements IGLBindable {
     	int j = 0;
     	for(Entry<Integer, Texture> entry : textures.entrySet()) {
     	    Texture texture = entry.getValue();
-    		if(texture instanceof IGLTexture) {
-                IGLTexture glTexture = (IGLTexture)texture;
+    		if(texture instanceof GLTexture) {
+                GLTexture glTexture = (GLTexture)texture;
                 glUniform1i(entry.getKey(), j);
                 checkError("glUniform1i");
                 glActiveTexture(GL_TEXTURE0 + j);

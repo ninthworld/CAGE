@@ -1,8 +1,8 @@
 package cage.core.input.action;
 
-import cage.core.input.component.IInputComponent;
+import cage.core.input.component.InputComponent;
 
-public interface IInputEvent {
-    IInputComponent getComponent();
+public interface InputEvent {
+    InputComponent getComponent();
     float getValue();
 }

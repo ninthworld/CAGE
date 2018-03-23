@@ -10,7 +10,7 @@ import cage.core.graphics.vertexarray.VertexArray;
 
 import java.awt.*;
 
-public interface IGraphicsContext {
+public interface GraphicsContext {
 
 	void draw(int vertexCount);
 	void draw(int vertexCount, int startIndex);

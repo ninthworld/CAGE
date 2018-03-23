@@ -1,7 +1,7 @@
 package cage.core.input;
 
-import cage.core.input.action.IInputAction;
-import cage.core.input.component.IInputComponent;
+import cage.core.input.action.InputAction;
+import cage.core.input.component.InputComponent;
 import cage.core.input.controller.InputController;
 import cage.core.input.controller.JoystickController;
 import cage.core.input.controller.KeyboardController;
@@ -30,7 +30,7 @@ public abstract class InputManager {
 
     public abstract Iterator<JoystickController> getJoystickControllerIterator();
 
-    public ActionState registerAction(InputController controller, IInputComponent component, InputActionType actionType, IInputAction action) {
+    public ActionState registerAction(InputController controller, InputComponent component, InputActionType actionType, InputAction action) {
         ActionState actionState = new ActionState(action, controller, component, actionType);
         controller.registerAction(actionState);
         actions.add(actionState);

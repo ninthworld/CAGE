@@ -1,7 +1,7 @@
 package cage.core.graphics.rendertarget;
 
 import cage.core.window.Window;
-import cage.core.common.IDestroyable;
+import cage.core.common.Destroyable;
 import cage.core.graphics.texture.Texture;
 import cage.core.window.listener.IResizeWindowListener;
 
@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-public abstract class RenderTarget<T extends Texture> implements IDestroyable {
+public abstract class RenderTarget<T extends Texture> implements Destroyable {
 
     private Map<Integer, T> colorTextures;
     private T depthTexture;
