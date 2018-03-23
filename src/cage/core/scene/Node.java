@@ -1,9 +1,7 @@
 package cage.core.scene;
 
 import cage.core.common.Destroyable;
-import org.joml.Matrix3f;
-import org.joml.Matrix4f;
-import org.joml.Vector3f;
+import org.joml.*;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -99,8 +97,8 @@ public abstract class Node implements Destroyable {
         }
     }
 
-    public Vector3f getLocalPosition() {
-        return new Vector3f(localPosition);
+    public Vector3fc getLocalPosition() {
+        return localPosition;
     }
 
     public void setLocalPosition(Vector3f position) {
@@ -121,8 +119,8 @@ public abstract class Node implements Destroyable {
         notifyUpdate();
     }
 
-    public Vector3f getLocalScale() {
-        return new Vector3f(localScale);
+    public Vector3fc getLocalScale() {
+        return localScale;
     }
 
     public void setLocalScale(Vector3f scale) {
@@ -134,47 +132,47 @@ public abstract class Node implements Destroyable {
         setLocalScale(new Vector3f(x, y, z));
     }
 
-    public Matrix4f getLocalTransform() {
+    public Matrix4fc getLocalTransform() {
         return localTransform;
     }
 
-    public Vector3f getLocalRight() {
+    public Vector3fc getLocalRight() {
         return localRotation.getRow(0, new Vector3f());
     }
 
-    public Vector3f getLocalForward() {
+    public Vector3fc getLocalForward() {
         return localRotation.getRow(2, new Vector3f()).mul(-1.0f);
     }
 
-    public Vector3f getLocalUp() {
+    public Vector3fc getLocalUp() {
         return localRotation.getRow(1, new Vector3f());
     }
 
-    public Vector3f getWorldPosition() {
-        return new Vector3f(worldPosition);
+    public Vector3fc getWorldPosition() {
+        return worldPosition;
     }
 
-    public Matrix3f getWorldRotation() {
-        return new Matrix3f(worldRotation);
+    public Matrix3fc getWorldRotation() {
+        return worldRotation;
     }
 
-    public Vector3f getWorldScale() {
-        return new Vector3f(worldScale);
+    public Vector3fc getWorldScale() {
+        return worldScale;
     }
 
-    public Matrix4f getWorldTransform() {
+    public Matrix4fc getWorldTransform() {
         return worldTransform;
     }
 
-    public Vector3f getWorldRight() {
+    public Vector3fc getWorldRight() {
         return worldRotation.getRow(0, new Vector3f());
     }
 
-    public Vector3f getWorldForward() {
+    public Vector3fc getWorldForward() {
         return worldRotation.getRow(1, new Vector3f());
     }
 
-    public Vector3f getWorldUp() {
+    public Vector3fc getWorldUp() {
         return worldRotation.getRow(2, new Vector3f());
     }
 
@@ -188,27 +186,27 @@ public abstract class Node implements Destroyable {
     }
 
     public void moveForward(float amount) {
-        translate(getLocalForward().mul(amount));
+        translate(getLocalForward().mul(amount, new Vector3f()));
     }
 
     public void moveBackward(float amount) {
-        translate(getLocalForward().mul(-amount));
+        translate(getLocalForward().mul(-amount, new Vector3f()));
     }
 
     public void moveRight(float amount) {
-        translate(getLocalRight().mul(amount));
+        translate(getLocalRight().mul(amount, new Vector3f()));
     }
 
     public void moveLeft(float amount) {
-        translate(getLocalRight().mul(-amount));
+        translate(getLocalRight().mul(-amount, new Vector3f()));
     }
 
     public void moveUp(float amount) {
-        translate(getLocalUp().mul(amount));
+        translate(getLocalUp().mul(amount, new Vector3f()));
     }
 
     public void moveDown(float amount) {
-        translate(getLocalUp().mul(-amount));
+        translate(getLocalUp().mul(-amount, new Vector3f()));
     }
 
     public void rotate(float angle, Vector3f axis) {

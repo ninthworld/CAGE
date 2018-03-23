@@ -4,6 +4,7 @@ import cage.core.common.Readable;
 import cage.core.graphics.texture.Texture;
 import cage.core.graphics.config.LayoutConfig;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.system.MemoryUtil;
 
@@ -38,8 +39,8 @@ public class Material implements Readable {
         this.buffer = BufferUtils.createFloatBuffer(READ_SIZE);
     }
 
-    public Vector3f getDiffuseColor() {
-        return new Vector3f(diffuse);
+    public Vector3fc getDiffuseColor() {
+        return diffuse;
     }
 
     public Texture getDiffuseTexture() {
@@ -58,8 +59,8 @@ public class Material implements Readable {
         this.diffuseMap = diffuse;
     }
 
-    public Vector3f getSpecularColor() {
-        return new Vector3f(specular);
+    public Vector3fc getSpecularColor() {
+        return specular;
     }
 
     public Texture getSpecularTexture() {
@@ -94,7 +95,7 @@ public class Material implements Readable {
         this.shininess = shininess;
     }
 
-    public Vector3f getEmissiveColor() {
+    public Vector3fc getEmissiveColor() {
         return emissive;
     }
 

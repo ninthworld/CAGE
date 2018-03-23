@@ -3,6 +3,7 @@ package cage.core.scene.light;
 import cage.core.scene.Node;
 import cage.core.scene.SceneManager;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.lwjgl.BufferUtils;
 
 import java.nio.FloatBuffer;
@@ -24,8 +25,8 @@ public class AmbientLight extends Light {
         buffer.rewind();
     }
 
-    public Vector3f getAmbientColor() {
-        return new Vector3f(ambient);
+    public Vector3fc getAmbientColor() {
+        return ambient;
     }
 
     public void setAmbientColor(Vector3f ambient) {

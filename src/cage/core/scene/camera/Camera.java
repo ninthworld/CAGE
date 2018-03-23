@@ -6,6 +6,7 @@ import cage.core.scene.Node;
 import cage.core.scene.SceneManager;
 import cage.core.scene.SceneNode;
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
 
 import java.nio.FloatBuffer;
@@ -34,7 +35,7 @@ public abstract class Camera extends SceneNode implements Readable {
 
         viewMatrix.identity();
         viewMatrix.mul(new Matrix4f().identity().set(getWorldRotation()));
-        viewMatrix.translate(getWorldPosition().mul(-1.0f));
+        viewMatrix.translate(getWorldPosition().mul(-1.0f, new Vector3f()));
 
         buffer.clear();
         buffer.position(16);

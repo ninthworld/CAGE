@@ -66,7 +66,7 @@ public class MyGame implements Game {
                 if (event.getComponent() == Axis.LEFT_X) {
                     engine.getSceneManager().getDefaultCamera().rotate(0.5f * deltaTime * event.getValue(), new Vector3f(0.0f, 1.0f, 0.0f));
                 } else if (event.getComponent() == Axis.LEFT_Y) {
-                    engine.getSceneManager().getDefaultCamera().rotate(0.5f * deltaTime * event.getValue(), engine.getSceneManager().getDefaultCamera().getLocalRight());
+                    engine.getSceneManager().getDefaultCamera().rotate(0.5f * deltaTime * event.getValue(), new Vector3f(engine.getSceneManager().getDefaultCamera().getLocalRight()));
                 }
             }
         };

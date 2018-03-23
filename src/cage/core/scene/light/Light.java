@@ -6,6 +6,7 @@ import cage.core.scene.Node;
 import cage.core.scene.SceneManager;
 import cage.core.scene.SceneNode;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.lwjgl.BufferUtils;
 
 import java.nio.FloatBuffer;
@@ -40,8 +41,8 @@ public abstract class Light extends SceneNode implements Readable {
         buffer.rewind();
     }
 
-    public Vector3f getDiffuseColor() {
-        return new Vector3f(diffuse);
+    public Vector3fc getDiffuseColor() {
+        return diffuse;
     }
 
     public void setDiffuseColor(Vector3f diffuse) {
@@ -52,8 +53,8 @@ public abstract class Light extends SceneNode implements Readable {
         diffuse = new Vector3f(r, g, b);
     }
 
-    public Vector3f getSpecularColor() {
-        return new Vector3f(specular);
+    public Vector3fc getSpecularColor() {
+        return specular;
     }
 
     public void setSpecularColor(Vector3f specular) {
