@@ -2,7 +2,7 @@ package cage.core.input.action;
 
 import cage.core.window.Window;
 
-public class CloseWindowAction implements IAction {
+public class CloseWindowAction implements IInputAction {
 
     private Window window;
 
@@ -11,7 +11,7 @@ public class CloseWindowAction implements IAction {
     }
 
     @Override
-    public void performAction(float deltaTime, IEvent event) {
+    public void performAction(float deltaTime, IInputEvent event) {
         window.setClosed(true);
     }
 }

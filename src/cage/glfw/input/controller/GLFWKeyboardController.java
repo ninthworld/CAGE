@@ -1,22 +1,17 @@
 package cage.glfw.input.controller;
 
 import cage.core.input.ActionState;
-import cage.core.input.action.IEvent;
-import cage.core.input.component.Axis;
-import cage.core.input.component.IComponent;
+import cage.core.input.action.IInputEvent;
+import cage.core.input.component.IInputComponent;
 import cage.core.input.component.Key;
 import cage.core.input.controller.KeyboardController;
-import cage.core.input.type.ActionType;
+import cage.core.input.type.InputActionType;
 import cage.glfw.utils.GLFWUtils;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.glfw.GLFWKeyCallback;
 
-import java.nio.ByteBuffer;
 import java.util.Iterator;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_LAST;
 import static org.lwjgl.glfw.GLFW.glfwGetKey;
-import static org.lwjgl.glfw.GLFW.glfwSetKeyCallback;
 
 public class GLFWKeyboardController extends KeyboardController {
 
@@ -44,24 +39,24 @@ public class GLFWKeyboardController extends KeyboardController {
                 int lastInput = lastKeys[key];
                 int currInput = currKeys[key];
 
-                ActionType actionUsed = ActionType.NONE;
+                InputActionType actionUsed = InputActionType.NONE;
                 if(lastInput > 0) {
                     if(currInput > 0) {
-                        actionUsed = ActionType.REPEAT;
+                        actionUsed = InputActionType.REPEAT;
                     }
                     else {
-                        actionUsed = ActionType.RELEASE;
+                        actionUsed = InputActionType.RELEASE;
                     }
                 }
                 else if(currInput > 0) {
-                    actionUsed = ActionType.PRESS;
+                    actionUsed = InputActionType.PRESS;
                 }
 
                 if(actionUsed == actionState.getActionType() ||
-                        (actionState.getActionType() == ActionType.REPEAT && actionUsed == ActionType.PRESS)) {
-                    actionState.getAction().performAction(deltaTime, new IEvent() {
+                        (actionState.getActionType() == InputActionType.REPEAT && actionUsed == InputActionType.PRESS)) {
+                    actionState.getAction().performAction(deltaTime, new IInputEvent() {
                         @Override
-                        public IComponent getComponent() {
+                        public IInputComponent getComponent() {
                             return actionState.getComponent();
                         }
 

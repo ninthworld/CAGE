@@ -3,7 +3,7 @@ package cage.glfw.utils;
 import cage.core.input.component.Axis;
 import cage.core.input.component.Button;
 import cage.core.input.component.Key;
-import cage.core.input.type.ActionType;
+import cage.core.input.type.InputActionType;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -169,12 +169,12 @@ public class GLFWUtils {
         }
     }
 
-    public static ActionType getAction(int action) {
+    public static InputActionType getAction(int action) {
         switch(action) {
-            case GLFW_PRESS: return ActionType.PRESS;
-            case GLFW_RELEASE: return ActionType.RELEASE;
-            case GLFW_REPEAT: return ActionType.REPEAT;
-            default: return ActionType.NONE;
+            case GLFW_PRESS: return InputActionType.PRESS;
+            case GLFW_RELEASE: return InputActionType.RELEASE;
+            case GLFW_REPEAT: return InputActionType.REPEAT;
+            default: return InputActionType.NONE;
         }
     }
 
@@ -338,7 +338,7 @@ public class GLFWUtils {
         }
     }
 
-    public static int getGLFWAction(ActionType action) {
+    public static int getGLFWAction(InputActionType action) {
         switch(action) {
             case PRESS: return GLFW_PRESS;
             case RELEASE: return GLFW_RELEASE;

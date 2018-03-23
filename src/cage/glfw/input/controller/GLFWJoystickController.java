@@ -1,12 +1,12 @@
 package cage.glfw.input.controller;
 
 import cage.core.input.ActionState;
-import cage.core.input.action.IEvent;
+import cage.core.input.action.IInputEvent;
 import cage.core.input.component.Axis;
 import cage.core.input.component.Button;
-import cage.core.input.component.IComponent;
+import cage.core.input.component.IInputComponent;
 import cage.core.input.controller.JoystickController;
-import cage.core.input.type.ActionType;
+import cage.core.input.type.InputActionType;
 import cage.glfw.utils.GLFWUtils;
 import org.lwjgl.BufferUtils;
 
@@ -41,7 +41,7 @@ public class GLFWJoystickController extends JoystickController {
             }
         }
 
-        Map<Button, ActionType> buttonActions = new HashMap<>();
+        Map<Button, InputActionType> buttonActions = new HashMap<>();
         ByteBuffer buttons = glfwGetJoystickButtons(GLFW_JOYSTICK_1 + getIndex());
         for(int i=0; i<Math.min(lastButtons.capacity(), buttons.capacity()); ++i) {
             Button btn = GLFWUtils.getGamepadButton(i);
@@ -49,14 +49,14 @@ public class GLFWJoystickController extends JoystickController {
             int currBtn = buttons.get(i);
             if(lastBtn > 0) {
                 if(currBtn > 0) {
-                    buttonActions.put(btn, ActionType.REPEAT);
+                    buttonActions.put(btn, InputActionType.REPEAT);
                 }
                 else {
-                    buttonActions.put(btn, ActionType.RELEASE);
+                    buttonActions.put(btn, InputActionType.RELEASE);
                 }
             }
             else if(currBtn > 0) {
-                buttonActions.put(btn, ActionType.PRESS);
+                buttonActions.put(btn, InputActionType.PRESS);
             }
         }
         lastButtons = buttons;
@@ -66,9 +66,9 @@ public class GLFWJoystickController extends JoystickController {
             ActionState actionState = it.next();
             if(actionState.getComponent() instanceof Axis) {
                 if(axisValues.containsKey(actionState.getComponent())) {
-                    actionState.getAction().performAction(deltaTime, new IEvent() {
+                    actionState.getAction().performAction(deltaTime, new IInputEvent() {
                         @Override
-                        public IComponent getComponent() {
+                        public IInputComponent getComponent() {
                             return actionState.getComponent();
                         }
 
@@ -81,12 +81,12 @@ public class GLFWJoystickController extends JoystickController {
             }
             else if(actionState.getComponent() instanceof Button) {
                 if(buttonActions.containsKey(actionState.getComponent())) {
-                    ActionType actionUsed = buttonActions.get(actionState.getComponent());
+                    InputActionType actionUsed = buttonActions.get(actionState.getComponent());
                     if(actionUsed == actionState.getActionType() ||
-                            (actionState.getActionType() == ActionType.REPEAT && actionUsed == ActionType.PRESS )) {
-                        actionState.getAction().performAction(deltaTime, new IEvent() {
+                            (actionState.getActionType() == InputActionType.REPEAT && actionUsed == InputActionType.PRESS )) {
+                        actionState.getAction().performAction(deltaTime, new IInputEvent() {
                             @Override
-                            public IComponent getComponent() {
+                            public IInputComponent getComponent() {
                                 return actionState.getComponent();
                             }
 

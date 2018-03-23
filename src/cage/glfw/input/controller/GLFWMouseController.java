@@ -1,13 +1,12 @@
 package cage.glfw.input.controller;
 
 import cage.core.input.ActionState;
-import cage.core.input.action.IEvent;
+import cage.core.input.action.IInputEvent;
 import cage.core.input.component.Axis;
 import cage.core.input.component.Button;
-import cage.core.input.component.IComponent;
-import cage.core.input.component.Key;
+import cage.core.input.component.IInputComponent;
 import cage.core.input.controller.MouseController;
-import cage.core.input.type.ActionType;
+import cage.core.input.type.InputActionType;
 import cage.glfw.utils.GLFWUtils;
 import org.lwjgl.glfw.*;
 
@@ -42,9 +41,9 @@ public class GLFWMouseController extends MouseController {
                     ActionState actionState = it.next();
                     if(actionState.getComponent() instanceof Axis) {
                         if(actionState.getComponent() == Axis.RIGHT_X && xOffset != 0.0) {
-                            actionState.getAction().performAction(deltaTime, new IEvent() {
+                            actionState.getAction().performAction(deltaTime, new IInputEvent() {
                                 @Override
-                                public IComponent getComponent() {
+                                public IInputComponent getComponent() {
                                     return actionState.getComponent();
                                 }
 
@@ -55,9 +54,9 @@ public class GLFWMouseController extends MouseController {
                             });
                         }
                         if(actionState.getComponent() == Axis.RIGHT_Y && yOffset != 0.0) {
-                            actionState.getAction().performAction(deltaTime, new IEvent() {
+                            actionState.getAction().performAction(deltaTime, new IInputEvent() {
                                 @Override
-                                public IComponent getComponent() {
+                                public IInputComponent getComponent() {
                                     return actionState.getComponent();
                                 }
 
@@ -82,9 +81,9 @@ public class GLFWMouseController extends MouseController {
                     ActionState actionState = it.next();
                     if(actionState.getComponent() instanceof Axis) {
                         if(actionState.getComponent() == Axis.LEFT_X && dx != 0.0f) {
-                            actionState.getAction().performAction(deltaTime, new IEvent() {
+                            actionState.getAction().performAction(deltaTime, new IInputEvent() {
                                 @Override
-                                public IComponent getComponent() {
+                                public IInputComponent getComponent() {
                                     return actionState.getComponent();
                                 }
 
@@ -95,9 +94,9 @@ public class GLFWMouseController extends MouseController {
                             });
                         }
                         if(actionState.getComponent() == Axis.LEFT_Y && dy != 0.0) {
-                            actionState.getAction().performAction(deltaTime, new IEvent() {
+                            actionState.getAction().performAction(deltaTime, new IInputEvent() {
                                 @Override
-                                public IComponent getComponent() {
+                                public IInputComponent getComponent() {
                                     return actionState.getComponent();
                                 }
 
@@ -137,28 +136,28 @@ public class GLFWMouseController extends MouseController {
                 int lastInput = lastButtons[button];
                 int currInput = currButtons[button];
 
-                ActionType actionUsed = ActionType.NONE;
+                InputActionType actionUsed = InputActionType.NONE;
                 if(lastInput > 0) {
                     if(currInput > 0) {
-                        actionUsed = ActionType.REPEAT;
+                        actionUsed = InputActionType.REPEAT;
                     }
                     else {
-                        actionUsed = ActionType.RELEASE;
-                        if(actionState.getActionType() == ActionType.RELEASE) {
+                        actionUsed = InputActionType.RELEASE;
+                        if(actionState.getActionType() == InputActionType.RELEASE) {
                             int i = 0;
                         }
                     }
                 }
                 else if(currInput > 0) {
-                    actionUsed = ActionType.PRESS;
+                    actionUsed = InputActionType.PRESS;
                 }
 
                 if(actionUsed == actionState.getActionType() ||
-                        (actionState.getActionType() == ActionType.REPEAT && actionUsed == ActionType.PRESS)) {
+                        (actionState.getActionType() == InputActionType.REPEAT && actionUsed == InputActionType.PRESS)) {
 
-                    actionState.getAction().performAction(deltaTime, new IEvent() {
+                    actionState.getAction().performAction(deltaTime, new IInputEvent() {
                         @Override
-                        public IComponent getComponent() {
+                        public IInputComponent getComponent() {
                             return actionState.getComponent();
                         }
 

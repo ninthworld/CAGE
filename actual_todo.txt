@@ -1,3 +1,10 @@
+* Remove I from interfaces
+* Add Movable and Sizable and Updatable
+* Add ResizeListener and MoveListener
+* Add SizableParent and MovableParent
+* Add Readable and Writable instead of BufferData
+* Verify coherency off all attach/detach register/unregister methods
+
 * Add grid plane
 * Add Cascaded Shadow Mapping
 * Add SSAO

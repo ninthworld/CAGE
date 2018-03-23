@@ -1,4 +1,4 @@
 package cage.core.input.component;
 
-public interface IComponent {
+public interface IInputComponent {
 }

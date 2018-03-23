@@ -1,6 +1,6 @@
 package cage.core.input.component;
 
-public enum Button implements IComponent {
+public enum Button implements IInputComponent {
     NONE,
     // _1, _2, _3,
     _4, _5, _6, _7, _8,

@@ -1,7 +1,9 @@
 package cage.glfw;
 
 import cage.core.application.IGame;
+import cage.core.gui.GUIManager;
 import cage.core.input.InputManager;
+import cage.nanovg.gui.NVGGUIManager;
 import cage.opengl.engine.GLEngine;
 import cage.glfw.window.GLFWWindow;
 import cage.glfw.input.GLFWInputManager;
@@ -19,6 +21,7 @@ public class GLFWBootstrap {
     private int refreshRate;
     private int samples;
     private InputManager inputManager;
+    private GUIManager guiManager;
 
     public GLFWBootstrap(String title, int width, int height) {this.title = title;
         this.width = width;
@@ -27,6 +30,7 @@ public class GLFWBootstrap {
         this.refreshRate = 60;
         this.samples = 1;
         this.inputManager = new GLFWInputManager();
+        this.guiManager = new NVGGUIManager();
     }
 
     public GLFWBootstrap setVSync(boolean vsync) {
@@ -49,14 +53,18 @@ public class GLFWBootstrap {
         return this;
     }
 
-    public void run(IGLGameConstructor app) {
+    public GLFWBootstrap setGUIManager(GUIManager guiManager) {
+        this.guiManager = guiManager;
+        return this;
+    }
 
+    public void run(IGLGameConstructor app) {
         GLFWWindow window = null;
         GLEngine engine = null;
         IGame game = null;
         try {
             window = new GLFWWindow(title, width, height, vsync, refreshRate, samples);
-            engine = new GLEngine(window, inputManager);
+            engine = new GLEngine(window, inputManager, guiManager);
             game = app.initialize(engine);
             engine.run(game);
         } catch(Exception e) {

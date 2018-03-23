@@ -1,29 +1,29 @@
 package cage.core.input;
 
-import cage.core.input.action.IAction;
-import cage.core.input.component.IComponent;
+import cage.core.input.action.IInputAction;
+import cage.core.input.component.IInputComponent;
 import cage.core.input.controller.InputController;
-import cage.core.input.type.ActionType;
+import cage.core.input.type.InputActionType;
 
 public class ActionState {
 
-    private IAction action;
+    private IInputAction action;
     private InputController controller;
-    private IComponent component;
-    private ActionType actionType;
+    private IInputComponent component;
+    private InputActionType actionType;
 
-    public ActionState(IAction action, InputController controller, IComponent component, ActionType actionType) {
+    public ActionState(IInputAction action, InputController controller, IInputComponent component, InputActionType actionType) {
         this.action = action;
         this.controller = controller;
         this.component = component;
         this.actionType = actionType;
     }
 
-    public IAction getAction() {
+    public IInputAction getAction() {
         return action;
     }
 
-    public void setAction(IAction action) {
+    public void setAction(IInputAction action) {
         this.action = action;
     }
 
@@ -31,19 +31,19 @@ public class ActionState {
         return controller;
     }
 
-    public IComponent getComponent() {
+    public IInputComponent getComponent() {
         return component;
     }
 
-    public void setComponent(IComponent component) {
+    public void setComponent(IInputComponent component) {
         this.component = component;
     }
 
-    public ActionType getActionType() {
+    public InputActionType getActionType() {
         return actionType;
     }
 
-    public void setActionType(ActionType actionType) {
+    public void setActionType(InputActionType actionType) {
         this.actionType = actionType;
     }
 }

@@ -1,5 +1,6 @@
 package cage.core.engine;
 
+import cage.core.gui.GUIManager;
 import cage.core.window.Window;
 import cage.core.application.IGame;
 import cage.core.application.ITimer;
@@ -19,11 +20,13 @@ public abstract class Engine {
     private SceneManager sceneManager;
     private RenderManager renderManager;
     private InputManager inputManager;
+    private GUIManager guiManager;
     protected int fps;
 
-    public Engine(Window window, InputManager inputManager, IGraphicsDevice graphicsDevice) {
+    public Engine(Window window, InputManager inputManager, GUIManager guiManager, IGraphicsDevice graphicsDevice) {
         this.window = window;
         this.inputManager = inputManager;
+        this.guiManager = guiManager;
         this.graphicsDevice = graphicsDevice;
         this.graphicsContext = graphicsDevice.getGraphicsContext();
         this.assetManager = new AssetManager(graphicsDevice);
@@ -60,6 +63,10 @@ public abstract class Engine {
 
     public InputManager getInputManager() {
         return inputManager;
+    }
+
+    public GUIManager getGUIManager() {
+        return guiManager;
     }
 
     public int getFPS() {

@@ -17,29 +17,24 @@ import static org.lwjgl.opengl.GL30.glGenerateMipmap;
 public class GLTextureCubeMap extends TextureCubeMap implements IGLTexture {
 
     private int textureId;
-    private Buffer data;
 
     public GLTextureCubeMap(int width, int height, FormatType format, boolean mipmapping) {
-        super(width, height, format, mipmapping);
-        this.data = null;
+        super(width, height, format, mipmapping);        
         generate();
     }
 
     public GLTextureCubeMap(int width, int height, boolean mipmapping) {
-        super(width, height, mipmapping);
-        this.data = null;
+        super(width, height, mipmapping);        
         generate();
     }
 
     public GLTextureCubeMap(int width, int height, FormatType format) {
-        super(width, height, format);
-        this.data = null;
+        super(width, height, format);        
         generate();
     }
 
     public GLTextureCubeMap(int width, int height) {
-        super(width, height);
-        this.data = null;
+        super(width, height);        
         generate();
     }
 
@@ -91,24 +86,6 @@ public class GLTextureCubeMap extends TextureCubeMap implements IGLTexture {
             glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, 0);
         }
         unbind();
-
-        if(data != null) {
-            if(data instanceof ByteBuffer) {
-                setData((ByteBuffer)data);
-            }
-            else if(data instanceof ShortBuffer) {
-                setData((ShortBuffer)data);
-            }
-            else if(data instanceof IntBuffer) {
-                setData((IntBuffer)data);
-            }
-            else if(data instanceof FloatBuffer) {
-                setData((FloatBuffer)data);
-            }
-            else if(data instanceof DoubleBuffer) {
-                setData((DoubleBuffer)data);
-            }
-        }
     }
 
     @Override
@@ -131,7 +108,6 @@ public class GLTextureCubeMap extends TextureCubeMap implements IGLTexture {
     
     @Override
     public void setData(ByteBuffer data) {
-        this.data = data;
         bind();
         glTexSubImage2D(
                 getGLCubeMapFace(getDataCubeFace()),
@@ -147,7 +123,6 @@ public class GLTextureCubeMap extends TextureCubeMap implements IGLTexture {
 
     @Override
     public void setData(ShortBuffer data) {
-        this.data = data;
         bind();
         glTexSubImage2D(
                 getGLCubeMapFace(getDataCubeFace()),
@@ -163,7 +138,6 @@ public class GLTextureCubeMap extends TextureCubeMap implements IGLTexture {
 
     @Override
     public void setData(IntBuffer data) {
-        this.data = data;
         bind();
         glTexSubImage2D(
                 getGLCubeMapFace(getDataCubeFace()),
@@ -179,7 +153,6 @@ public class GLTextureCubeMap extends TextureCubeMap implements IGLTexture {
 
     @Override
     public void setData(FloatBuffer data) {
-        this.data = data;
         bind();
         glTexSubImage2D(
                 getGLCubeMapFace(getDataCubeFace()),
@@ -195,7 +168,6 @@ public class GLTextureCubeMap extends TextureCubeMap implements IGLTexture {
 
     @Override
     public void setData(DoubleBuffer data) {
-        this.data = data;
         bind();
         glTexSubImage2D(
                 getGLCubeMapFace(getDataCubeFace()),

@@ -101,22 +101,6 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/lwjgl-nuklear/lwjgl-nuklear-natives-linux.jar!/" />
-          <root url="jar://$MODULE_DIR$/lib/lwjgl-nuklear/lwjgl-nuklear-natives-macos.jar!/" />
-          <root url="jar://$MODULE_DIR$/lib/lwjgl-nuklear/lwjgl-nuklear-natives-windows.jar!/" />
-          <root url="jar://$MODULE_DIR$/lib/lwjgl-nuklear/lwjgl-nuklear.jar!/" />
-        </CLASSES>
-        <JAVADOC>
-          <root url="jar://$MODULE_DIR$/lib/lwjgl-nuklear/lwjgl-nuklear-javadoc.jar!/" />
-        </JAVADOC>
-        <SOURCES>
-          <root url="jar://$MODULE_DIR$/lib/lwjgl-nuklear/lwjgl-nuklear-sources.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/lwjgl-nanovg/lwjgl-nanovg-natives-linux.jar!/" />
           <root url="jar://$MODULE_DIR$/lib/lwjgl-nanovg/lwjgl-nanovg-natives-macos.jar!/" />
           <root url="jar://$MODULE_DIR$/lib/lwjgl-nanovg/lwjgl-nanovg-natives-windows.jar!/" />
