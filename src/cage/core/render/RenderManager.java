@@ -1,5 +1,6 @@
 package cage.core.render;
 
+import cage.core.graphics.GraphicsDevice;
 import cage.core.window.Window;
 import cage.core.asset.AssetManager;
 import cage.core.graphics.*;
@@ -24,6 +25,7 @@ import cage.core.scene.light.Light;
 import cage.core.window.listener.IResizeWindowListener;
 import org.lwjgl.BufferUtils;
 
+import java.awt.*;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
@@ -93,7 +95,7 @@ public class RenderManager {
         outputStages.forEach(RenderStage::render);
         graphicsContext.bindBackBuffer();
         graphicsContext.clear();
-        outputStages.forEach((RenderStage stage) -> graphicsContext.resolveToBackBuffer(stage.getRenderTarget(), stage.getOutputDimensions()));
+        outputStages.forEach((RenderStage stage) -> graphicsContext.resolveToBackBuffer(stage.getRenderTarget(), new Rectangle(stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight())));
         outputStages.forEach(RenderStage::postRender);
     }
 

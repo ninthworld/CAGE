@@ -1,13 +1,14 @@
 package cage.core.graphics.texture;
 
 import cage.core.common.Destroyable;
+import cage.core.common.Sizable;
 import cage.core.common.Writable;
 import cage.core.graphics.sampler.Sampler;
 import cage.core.graphics.type.FormatType;
 
 import java.nio.*;
 
-public abstract class Texture implements Destroyable, Writable {
+public abstract class Texture implements Destroyable, Sizable, Writable {
 
     private int width;
     private int height;
@@ -35,14 +36,17 @@ public abstract class Texture implements Destroyable, Writable {
         this(width, height, FormatType.RGBA_8_UNORM, false);
     }
 
+    @Override
     public int getWidth() {
         return width;
     }
 
+    @Override
     public int getHeight() {
         return height;
     }
 
+    @Override
     public void setSize(int width, int height) {
         this.width = width;
         this.height = height;

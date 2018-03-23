@@ -1,5 +1,6 @@
 package cage.core.graphics.rendertarget;
 
+import cage.core.common.Sizable;
 import cage.core.window.Window;
 import cage.core.common.Destroyable;
 import cage.core.graphics.texture.Texture;
@@ -9,7 +10,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-public abstract class RenderTarget<T extends Texture> implements Destroyable {
+public abstract class RenderTarget<T extends Texture> implements Destroyable, Sizable {
 
     private Map<Integer, T> colorTextures;
     private T depthTexture;
@@ -28,14 +29,17 @@ public abstract class RenderTarget<T extends Texture> implements Destroyable {
         this.resizeListener = null;
     }
 
+    @Override
     public int getWidth() {
         return width;
     }
 
+    @Override
     public int getHeight() {
         return height;
     }
 
+    @Override
     public void setSize(int width, int height) {
         this.width = width;
         this.height = height;

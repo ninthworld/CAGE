@@ -1,5 +1,7 @@
 package cage.core.render.stage;
 
+import cage.core.common.Movable;
+import cage.core.common.Sizable;
 import cage.core.graphics.GraphicsContext;
 import cage.core.graphics.rasterizer.Rasterizer;
 import cage.core.graphics.rendertarget.RenderTarget;
@@ -11,14 +13,17 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public abstract class RenderStage {
+public abstract class RenderStage implements Sizable, Movable {
 
     private GraphicsContext graphicsContext;
     private Rasterizer rasterizer;
     private List<RenderStage> inputStages;
     private Shader shader;
     private RenderTarget renderTarget;
-    private Rectangle outputDimensions;
+    private int width;
+    private int height;
+    private int posX;
+    private int posY;
     private boolean rendered;
 
     public RenderStage(Shader shader, RenderTarget renderTarget, Rasterizer rasterizer, GraphicsContext graphicsContext) {
@@ -27,9 +32,12 @@ public abstract class RenderStage {
         this.renderTarget = renderTarget;
         this.rasterizer = rasterizer;
         this.graphicsContext = graphicsContext;
-        this.outputDimensions = new Rectangle(0, 0, this.renderTarget.getWidth(), this.renderTarget.getHeight());
+        this.width = renderTarget.getWidth();
+        this.height = renderTarget.getHeight();
+        this.posX = 0;
+        this.posY = 0;
         if(this.renderTarget.containsResizeListener()) {
-            this.renderTarget.getWindow().addListener((IResizeWindowListener) (width, height) -> outputDimensions.setSize(width, height));
+            //this.renderTarget.getWindow().addListener((IResizeWindowListener) (width, height) -> outputDimensions.setSize(width, height));
         }
         this.rendered = false;
     }
@@ -120,15 +128,35 @@ public abstract class RenderStage {
         return inputStages.iterator();
     }
 
-    public Rectangle getOutputDimensions() {
-        return outputDimensions;
+    @Override
+    public int getX() {
+        return posX;
     }
 
-    public void setOutputDimensions(Rectangle outputDimensions) {
-        this.outputDimensions = outputDimensions;
+    @Override
+    public int getY() {
+        return posY;
     }
 
-    public void setOutputDimensions(int x, int y, int width, int height) {
-        setOutputDimensions(new Rectangle(x, y, width, height));
+    @Override
+    public void setPosition(int x, int y) {
+        this.posX = x;
+        this.posY = y;
+    }
+
+    @Override
+    public int getWidth() {
+        return width;
+    }
+
+    @Override
+    public int getHeight() {
+        return height;
+    }
+
+    @Override
+    public void setSize(int width, int height) {
+        this.width = width;
+        this.height = height;
     }
 }

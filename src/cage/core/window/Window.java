@@ -1,6 +1,8 @@
 package cage.core.window;
 
+import cage.core.common.Movable;
 import cage.core.common.Readable;
+import cage.core.common.Sizable;
 import cage.core.graphics.config.LayoutConfig;
 import cage.core.window.listener.IWindowListener;
 import org.lwjgl.BufferUtils;
@@ -10,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public abstract class Window implements Readable {
+public abstract class Window implements Sizable, Movable, Readable {
 
     public static final LayoutConfig READ_LAYOUT = new LayoutConfig().float2().float2();
     public static final int READ_SIZE = READ_LAYOUT.getUnitSize() / 4;
@@ -77,14 +79,17 @@ public abstract class Window implements Readable {
         this.title = title;
     }
 
+    @Override
     public int getWidth() {
         return width;
     }
 
+    @Override
     public int getHeight() {
         return height;
     }
 
+    @Override
     public void setSize(int width, int height) {
         this.width = width;
         this.height = height;
@@ -124,11 +129,13 @@ public abstract class Window implements Readable {
         this.wHeight = height;
     }
 
-    public int getPositionX() {
+    @Override
+    public int getX() {
         return posX;
     }
 
-    public int getPositionY() {
+    @Override
+    public int getY() {
         return posY;
     }
 
@@ -148,6 +155,7 @@ public abstract class Window implements Readable {
         this.vsync = vsync;
     }
 
+    @Override
     public void setPosition(int x, int y) {
         this.posX = x;
         this.posY = y;
