@@ -45,9 +45,9 @@ public class GLRenderTargetMS extends RenderTargetMS implements GLRenderTarget {
     }
 
     @Override
-    public void attachColorTexture(int index, TextureMS colorTexture) {
+    public void addColorTexture(int index, TextureMS colorTexture) {
     	if(colorTexture instanceof GLTextureMS) {
-	        super.attachColorTexture(index, colorTexture);
+	        super.addColorTexture(index, colorTexture);
 
             GLTextureMS glTexture = (GLTextureMS)colorTexture;
 	        bind();
@@ -68,9 +68,9 @@ public class GLRenderTargetMS extends RenderTargetMS implements GLRenderTarget {
     }
 
     @Override
-    public void attachDepthTexture(TextureMS depthTexture) {
+    public void setDepthTexture(TextureMS depthTexture) {
     	if(depthTexture instanceof GLTextureMS) {
-            super.attachDepthTexture(depthTexture);
+            super.setDepthTexture(depthTexture);
 
             GLTextureMS glTexture = (GLTextureMS)depthTexture;
             bind();

@@ -62,14 +62,14 @@ public abstract class RenderStage implements Sizable, Movable {
             return;
         }
         rendered = true;
-        getInputStageIterator().forEachRemaining(RenderStage::render);
+        inputStages.forEach(RenderStage::render);
         preRender();
         graphicsContext.bindRasterizer(rasterizer);
     }
 
     public void postRender() {
         rendered = false;
-        getInputStageIterator().forEachRemaining(RenderStage::postRender);
+        inputStages.forEach(RenderStage::postRender);
     }
 
     public GraphicsContext getGraphicsContext() {
@@ -113,34 +113,37 @@ public abstract class RenderStage implements Sizable, Movable {
         this.rendered = rendered;
     }
 
-    public int getInputStageCount() {
+    public void addInputRenderStage(RenderStage renderStage) {
+        inputStages.add(renderStage);
+    }
+
+    public void removeInputRenderStage(RenderStage renderStage) {
+        inputStages.remove(renderStage);
+    }
+
+    public void removeInputRenderStage(int index) {
+        inputStages.remove(index);
+    }
+
+    public void removeAllInputRenderStages() {
+        inputStages.forEach(this::removeInputRenderStage);
+    }
+
+    public int getInputRenderStageCount() {
         return inputStages.size();
     }
 
-    public void attachInputStage(RenderStage stage) {
-        inputStages.add(stage);
+    public boolean containsInputRenderStage(RenderStage renderStage) {
+        return inputStages.contains(renderStage);
     }
 
-    public void detachInputStage(RenderStage stage) {
-        inputStages.remove(stage);
-    }
-
-    public void detachAllInputStages() {
-        inputStages.forEach(this::detachInputStage);
-    }
-
-    public void containsInputStage(RenderStage stage) {
-        inputStages.contains(stage);
-    }
-
-    public RenderStage getInputStage(int index) {
+    public RenderStage getInputRenderStage(int index) {
         return inputStages.get(index);
     }
 
-    public Iterator<RenderStage> getInputStageIterator() {
+    public Iterator<RenderStage> getInputRenderStageIterator() {
         return inputStages.iterator();
     }
-
 
     @Override
     public int getX() {

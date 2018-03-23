@@ -226,8 +226,8 @@ public class GLGraphicsDevice implements GraphicsDevice {
     public RenderTarget2D createRenderTarget2D() {
         GLRenderTarget2D glRenderTarget = new GLRenderTarget2D(window.getWidth(), window.getHeight());
         glRenderTarget.setSizableParent(window);
-        glRenderTarget.attachDepthTexture(createTexture2D(glRenderTarget.getWidth(), glRenderTarget.getHeight(), FormatType.DEPTH_24_STENCIL_8));
-        glRenderTarget.attachColorTexture(0, createTexture2D(glRenderTarget.getWidth(), glRenderTarget.getHeight()));
+        glRenderTarget.setDepthTexture(createTexture2D(glRenderTarget.getWidth(), glRenderTarget.getHeight(), FormatType.DEPTH_24_STENCIL_8));
+        glRenderTarget.addColorTexture(0, createTexture2D(glRenderTarget.getWidth(), glRenderTarget.getHeight()));
         glObjects.add(glRenderTarget);
         return glRenderTarget;
     }
@@ -235,8 +235,8 @@ public class GLGraphicsDevice implements GraphicsDevice {
     @Override
     public RenderTarget2D createRenderTarget2D(int width, int height) {
         GLRenderTarget2D glRenderTarget = new GLRenderTarget2D(width, height);
-        glRenderTarget.attachDepthTexture(createTexture2D(width, height, FormatType.DEPTH_24_STENCIL_8));
-        glRenderTarget.attachColorTexture(0, createTexture2D(width, height));
+        glRenderTarget.setDepthTexture(createTexture2D(width, height, FormatType.DEPTH_24_STENCIL_8));
+        glRenderTarget.addColorTexture(0, createTexture2D(width, height));
         glObjects.add(glRenderTarget);
         return glRenderTarget;
     }
@@ -245,8 +245,8 @@ public class GLGraphicsDevice implements GraphicsDevice {
     public RenderTargetMS createRenderTargetMS(int samples) {
         GLRenderTargetMS glRenderTarget = new GLRenderTargetMS(window.getWidth(), window.getHeight(), samples);
         glRenderTarget.setSizableParent(window);
-        glRenderTarget.attachDepthTexture(createTextureMS(glRenderTarget.getWidth(), glRenderTarget.getHeight(), samples, FormatType.DEPTH_24_STENCIL_8));
-        glRenderTarget.attachColorTexture(0, createTextureMS(glRenderTarget.getWidth(), glRenderTarget.getHeight(), samples));
+        glRenderTarget.setDepthTexture(createTextureMS(glRenderTarget.getWidth(), glRenderTarget.getHeight(), samples, FormatType.DEPTH_24_STENCIL_8));
+        glRenderTarget.addColorTexture(0, createTextureMS(glRenderTarget.getWidth(), glRenderTarget.getHeight(), samples));
         glObjects.add(glRenderTarget);
         return glRenderTarget;
     }
@@ -254,8 +254,8 @@ public class GLGraphicsDevice implements GraphicsDevice {
     @Override
     public RenderTargetMS createRenderTargetMS(int width, int height, int samples) {
         GLRenderTargetMS glRenderTarget = new GLRenderTargetMS(width, height, samples);
-        glRenderTarget.attachDepthTexture(createTextureMS(width, height, samples, FormatType.DEPTH_24_STENCIL_8));
-        glRenderTarget.attachColorTexture(0, createTextureMS(width, height, samples));
+        glRenderTarget.setDepthTexture(createTextureMS(width, height, samples, FormatType.DEPTH_24_STENCIL_8));
+        glRenderTarget.addColorTexture(0, createTextureMS(width, height, samples));
         glObjects.add(glRenderTarget);
         return glRenderTarget;
     }

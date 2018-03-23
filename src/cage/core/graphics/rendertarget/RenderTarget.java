@@ -30,50 +30,65 @@ public abstract class RenderTarget<T extends Texture> implements Destroyable, Si
         this.listeners = new ArrayList<>();
     }
 
+    public void addColorTexture(int index, T texture) {
+        if(containsColorTexture(index)) {
+            removeColorTexture(index);
+        }
+        colorTextures.put(index, texture);
+        texture.setSizableParent(this);
+    }
+
+    public void removeColorTexture(int index) {
+        colorTextures.remove(index).removeSizableParent();
+    }
+
+    public void removeColorTexture(int index, T texture) {
+        colorTextures.remove(index, texture);
+        texture.removeSizableParent();
+    }
+
+    public void removeAllColorTextures() {
+        colorTextures.forEach(this::removeColorTexture);
+    }
+
     public int getColorTextureCount() {
         return colorTextures.size();
-    }
-
-    public void attachColorTexture(int index, T colorTexture) {
-        colorTextures.put(index, colorTexture);
-        colorTexture.setSizableParent(this);
-    }
-
-    public void detachColorTexture(int index) {
-        colorTextures.remove(index);
-    }
-
-    public void detachAllColorTextures() {
-        colorTextures.clear();
-    }
-
-    public Iterator<Map.Entry<Integer, T>> getColorTextureIterator() {
-        return colorTextures.entrySet().iterator();
     }
 
     public boolean containsColorTexture(int index) {
         return colorTextures.containsKey(index);
     }
 
+    public boolean containsColorTexture(T texture) {
+        return colorTextures.containsValue(texture);
+    }
+
     public T getColorTexture(int index) {
         return colorTextures.get(index);
     }
 
-    public void attachDepthTexture(T depthTexture) {
-        this.depthTexture = depthTexture;
-        depthTexture.setSizableParent(this);
-    }
-
-    public void detachDepthTexture(T depthTexture) {
-        this.depthTexture = null;
-    }
-
-    public boolean containsDepthTexture() {
-        return depthTexture != null;
+    public Iterator<Map.Entry<Integer, T>> getColorTextureIterator() {
+        return colorTextures.entrySet().iterator();
     }
 
     public T getDepthTexture() {
         return depthTexture;
+    }
+
+    public void setDepthTexture(T texture) {
+        if(containsDepthTexture()) {
+            removeDepthTexture();
+        }
+        this.depthTexture = texture;
+    }
+
+    public void removeDepthTexture() {
+        depthTexture.removeSizableParent();
+        depthTexture = null;
+    }
+
+    public boolean containsDepthTexture() {
+        return depthTexture != null;
     }
 
     @Override

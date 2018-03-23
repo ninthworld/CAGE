@@ -24,20 +24,32 @@ public abstract class NodeController {
         }
     }
 
-    public int getNodeCount() {
-        return nodes.size();
+    public boolean isEnabled() {
+        return enabled;
     }
 
-    public void attachNode(Node node) {
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public void addNode(Node node) {
         nodes.add(node);
     }
 
-    public void detachNode(Node node) {
+    public void removeNode(Node node) {
         nodes.remove(node);
     }
 
-    public void detachAllNodes() {
-        nodes.forEach(this::detachNode);
+    public void removeNode(int index) {
+        nodes.remove(index);
+    }
+
+    public void removeAllNodes() {
+        nodes.forEach(this::removeNode);
+    }
+
+    public int getNodeCount() {
+        return nodes.size();
     }
 
     public boolean containsNode(Node node) {
@@ -50,13 +62,5 @@ public abstract class NodeController {
 
     public Iterator<Node> getNodeIterator() {
         return nodes.iterator();
-    }
-
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
     }
 }

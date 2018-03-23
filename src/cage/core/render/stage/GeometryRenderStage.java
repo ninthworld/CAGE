@@ -73,19 +73,19 @@ public class GeometryRenderStage extends RenderStage {
                 materialUniform.writeData(material.readData());
 
                 if(material.getDiffuseTexture() != null && material.getDiffuseTexture() instanceof Texture2D) {
-                    getShader().attachTexture("diffuseTexture", material.getDiffuseTexture());
+                    getShader().addTexture("diffuseTexture", material.getDiffuseTexture());
                 }
 
                 if(material.getNormalTexture() != null && material.getNormalTexture() instanceof Texture2D) {
-                    getShader().attachTexture("normalTexture", material.getNormalTexture());
+                    getShader().addTexture("normalTexture", material.getNormalTexture());
                 }
 
                 if(material.getSpecularTexture() != null && material.getSpecularTexture() instanceof Texture2D) {
-                    getShader().attachTexture("specularTexture", material.getSpecularTexture());
+                    getShader().addTexture("specularTexture", material.getSpecularTexture());
                 }
 
                 if(material.getHighlightTexture() != null && material.getHighlightTexture() instanceof Texture2D) {
-                    getShader().attachTexture("highlightTexture", material.getHighlightTexture());
+                    getShader().addTexture("highlightTexture", material.getHighlightTexture());
                 }
 
                 getGraphicsContext().bindShader(getShader());

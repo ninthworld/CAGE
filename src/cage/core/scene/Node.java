@@ -46,7 +46,7 @@ public abstract class Node implements Destroyable {
         this.enabled = true;
         this.parent = parent;
         if(this.parent != null) {
-            this.parent.attachNode(this);
+            this.parent.addNode(this);
         }
     }
 
@@ -86,51 +86,16 @@ public abstract class Node implements Destroyable {
         worldTransform.mul(localTransform);
     }
 
-    public int getNodeCount() {
-        return children.size();
-    }
-
-    public void attachNode(Node node) {
-        if(node != this) {
-            if(node.parent != null) {
-                node.parent.detachNode(this);
-            }
-            node.parent = this;
-            children.add(node);
-        }
-    }
-
-    public void detachNode(Node node) {
-        children.remove(node);
-        node.parent = null;
-    }
-
-    public void detachAllNodes() {
-        children.forEach((Node node) -> detachNode(node));
-    }
-
-    public boolean containsNode(Node node) {
-        return children.contains(node);
-    }
-
-    public Node getNode(int index) {
-        return children.get(index);
-    }
-
-    public Iterator<Node> getNodeIterator() {
-        return children.iterator();
-    }
-
     public Node getParentNode() {
         return parent;
     }
 
     public void setParentNode(Node parent) {
-        if(parent != null) {
-            parent.detachNode(this);
+        if(this.parent != null) {
+            this.parent.removeNode(this);
         }
         if(parent != null) {
-            parent.attachNode(this);
+            parent.addNode(this);
         }
     }
 
@@ -292,12 +257,50 @@ public abstract class Node implements Destroyable {
     public void notifyUpdate() {
         localUpdated = true;
     }
-
     public boolean isEnabled() {
         return enabled;
     }
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public void addNode(Node node) {
+        if(node != this) {
+            if(node.parent != null) {
+                node.parent.removeNode(this);
+            }
+            node.parent = this;
+            children.add(node);
+        }
+    }
+
+    public void removeNode(Node node) {
+        children.remove(node);
+        node.parent = null;
+    }
+
+    public void removeNode(int index) {
+        children.remove(index).parent = null;
+    }
+
+    public void removeAllNodes() {
+        children.forEach(this::removeNode);
+    }
+
+    public int getNodeCount() {
+        return children.size();
+    }
+
+    public boolean containsNode(Node node) {
+        return children.contains(node);
+    }
+
+    public Node getNode(int index) {
+        return children.get(index);
+    }
+
+    public Iterator<Node> getNodeIterator() {
+        return children.iterator();
     }
 }

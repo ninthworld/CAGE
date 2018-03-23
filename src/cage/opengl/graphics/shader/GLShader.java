@@ -57,7 +57,7 @@ public class GLShader extends Shader implements GLBindable {
     }
 
     @Override
-    public void attachShaderStorageBuffer(String name, ShaderStorageBuffer buffer) {
+    public void addShaderStorageBuffer(String name, ShaderStorageBuffer buffer) {
         int index = getShaderStorageBufferIndex(name);
         glShaderStorageBlockBinding(programId, index, index);
         checkError("glShaderStorageBlockBinding");
@@ -65,9 +65,15 @@ public class GLShader extends Shader implements GLBindable {
     }
 
     @Override
-    public void detachShaderStorageBuffer(String name) {
+    public void removeShaderStorageBuffer(String name) {
         int index = getShaderStorageBufferIndex(name);
         shaderStorageBuffers.remove(index);
+    }
+
+    @Override
+    public void removeShaderStorageBuffer(String name, ShaderStorageBuffer buffer) {
+        int index = getShaderStorageBufferIndex(name);
+        shaderStorageBuffers.remove(index, buffer);
     }
 
     @Override
@@ -95,7 +101,7 @@ public class GLShader extends Shader implements GLBindable {
     }
 
     @Override
-    public void attachUniformBuffer(String name, UniformBuffer buffer) {
+    public void addUniformBuffer(String name, UniformBuffer buffer) {
         int index = getUniformBufferIndex(name);
         glUniformBlockBinding(programId, index, index);
         checkError("glUniformBlockBinding");
@@ -103,9 +109,15 @@ public class GLShader extends Shader implements GLBindable {
     }
 
     @Override
-    public void detachUniformBuffer(String name) {
+    public void removeUniformBuffer(String name) {
         int index = getUniformBufferIndex(name);
         uniformBuffers.remove(index);
+    }
+
+    @Override
+    public void removeUniformBuffer(String name, UniformBuffer buffer) {
+        int index = getUniformBufferIndex(name);
+        uniformBuffers.remove(index, buffer);
     }
 
     @Override
@@ -133,15 +145,21 @@ public class GLShader extends Shader implements GLBindable {
     }
 
     @Override
-    public void attachTexture(String name, Texture texture) {
+    public void addTexture(String name, Texture texture) {
         int index = getTextureIndex(name);
         textures.put(index, texture);
     }
 
     @Override
-    public void detachTexture(String name) {
+    public void removeTexture(String name) {
         int index = getTextureIndex(name);
         textures.remove(index);
+    }
+
+    @Override
+    public void removeTexture(String name, Texture texture) {
+        int index = getTextureIndex(name);
+        textures.remove(index, texture);
     }
 
     @Override

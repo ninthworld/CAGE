@@ -36,7 +36,7 @@ public class SceneNode extends Node {
 
     public OrthographicCamera createOrthographicCamera() {
         OrthographicCamera camera = new OrthographicCamera(sceneManager, this);
-        attachNode(camera);
+        addNode(camera);
         getSceneManager().registerCamera(camera);
         return camera;
     }
@@ -70,7 +70,7 @@ public class SceneNode extends Node {
     @Override
     public void destroy() {
         if(getParentNode() != null) {
-            getParentNode().detachNode(this);
+            getParentNode().removeNode(this);
         }
     }
 }

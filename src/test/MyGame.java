@@ -36,7 +36,7 @@ public class MyGame implements Game {
     @Override
     public void initialize(Engine engine) {
         engine.getGraphicsContext().setClearColor(Color.decode("#6495ed"));
-        engine.getInputManager().registerAction(engine.getInputManager().getKeyboardController(), Key.ESCAPE, InputActionType.PRESS, new CloseWindowAction(engine.getWindow()));
+        engine.getInputManager().addAction(engine.getInputManager().getKeyboardController(), Key.ESCAPE, InputActionType.PRESS, new CloseWindowAction(engine.getWindow()));
 
         engine.getGUIManager().getRootContainer().addComponent(new GUIComponent() {
             @Override
@@ -70,35 +70,35 @@ public class MyGame implements Game {
                 }
             }
         };
-        engine.getInputManager().registerAction(engine.getInputManager().getMouseController(), Axis.LEFT_X, InputActionType.NONE, mouseAction);
-        engine.getInputManager().registerAction(engine.getInputManager().getMouseController(), Axis.LEFT_Y, InputActionType.NONE, mouseAction);
-        engine.getInputManager().registerAction(engine.getInputManager().getMouseController(), Button.RIGHT, InputActionType.PRESS, ((deltaTime, event) -> {
+        engine.getInputManager().addAction(engine.getInputManager().getMouseController(), Axis.LEFT_X, InputActionType.NONE, mouseAction);
+        engine.getInputManager().addAction(engine.getInputManager().getMouseController(), Axis.LEFT_Y, InputActionType.NONE, mouseAction);
+        engine.getInputManager().addAction(engine.getInputManager().getMouseController(), Button.RIGHT, InputActionType.PRESS, ((deltaTime, event) -> {
             canLook = true;
             engine.getWindow().setMouseCentered(true);
             engine.getWindow().setMouseVisible(false);
         }));
-        engine.getInputManager().registerAction(engine.getInputManager().getMouseController(), Button.RIGHT, InputActionType.RELEASE, ((deltaTime, event) -> {
+        engine.getInputManager().addAction(engine.getInputManager().getMouseController(), Button.RIGHT, InputActionType.RELEASE, ((deltaTime, event) -> {
             canLook = false;
             engine.getWindow().setMouseCentered(false);
             engine.getWindow().setMouseVisible(true);
         }));
 
-        engine.getInputManager().registerAction(engine.getInputManager().getKeyboardController(), Key.W, InputActionType.REPEAT, ((deltaTime, event) -> {
+        engine.getInputManager().addAction(engine.getInputManager().getKeyboardController(), Key.W, InputActionType.REPEAT, ((deltaTime, event) -> {
             engine.getSceneManager().getDefaultCamera().moveForward(16.0f * deltaTime);
         }));
-        engine.getInputManager().registerAction(engine.getInputManager().getKeyboardController(), Key.A, InputActionType.REPEAT, ((deltaTime, event) -> {
+        engine.getInputManager().addAction(engine.getInputManager().getKeyboardController(), Key.A, InputActionType.REPEAT, ((deltaTime, event) -> {
             engine.getSceneManager().getDefaultCamera().moveLeft(16.0f * deltaTime);
         }));
-        engine.getInputManager().registerAction(engine.getInputManager().getKeyboardController(), Key.S, InputActionType.REPEAT, ((deltaTime, event) -> {
+        engine.getInputManager().addAction(engine.getInputManager().getKeyboardController(), Key.S, InputActionType.REPEAT, ((deltaTime, event) -> {
             engine.getSceneManager().getDefaultCamera().moveBackward(16.0f * deltaTime);
         }));
-        engine.getInputManager().registerAction(engine.getInputManager().getKeyboardController(), Key.D, InputActionType.REPEAT, ((deltaTime, event) -> {
+        engine.getInputManager().addAction(engine.getInputManager().getKeyboardController(), Key.D, InputActionType.REPEAT, ((deltaTime, event) -> {
             engine.getSceneManager().getDefaultCamera().moveRight(16.0f * deltaTime);
         }));
-        engine.getInputManager().registerAction(engine.getInputManager().getKeyboardController(), Key.SPACE, InputActionType.REPEAT, ((deltaTime, event) -> {
+        engine.getInputManager().addAction(engine.getInputManager().getKeyboardController(), Key.SPACE, InputActionType.REPEAT, ((deltaTime, event) -> {
             engine.getSceneManager().getDefaultCamera().moveUp(16.0f * deltaTime);
         }));
-        engine.getInputManager().registerAction(engine.getInputManager().getKeyboardController(), Key.LSHIFT, InputActionType.REPEAT, ((deltaTime, event) -> {
+        engine.getInputManager().addAction(engine.getInputManager().getKeyboardController(), Key.LSHIFT, InputActionType.REPEAT, ((deltaTime, event) -> {
             engine.getSceneManager().getDefaultCamera().moveDown(16.0f * deltaTime);
         }));
     }

@@ -52,7 +52,7 @@ public class GLVertexArray extends VertexArray implements GLBindable {
     }
 
     @Override
-    public void attachVertexBuffer(VertexBuffer buffer) {
+    public void addVertexBuffer(VertexBuffer buffer) {
         if(buffer instanceof GLVertexBuffer) {
             GLVertexBuffer glBuffer = (GLVertexBuffer)buffer;
 
@@ -86,20 +86,11 @@ public class GLVertexArray extends VertexArray implements GLBindable {
                 }
             }
 
-            attributeCount += glBuffer.getLayout().getLayoutStack().size();
-
             glBindBuffer(GL_ARRAY_BUFFER, 0);
             glBindVertexArray(0);
-
-            vertexBuffers.add(glBuffer);
         }
-    }
 
-    @Override
-    public void detachVertexBuffer(VertexBuffer buffer) {
-        if(vertexBuffers.remove(buffer)) {
-            attributeCount -= buffer.getLayout().getLayoutStack().size();
-        }
+        super.addVertexBuffer(buffer);
     }
 
     public int getVertexArrayId() {

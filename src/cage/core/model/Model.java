@@ -24,24 +24,24 @@ public class Model {
         this.vertexArray = vertexArray;
     }
 
+    public void addMesh(Mesh mesh) {
+        meshes.add(mesh);
+    }
+
+    public void removeMesh(Mesh mesh) {
+        meshes.remove(mesh);
+    }
+
+    public void removeMesh(int index) {
+        meshes.remove(index);
+    }
+
+    public void removeAllMeshs() {
+        meshes.forEach(this::removeMesh);
+    }
+
     public int getMeshCount() {
         return meshes.size();
-    }
-
-    public void attachMesh(Mesh mesh) {
-        this.meshes.add(mesh);
-    }
-
-    public void detachMesh(Mesh mesh) {
-        this.meshes.remove(mesh);
-    }
-
-    public void detachAllMeshes() {
-        this.meshes.forEach(this::detachMesh);
-    }
-
-    public Iterator<Mesh> getMeshIterator() {
-        return meshes.iterator();
     }
 
     public boolean containsMesh(Mesh mesh) {
@@ -50,5 +50,9 @@ public class Model {
 
     public Mesh getMesh(int index) {
         return meshes.get(index);
+    }
+
+    public Iterator<Mesh> getMeshIterator() {
+        return meshes.iterator();
     }
 }

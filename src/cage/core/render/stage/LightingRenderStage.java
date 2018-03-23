@@ -23,12 +23,12 @@ public class LightingRenderStage extends FXRenderStage {
 
     @Override
     public void preRender() {
-        if(getInputStageCount() > 0 && getInputStage(0) instanceof GeometryRenderStage) {
-            GeometryRenderStage renderStage = (GeometryRenderStage)getInputStage(0);
-            getShader().attachTexture("diffuseTexture", renderStage.getDiffuseTextureOutput());
-            getShader().attachTexture("specularTexture", renderStage.getSpecularTextureOutput());
-            getShader().attachTexture("normalTexture", renderStage.getNormalTextureOutput());
-            getShader().attachTexture("depthTexture", renderStage.getDepthTextureOutput());
+        if(getInputRenderStageCount() > 0 && getInputRenderStage(0) instanceof GeometryRenderStage) {
+            GeometryRenderStage renderStage = (GeometryRenderStage)getInputRenderStage(0);
+            getShader().addTexture("diffuseTexture", renderStage.getDiffuseTextureOutput());
+            getShader().addTexture("specularTexture", renderStage.getSpecularTextureOutput());
+            getShader().addTexture("normalTexture", renderStage.getNormalTextureOutput());
+            getShader().addTexture("depthTexture", renderStage.getDepthTextureOutput());
 
             int capacity =  sceneManager.getLightCount() * Light.READ_SIZE;
             FloatBuffer lightBuffer = BufferUtils.createFloatBuffer(capacity);

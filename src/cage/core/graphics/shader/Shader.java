@@ -5,10 +5,7 @@ import cage.core.graphics.buffer.ShaderStorageBuffer;
 import cage.core.graphics.buffer.UniformBuffer;
 import cage.core.graphics.texture.Texture;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public abstract class Shader implements Destroyable {
 
@@ -23,38 +20,30 @@ public abstract class Shader implements Destroyable {
         this.uniformBuffers = new HashMap<>();
         this.textures = new HashMap<>();
     }
-
-    public void attachShaderStorageBuffer(int index, ShaderStorageBuffer buffer) {
-        this.shaderStorageBuffers.put(index, buffer);
+    
+    public void addShaderStorageBuffer(int index, ShaderStorageBuffer buffer) {
+        shaderStorageBuffers.put(index, buffer);
+    }
+    
+    public void removeShaderStorageBuffer(int index) {
+        shaderStorageBuffers.remove(index);
     }
 
-    public abstract void attachShaderStorageBuffer(String name, ShaderStorageBuffer buffer);
-
-    public void detachShaderStorageBuffer(int index) {
-        this.shaderStorageBuffers.remove(index);
+    public void removeShaderStorageBuffer(int index, ShaderStorageBuffer buffer) {
+        shaderStorageBuffers.remove(index, buffer);
     }
 
-    public abstract void detachShaderStorageBuffer(String name);
-
-    public void detachShaderStorageBuffer(ShaderStorageBuffer buffer) {
-        List<Integer> keys = new ArrayList<>();
-        for(Integer i : this.shaderStorageBuffers.keySet()) {
-            if(this.shaderStorageBuffers.get(i).equals(buffer)) {
-                keys.add(i);
-            }
-        }
-        keys.forEach((Integer i) -> this.shaderStorageBuffers.remove(i));
+    public void removeAllShaderStorageBuffers() {
+        shaderStorageBuffers.forEach(this::removeShaderStorageBuffer);
     }
 
-    public void detachAllShaderStorageBuffers() {
-        this.shaderStorageBuffers.clear();
+    public int getShaderStorageBufferCount() {
+        return shaderStorageBuffers.size();
     }
 
     public boolean containsShaderStorageBuffer(int index) {
         return shaderStorageBuffers.containsKey(index);
     }
-
-    public abstract boolean containsShaderStorageBuffer(String name);
 
     public boolean containsShaderStorageBuffer(ShaderStorageBuffer buffer) {
         return shaderStorageBuffers.containsValue(buffer);
@@ -64,39 +53,43 @@ public abstract class Shader implements Destroyable {
         return shaderStorageBuffers.get(index);
     }
 
+    public Iterator<Map.Entry<Integer, ShaderStorageBuffer>> getShaderStorageBufferIterator() {
+        return shaderStorageBuffers.entrySet().iterator();
+    }
+
+    public abstract void addShaderStorageBuffer(String name, ShaderStorageBuffer buffer);
+
+    public abstract void removeShaderStorageBuffer(String name);
+    
+    public abstract void removeShaderStorageBuffer(String name, ShaderStorageBuffer buffer);
+
+    public abstract boolean containsShaderStorageBuffer(String name);
+    
     public abstract ShaderStorageBuffer getShaderStorageBuffer(String name);
 
-    public void attachUniformBuffer(int index, UniformBuffer buffer) {
-        this.uniformBuffers.put(index, buffer);
+    public void addUniformBuffer(int index, UniformBuffer buffer) {
+        uniformBuffers.put(index, buffer);
     }
 
-    public abstract void attachUniformBuffer(String name, UniformBuffer buffer);
-
-    public void detachUniformBuffer(int index) {
-        this.uniformBuffers.remove(index);
+    public void removeUniformBuffer(int index) {
+        uniformBuffers.remove(index);
     }
 
-    public abstract void detachUniformBuffer(String name);
-
-    public void detachUniformBuffer(UniformBuffer buffer) {
-        List<Integer> keys = new ArrayList<>();
-        for(Integer i : this.uniformBuffers.keySet()) {
-            if(this.uniformBuffers.get(i).equals(buffer)) {
-                keys.add(i);
-            }
-        }
-        keys.forEach((Integer i) -> this.uniformBuffers.remove(i));
+    public void removeUniformBuffer(int index, UniformBuffer buffer) {
+        uniformBuffers.remove(index, buffer);
     }
 
-    public void detachAllUniformBuffers() {
-        this.uniformBuffers.clear();
+    public void removeAllUniformBuffers() {
+        uniformBuffers.forEach(this::removeUniformBuffer);
+    }
+
+    public int getUniformBufferCount() {
+        return uniformBuffers.size();
     }
 
     public boolean containsUniformBuffer(int index) {
         return uniformBuffers.containsKey(index);
     }
-
-    public abstract boolean containsUniformBuffer(String name);
 
     public boolean containsUniformBuffer(UniformBuffer buffer) {
         return uniformBuffers.containsValue(buffer);
@@ -106,39 +99,43 @@ public abstract class Shader implements Destroyable {
         return uniformBuffers.get(index);
     }
 
+    public Iterator<Map.Entry<Integer, UniformBuffer>> getUniformBufferIterator() {
+        return uniformBuffers.entrySet().iterator();
+    }
+
+    public abstract void addUniformBuffer(String name, UniformBuffer buffer);
+
+    public abstract void removeUniformBuffer(String name);
+
+    public abstract void removeUniformBuffer(String name, UniformBuffer buffer);
+
+    public abstract boolean containsUniformBuffer(String name);
+
     public abstract UniformBuffer getUniformBuffer(String name);
 
-    public void attachTexture(int index, Texture texture) {
-        this.textures.put(index, texture);
+    public void addTexture(int index, Texture texture) {
+        textures.put(index, texture);
     }
 
-    public abstract void attachTexture(String name, Texture texture);
-
-    public void detachTexture(int index) {
-        this.textures.remove(index);
+    public void removeTexture(int index) {
+        textures.remove(index);
     }
 
-    public abstract void detachTexture(String name);
-
-    public void detachTexture(Texture texture) {
-        List<Integer> keys = new ArrayList<>();
-        for(Integer i : this.textures.keySet()) {
-            if(this.textures.get(i).equals(texture)) {
-                keys.add(i);
-            }
-        }
-        keys.forEach((Integer i) -> this.textures.remove(i));
+    public void removeTexture(int index, Texture texture) {
+        textures.remove(index, texture);
     }
 
-    public void detachAllTextures() {
-        this.textures.clear();
+    public void removeAllTextures() {
+        textures.forEach(this::removeTexture);
+    }
+
+    public int getTextureCount() {
+        return textures.size();
     }
 
     public boolean containsTexture(int index) {
         return textures.containsKey(index);
     }
-
-    public abstract boolean containsTexture(String name);
 
     public boolean containsTexture(Texture texture) {
         return textures.containsValue(texture);
@@ -147,6 +144,18 @@ public abstract class Shader implements Destroyable {
     public Texture getTexture(int index) {
         return textures.get(index);
     }
+
+    public Iterator<Map.Entry<Integer, Texture>> getTextureIterator() {
+        return textures.entrySet().iterator();
+    }
+
+    public abstract void addTexture(String name, Texture texture);
+
+    public abstract void removeTexture(String name);
+
+    public abstract void removeTexture(String name, Texture texture);
+
+    public abstract boolean containsTexture(String name);
 
     public abstract Texture getTexture(String name);
 

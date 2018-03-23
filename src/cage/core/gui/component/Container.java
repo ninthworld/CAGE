@@ -3,6 +3,7 @@ package cage.core.gui.component;
 import cage.core.gui.GUIGraphics;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class Container extends GUIComponent {
@@ -17,7 +18,33 @@ public class Container extends GUIComponent {
         components.add(component);
     }
 
-    // TODO: The rest
+    public void removeComponent(GUIComponent component) {
+        components.remove(component);
+    }
+
+    public void removeComponent(int index) {
+        components.remove(index);
+    }
+
+    public void removeAllComponents() {
+        components.forEach(this::removeComponent);
+    }
+
+    public int getComponentCount() {
+        return components.size();
+    }
+
+    public boolean containsComponent(GUIComponent component) {
+        return components.contains(component);
+    }
+
+    public GUIComponent getComponent(int index) {
+        return components.get(index);
+    }
+
+    public Iterator<GUIComponent> getComponentIterator() {
+        return components.iterator();
+    }
 
     @Override
     public void render(GUIGraphics graphics) {

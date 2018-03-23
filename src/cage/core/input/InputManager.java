@@ -30,19 +30,40 @@ public abstract class InputManager {
 
     public abstract Iterator<JoystickController> getJoystickControllerIterator();
 
-    public ActionState registerAction(InputController controller, InputComponent component, InputActionType actionType, InputAction action) {
+    public ActionState addAction(InputController controller, InputComponent component, InputActionType actionType, InputAction action) {
         ActionState actionState = new ActionState(action, controller, component, actionType);
-        controller.registerAction(actionState);
+        controller.addActionState(actionState);
         actions.add(actionState);
         return actionState;
     }
 
-    public void unregisterAction(ActionState actionState) {
-        actionState.getController().unregisterAction(actionState);
-        actions.remove(actionState);
+    public void removeAction(ActionState action) {
+        action.getController().removeActionState(action);
+        actions.remove(action);
     }
 
-    public void unregisterAllActions() {
-        actions.forEach(this::unregisterAction);
+    public void removeAction(int index) {
+        ActionState action = actions.remove(index);
+        action.getController().removeActionState(action);
+    }
+
+    public void removeAllActions() {
+        actions.forEach(this::removeAction);
+    }
+
+    public int getActionCount() {
+        return actions.size();
+    }
+
+    public boolean containsAction(ActionState action) {
+        return actions.contains(action);
+    }
+
+    public ActionState getAction(int index) {
+        return actions.get(index);
+    }
+
+    public Iterator<ActionState> getActionIterator() {
+        return actions.iterator();
     }
 }

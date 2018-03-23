@@ -74,28 +74,12 @@ public class SceneManager {
         this.window = window;
     }
 
-    public void registerController(NodeController controller) {
-        controllers.add(controller);
-    }
-
-    public void unregisterController(NodeController controller) {
-        controllers.remove(controller);
-    }
-
-    public void unregisterAllControllers() {
-        controllers.forEach(this::unregisterController);
-    }
-
     public void registerLight(Light light) {
         lights.add(light);
     }
 
     public void unregisterLight(Light light) {
         lights.remove(light);
-    }
-
-    public void unregisterAllLights() {
-        lights.forEach(this::unregisterLight);
     }
 
     public void registerCamera(Camera camera) {
@@ -106,7 +90,35 @@ public class SceneManager {
         cameras.remove(camera);
     }
 
-    public void unregisterAllCameras() {
-        cameras.forEach(this::unregisterCamera);
+    public void addController(NodeController controller) {
+        controllers.add(controller);
+    }
+
+    public void removeController(NodeController controller) {
+        controllers.remove(controller);
+    }
+
+    public void removeController(int index) {
+        controllers.remove(index);
+    }
+
+    public void removeAllControllers() {
+        controllers.forEach(this::removeController);
+    }
+
+    public int getControllerCount() {
+        return controllers.size();
+    }
+
+    public boolean containsController(NodeController controller) {
+        return controllers.contains(controller);
+    }
+
+    public NodeController getController(int index) {
+        return controllers.get(index);
+    }
+
+    public Iterator<NodeController> getControllerIterator() {
+        return controllers.iterator();
     }
 }

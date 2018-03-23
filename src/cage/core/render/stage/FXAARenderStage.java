@@ -14,8 +14,8 @@ public class FXAARenderStage extends FXRenderStage {
 
     @Override
     public void preRender() {
-        if(getInputStageCount() >= 1) {
-            getShader().attachTexture("diffuseTexture", getInputStage(0).getRenderTarget().getColorTexture(0));
+        if(getInputRenderStageCount() >= 1) {
+            getShader().addTexture("diffuseTexture", getInputRenderStage(0).getRenderTarget().getColorTexture(0));
         }
     }
 }

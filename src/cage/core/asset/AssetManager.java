@@ -150,7 +150,7 @@ public class AssetManager {
                 indexBuffer.writeData(indices);
 
                 VertexArray vertexArray = graphicsDevice.createVertexArray();
-                vertexArray.attachVertexBuffer(vertexBuffer);
+                vertexArray.addVertexBuffer(vertexBuffer);
 
                 Material material = new Material();
                 for (com.owens.oobjloader.builder.Material mtl : builder.materialLib.values()) {
@@ -172,7 +172,7 @@ public class AssetManager {
                 }
 
                 Model model = new Model(vertexArray);
-                model.attachMesh(new Mesh(indexBuffer, material));
+                model.addMesh(new Mesh(indexBuffer, material));
 
                 models.put(file, model);
                 return model;

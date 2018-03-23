@@ -45,9 +45,9 @@ public class GLRenderTarget2D extends RenderTarget2D implements GLRenderTarget {
     }
 
     @Override
-    public void attachColorTexture(int index, Texture2D colorTexture) {
+    public void addColorTexture(int index, Texture2D colorTexture) {
         if(colorTexture instanceof GLTexture2D) {
-            super.attachColorTexture(index, colorTexture);
+            super.addColorTexture(index, colorTexture);
 
             GLTexture2D glTexture = (GLTexture2D)colorTexture;
             bind();
@@ -68,9 +68,9 @@ public class GLRenderTarget2D extends RenderTarget2D implements GLRenderTarget {
     }
 
     @Override
-    public void attachDepthTexture(Texture2D depthTexture) {
+    public void setDepthTexture(Texture2D depthTexture) {
         if(depthTexture instanceof GLTexture2D) {
-            super.attachDepthTexture(depthTexture);
+            super.setDepthTexture(depthTexture);
 
             GLTexture2D glTexture = (GLTexture2D)depthTexture;
             bind();

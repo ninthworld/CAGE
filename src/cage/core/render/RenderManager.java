@@ -79,16 +79,16 @@ public class RenderManager {
 
         defaultGeometryRenderStage = createGeometryRenderStage(sceneManager.getDefaultCamera());
         defaultLightingRenderStage = createLightingRenderStage();
-        defaultLightingRenderStage.attachInputStage(defaultGeometryRenderStage);
+        defaultLightingRenderStage.addInputRenderStage(defaultGeometryRenderStage);
 
         defaultFXAARenderStage = (FXAARenderStage)createFXRenderStage(FXAARenderStage::new);
         {
             Shader shader = assetManager.loadShader("fx/fx.vs.glsl", "fx/fxaa.fs.glsl");
-            shader.attachUniformBuffer("Window", getDefaultWindowUniformBuffer());
+            shader.addUniformBuffer("Window", getDefaultWindowUniformBuffer());
             defaultFXAARenderStage.setShader(shader);
-            defaultFXAARenderStage.attachInputStage(defaultLightingRenderStage);
+            defaultFXAARenderStage.addInputRenderStage(defaultLightingRenderStage);
         }
-        attachOutputStage(defaultFXAARenderStage);
+        addOutputRenderStage(defaultFXAARenderStage);
     }
 
     public void render() {
@@ -116,12 +116,12 @@ public class RenderManager {
     public GeometryRenderStage createGeometryRenderStage(Camera camera) {
         GeometryRenderStage renderStage = (GeometryRenderStage)createRenderStage(GeometryRenderStage::new);
         Shader shader = assetManager.getDefaultGeometryShader();
-        shader.attachUniformBuffer("Camera", defaultCameraUniformBuffer);
-        shader.attachUniformBuffer("Entity", defaultEntityUniformBuffer);
-        shader.attachUniformBuffer("Material", defaultMaterialUniformBuffer);
-        renderStage.getRenderTarget().attachColorTexture(1,
+        shader.addUniformBuffer("Camera", defaultCameraUniformBuffer);
+        shader.addUniformBuffer("Entity", defaultEntityUniformBuffer);
+        shader.addUniformBuffer("Material", defaultMaterialUniformBuffer);
+        renderStage.getRenderTarget().addColorTexture(1,
                 graphicsDevice.createTexture2D(renderStage.getRenderTarget().getWidth(), renderStage.getRenderTarget().getHeight()));
-        renderStage.getRenderTarget().attachColorTexture(2,
+        renderStage.getRenderTarget().addColorTexture(2,
                 graphicsDevice.createTexture2D(renderStage.getRenderTarget().getWidth(), renderStage.getRenderTarget().getHeight()));
         renderStage.setShader(shader);
         renderStage.setSceneNode(sceneManager.getRootSceneNode());
@@ -132,8 +132,8 @@ public class RenderManager {
     public LightingRenderStage createLightingRenderStage() {
         LightingRenderStage renderStage = (LightingRenderStage)createFXRenderStage(LightingRenderStage::new);
         Shader shader = assetManager.getDefaultLightingShader();
-        assetManager.getDefaultLightingShader().attachUniformBuffer("Camera", defaultCameraUniformBuffer);
-        assetManager.getDefaultLightingShader().attachShaderStorageBuffer("Light", defaultLightShaderStorageBuffer);
+        assetManager.getDefaultLightingShader().addUniformBuffer("Camera", defaultCameraUniformBuffer);
+        assetManager.getDefaultLightingShader().addShaderStorageBuffer("Light", defaultLightShaderStorageBuffer);
         renderStage.setShader(shader);
         renderStage.setSceneManager(sceneManager);
         return renderStage;
@@ -171,38 +171,38 @@ public class RenderManager {
         return defaultFXModel;
     }
 
-    public int getOutputStageCount() {
+    public void addOutputRenderStage(RenderStage renderStage) {
+        outputStages.add(renderStage);
+    }
+
+    public void removeOutputRenderStage(RenderStage renderStage) {
+        outputStages.remove(renderStage);
+    }
+
+    public void removeOutputRenderStage(int index) {
+        outputStages.remove(index);
+    }
+
+    public void removeAllOutputRenderStages() {
+        outputStages.forEach(this::removeOutputRenderStage);
+    }
+
+    public int getOutputRenderStageCount() {
         return outputStages.size();
     }
 
-    public void attachOutputStage(RenderStage stage) {
-        outputStages.add(stage);
+    public boolean containsOutputRenderStage(RenderStage renderStage) {
+        return outputStages.contains(renderStage);
     }
 
-    public void detachOutputStage(RenderStage stage) {
-        outputStages.remove(stage);
-    }
-
-    public void detachAllOutputStages() {
-        this.outputStages.forEach(this::detachOutputStage);
-    }
-
-    public boolean containsOutputStage(RenderStage stage) {
-        return outputStages.contains(stage);
-    }
-
-    public RenderStage getOutputStage(int index) {
+    public RenderStage getOutputRenderStage(int index) {
         return outputStages.get(index);
     }
 
-    public void setOutputStage(int index, RenderStage renderStage) {
-        outputStages.add(index, renderStage);
-    }
-
-    public Iterator<RenderStage> getOutputStageIterator() {
+    public Iterator<RenderStage> getOutputRenderStageIterator() {
         return outputStages.iterator();
     }
-
+    
     private Model createDefaultFXModel() {
         float[] quadPositions = new float[] {
                 -1.0f, -1.0f,
@@ -221,10 +221,10 @@ public class RenderManager {
         quadIndexBuffer.writeData((IntBuffer)BufferUtils.createIntBuffer(quadIndices.length).put(quadIndices).rewind());
 
         VertexArray quadVertexArray = graphicsDevice.createVertexArray();
-        quadVertexArray.attachVertexBuffer(quadVertexBuffer);
+        quadVertexArray.addVertexBuffer(quadVertexBuffer);
 
         Model quadModel = new Model(quadVertexArray);
-        quadModel.attachMesh(new Mesh(quadIndexBuffer, new Material()));
+        quadModel.addMesh(new Mesh(quadIndexBuffer, new Material()));
 
         return quadModel;
     }

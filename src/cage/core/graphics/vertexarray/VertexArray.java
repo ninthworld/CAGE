@@ -21,20 +21,26 @@ public abstract class VertexArray implements Destroyable {
         return attributeCount;
     }
 
+    public void addVertexBuffer(VertexBuffer buffer) {
+        vertexBuffers.add(buffer);
+        attributeCount += buffer.getLayout().getLayoutStack().size();
+    }
+
+    public void removeVertexBuffer(VertexBuffer buffer) {
+        attributeCount -= buffer.getLayout().getLayoutStack().size();
+        vertexBuffers.remove(buffer);
+    }
+
+    public void removeVertexBuffer(int index) {
+        attributeCount -= vertexBuffers.remove(index).getLayout().getLayoutStack().size();
+    }
+
+    public void removeAllVertexBuffers() {
+        vertexBuffers.forEach(this::removeVertexBuffer);
+    }
+
     public int getVertexBufferCount() {
         return vertexBuffers.size();
-    }
-
-    public abstract void attachVertexBuffer(VertexBuffer buffer);
-
-    public abstract void detachVertexBuffer(VertexBuffer buffer);
-
-    public void detachAllVertexBuffers() {
-        vertexBuffers.forEach(this::detachVertexBuffer);
-    }
-
-    public Iterator<VertexBuffer> getVertexBufferIterator() {
-        return vertexBuffers.iterator();
     }
 
     public boolean containsVertexBuffer(VertexBuffer buffer) {
@@ -44,4 +50,9 @@ public abstract class VertexArray implements Destroyable {
     public VertexBuffer getVertexBuffer(int index) {
         return vertexBuffers.get(index);
     }
+
+    public Iterator<VertexBuffer> getVertexBufferIterator() {
+        return vertexBuffers.iterator();
+    }
+
 }
