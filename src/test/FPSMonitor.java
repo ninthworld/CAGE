@@ -25,8 +25,8 @@ public class FPSMonitor extends GUIComponent {
     
     public FPSMonitor(Timer timer) {
         this.timer = timer;
-        this.x = 0.0f;
-        this.y = 0.0f;
+        this.x = 4.0f;
+        this.y = 4.0f;
         this.width = 80.0f;
         this.height = 48.0f;
         this.fontSize = 10;

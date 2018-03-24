@@ -71,7 +71,7 @@ void main() {
                     relLightDir = -normalize(position - light.worldPosition.xyz);
                 }
                 else if(light.type == DIRECTIONAL_TYPE) {
-                    relLightDir = normalize(light.worldPosition.xyz);
+                    relLightDir = -normalize(light.worldPosition.xyz);
                 }
 
                 // Diffuse

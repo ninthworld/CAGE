@@ -17,6 +17,7 @@ import static org.lwjgl.opengl.GL30.glGenerateMipmap;
 public class GLTextureCubeMap extends TextureCubeMap implements GLTexture {
 
     private int textureId;
+    private Buffer data;
 
     public GLTextureCubeMap(int width, int height, FormatType format, boolean mipmapping) {
         super(width, height, format, mipmapping);        
@@ -76,8 +77,31 @@ public class GLTextureCubeMap extends TextureCubeMap implements GLTexture {
                     0);
             checkError("glTexImage2D");
         }
+        generateMipmap();
+        unbind();
 
+        if(data != null) {
+            if(data instanceof ByteBuffer) {
+                writeData((ByteBuffer)data);
+            }
+            else if(data instanceof ShortBuffer) {
+                writeData((ShortBuffer)data);
+            }
+            else if(data instanceof IntBuffer) {
+                writeData((IntBuffer)data);
+            }
+            else if(data instanceof FloatBuffer) {
+                writeData((FloatBuffer)data);
+            }
+            else if(data instanceof DoubleBuffer) {
+                writeData((DoubleBuffer)data);
+            }
+        }
+    }
+
+    private void generateMipmap() {
         if(isMipmapping()) {
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 1000);
             glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
             checkError("glGenerateMipmap");
         }
@@ -85,7 +109,6 @@ public class GLTextureCubeMap extends TextureCubeMap implements GLTexture {
             glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_BASE_LEVEL, 0);
             glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, 0);
         }
-        unbind();
     }
 
     @Override
@@ -108,6 +131,7 @@ public class GLTextureCubeMap extends TextureCubeMap implements GLTexture {
     
     @Override
     public void writeData(ByteBuffer data) {
+        this.data = data;
         bind();
         glTexSubImage2D(
                 getGLCubeMapFace(getDataCubeFace()),
@@ -118,11 +142,13 @@ public class GLTextureCubeMap extends TextureCubeMap implements GLTexture {
                 getGLDataType(getFormat()),
                 data);
         checkError("glTexSubImage2D");
+        generateMipmap();
         unbind();
     }
 
     @Override
     public void writeData(ShortBuffer data) {
+        this.data = data;
         bind();
         glTexSubImage2D(
                 getGLCubeMapFace(getDataCubeFace()),
@@ -133,11 +159,13 @@ public class GLTextureCubeMap extends TextureCubeMap implements GLTexture {
                 getGLDataType(getFormat()),
                 data);
         checkError("glTexSubImage2D");
+        generateMipmap();
         unbind();
     }
 
     @Override
     public void writeData(IntBuffer data) {
+        this.data = data;
         bind();
         glTexSubImage2D(
                 getGLCubeMapFace(getDataCubeFace()),
@@ -148,11 +176,13 @@ public class GLTextureCubeMap extends TextureCubeMap implements GLTexture {
                 getGLDataType(getFormat()),
                 data);
         checkError("glTexSubImage2D");
+        generateMipmap();
         unbind();
     }
 
     @Override
     public void writeData(FloatBuffer data) {
+        this.data = data;
         bind();
         glTexSubImage2D(
                 getGLCubeMapFace(getDataCubeFace()),
@@ -163,11 +193,13 @@ public class GLTextureCubeMap extends TextureCubeMap implements GLTexture {
                 getGLDataType(getFormat()),
                 data);
         checkError("glTexSubImage2D");
+        generateMipmap();
         unbind();
     }
 
     @Override
     public void writeData(DoubleBuffer data) {
+        this.data = data;
         bind();
         glTexSubImage2D(
                 getGLCubeMapFace(getDataCubeFace()),
@@ -178,6 +210,7 @@ public class GLTextureCubeMap extends TextureCubeMap implements GLTexture {
                 getGLDataType(getFormat()),
                 data);
         checkError("glTexSubImage2D");
+        generateMipmap();
         unbind();
     }
 

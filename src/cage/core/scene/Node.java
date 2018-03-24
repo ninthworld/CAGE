@@ -9,9 +9,9 @@ import java.util.List;
 
 public abstract class Node implements Destroyable {
 
-    public static final Vector3f FORWARD = new Vector3f(0.0f, 0.0f, 1.0f);
-    public static final Vector3f RIGHT = new Vector3f(-1.0f, 0.0f, 0.0f);
-    public static final Vector3f UP = new Vector3f(0.0f, 1.0f, 0.0f);
+    public static final Vector3fc FORWARD = new Vector3f(0.0f, 0.0f, 1.0f);
+    public static final Vector3fc RIGHT = new Vector3f(-1.0f, 0.0f, 0.0f);
+    public static final Vector3fc UP = new Vector3f(0.0f, 1.0f, 0.0f);
 
     private Vector3f worldPosition;
     private Vector3f worldScale;
@@ -176,7 +176,7 @@ public abstract class Node implements Destroyable {
         return worldRotation.getRow(2, new Vector3f());
     }
 
-    public void translate(Vector3f offset) {
+    public void translate(Vector3fc offset) {
         localPosition.add(offset);
         notifyUpdate();
     }
@@ -209,7 +209,7 @@ public abstract class Node implements Destroyable {
         translate(getLocalUp().mul(-amount, new Vector3f()));
     }
 
-    public void rotate(float angle, Vector3f axis) {
+    public void rotate(float angle, Vector3fc axis) {
         localRotation.rotate(angle, axis);
         notifyUpdate();
     }
@@ -239,8 +239,8 @@ public abstract class Node implements Destroyable {
         rotate(angle, FORWARD);
     }
 
-    public void lookAt(Vector3f target, Vector3f up) {
-        localRotation.lookAlong(target.sub(localPosition), up);
+    public void lookAt(Vector3fc target, Vector3fc up) {
+        localRotation.lookAlong(target.sub(localPosition, new Vector3f()), up);
         notifyUpdate();
     }
 

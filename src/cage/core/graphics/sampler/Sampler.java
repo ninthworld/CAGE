@@ -62,7 +62,13 @@ public abstract class Sampler implements Destroyable {
     public void setEdgeW(EdgeType edge) {
         this.edgeW = edge;
     }
-    
+
+    public void setEdge(EdgeType edge) {
+        setEdgeU(edge);
+        setEdgeV(edge);
+        setEdgeW(edge);
+    }
+
     public FilterType getFilterMin() {
         return min;
     }
@@ -77,6 +83,11 @@ public abstract class Sampler implements Destroyable {
 
     public void setFilterMag(FilterType filter) {
         this.mag = filter;
+    }
+
+    public void setFilter(FilterType filter) {
+        setFilterMin(filter);
+        setFilterMag(filter);
     }
 
     public boolean isMipmapping() {

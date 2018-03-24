@@ -3,6 +3,9 @@ package test;
 import cage.core.engine.Engine;
 
 import cage.core.application.Game;
+import cage.core.graphics.sampler.Sampler;
+import cage.core.graphics.type.EdgeType;
+import cage.core.graphics.type.FilterType;
 import cage.core.input.action.CloseWindowAction;
 import cage.core.input.action.InputAction;
 import cage.core.input.component.Axis;
@@ -10,8 +13,12 @@ import cage.core.input.component.Button;
 import cage.core.input.component.Key;
 import cage.core.input.type.InputActionType;
 import cage.core.model.Model;
+import cage.core.model.material.Material;
+import cage.core.scene.Node;
 import cage.core.scene.SceneEntity;
 import cage.core.scene.SceneNode;
+import cage.core.scene.controller.RotationController;
+import cage.core.scene.light.DirectionalLight;
 import cage.core.scene.light.Light;
 import cage.core.scene.light.PointLight;
 import cage.core.scene.light.type.AttenuationType;
@@ -40,20 +47,48 @@ public class MyGame implements Game {
 
         engine.getGUIManager().getRootContainer().addComponent(monitor);
 
+        RotationController rc = new RotationController(1.0f, Node.UP);
+        engine.getSceneManager().addController(rc);
         rotateNode = engine.getSceneManager().getRootSceneNode().createSceneNode();
+        rc.addNode(rotateNode);
 
-        Model model = engine.getAssetManager().loadOBJModelFile("dolphin/dolphinHighPoly.obj");
-        dolphinEntity = rotateNode.createSceneEntity(model);
-        dolphinEntity.translate(4.0f, 0.0f, 0.0f);
+        dolphinEntity = rotateNode.createSceneEntity(engine.getAssetManager().loadOBJModelFile("dolphin/dolphinHighPoly.obj"));
+        dolphinEntity.translate(4.0f, 4.0f, 0.0f);
         dolphinEntity.scale(2.0f);
 
-        PointLight light = engine.getSceneManager().getRootSceneNode().createPointLight();
-        light.setLocalPosition(0.0f, 0.0f, 0.0f);
-        light.setRange(32.0f);
-        light.setAttenuation(AttenuationType.QUADRATIC);
-        light.setDiffuseColor(1.0f, 1.0f, 1.0f);
-        light.setSpecularColor(1.0f, 1.0f, 1.0f);
+        Sampler groundSampler = engine.getGraphicsDevice().createSampler();
+        groundSampler.setEdge(EdgeType.WRAP);
+        groundSampler.setMipmapping(true);
+        groundSampler.setMipmapMinLOD(0.0f);
+        groundSampler.setMipmapMaxLOD(8.0f);
+        Model groundModel = engine.getAssetManager().loadOBJModelFile("ground/ground.obj");
+        Material groundMaterial = groundModel.getMesh(0).getMaterial();
+        groundMaterial.setNormalTexture(engine.getAssetManager().loadTextureFile("tiles/tiles_norm.jpg"));
 
+        groundMaterial.getDiffuseTexture().setSampler(groundSampler);
+        groundMaterial.getDiffuseTexture().setMipmapping(true);
+
+        groundMaterial.getSpecularTexture().setSampler(groundSampler);
+        groundMaterial.getSpecularTexture().setMipmapping(true);
+
+        groundMaterial.getNormalTexture().setSampler(groundSampler);
+        groundMaterial.getNormalTexture().setMipmapping(true);
+
+        SceneEntity groundEntity = engine.getSceneManager().getRootSceneNode().createSceneEntity(groundModel);
+
+        PointLight pointLight = engine.getSceneManager().getRootSceneNode().createPointLight();
+        pointLight.setLocalPosition(0.0f, 8.0f, 0.0f);
+        pointLight.setRange(32.0f);
+        pointLight.setAttenuation(AttenuationType.QUADRATIC);
+        pointLight.setDiffuseColor(1.0f, 1.0f, 1.0f);
+        pointLight.setSpecularColor(1.0f, 1.0f, 1.0f);
+
+        DirectionalLight dirLight = engine.getSceneManager().getRootSceneNode().createDirectionalLight();
+        dirLight.setDirection(-1.0f, -1.0f, -1.0f);
+        dirLight.setDiffuseColor(1.0f, 1.0f, 1.0f);
+        //dirLight.setSpecularColor(1.0f, 1.0f, 1.0f);
+
+        engine.getSceneManager().getDefaultCamera().moveUp(4.0f);
         InputAction mouseAction = (deltaTime, event) -> {
             if(canLook) {
                 if (event.getComponent() == Axis.LEFT_X) {

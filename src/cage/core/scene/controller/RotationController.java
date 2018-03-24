@@ -2,13 +2,14 @@ package cage.core.scene.controller;
 
 import cage.core.scene.Node;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
 public class RotationController extends NodeController {
 
-    private Vector3f axis;
+    private Vector3fc axis;
     private float speed;
 
-    public RotationController(float speed, Vector3f axis) {
+    public RotationController(float speed, Vector3fc axis) {
         this.speed = speed;
         this.axis = axis;
     }
@@ -26,7 +27,7 @@ public class RotationController extends NodeController {
         this.speed = speed;
     }
 
-    public Vector3f getAxis() {
+    public Vector3fc getAxis() {
         return axis;
     }
 
