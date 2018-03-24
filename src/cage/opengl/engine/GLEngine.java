@@ -11,6 +11,8 @@ import cage.glfw.window.GLFWWindow;
 import cage.opengl.graphics.GLGraphicsDevice;
 import cage.glfw.input.GLFWInputManager;
 
+import java.nio.file.Path;
+
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
 import static org.lwjgl.opengl.GL11.glEnable;
 
@@ -18,8 +20,8 @@ public class GLEngine extends Engine {
 
     private GLTimer timer;
 
-    public GLEngine(GLFWWindow window, InputManager inputManager, GUIManager guiManager) {
-        super(window, inputManager, guiManager, new GLGraphicsDevice(window));
+    public GLEngine(GLFWWindow window, InputManager inputManager, GUIManager guiManager, Path assetProperties) {
+        super(window, inputManager, guiManager, new GLGraphicsDevice(window), assetProperties);
         if(inputManager instanceof GLFWInputManager) {
             ((GLFWInputManager) inputManager).initialize(window.getHandle());
         }
@@ -27,6 +29,7 @@ public class GLEngine extends Engine {
             ((NVGGUIManager) guiManager).initialize(window);
         }
         this.timer = (GLTimer)createTimer();
+        initialize();
     }
 
     @Override

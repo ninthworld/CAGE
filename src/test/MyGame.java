@@ -33,18 +33,16 @@ public class MyGame implements Game {
         this.canLook = false;
     }
 
-
     @Override
     public void initialize(Engine engine) {
         engine.getGraphicsContext().setClearColor(Color.decode("#6495ed"));
         engine.getInputManager().addAction(engine.getInputManager().getKeyboardController(), Key.ESCAPE, InputActionType.PRESS, new CloseWindowAction(engine.getWindow()));
 
-        engine.getAssetManager().loadFont("Arial", "arial.ttf");
         engine.getGUIManager().getRootContainer().addComponent(monitor);
 
         rotateNode = engine.getSceneManager().getRootSceneNode().createSceneNode();
 
-        Model model = engine.getAssetManager().loadOBJModel("dolphin/dolphinHighPoly.obj");
+        Model model = engine.getAssetManager().loadOBJModelFile("dolphin/dolphinHighPoly.obj");
         dolphinEntity = rotateNode.createSceneEntity(model);
         dolphinEntity.translate(4.0f, 0.0f, 0.0f);
         dolphinEntity.scale(2.0f);

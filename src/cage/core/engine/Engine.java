@@ -12,6 +12,8 @@ import cage.core.input.InputManager;
 import cage.core.render.RenderManager;
 import cage.core.scene.SceneManager;
 
+import java.nio.file.Path;
+
 public abstract class Engine implements Destroyable {
 
     private Window window;
@@ -23,15 +25,19 @@ public abstract class Engine implements Destroyable {
     private InputManager inputManager;
     private GUIManager guiManager;
 
-    public Engine(Window window, InputManager inputManager, GUIManager guiManager, GraphicsDevice graphicsDevice) {
+    public Engine(Window window, InputManager inputManager, GUIManager guiManager, GraphicsDevice graphicsDevice, Path assetProperties) {
         this.window = window;
         this.inputManager = inputManager;
         this.guiManager = guiManager;
         this.graphicsDevice = graphicsDevice;
         this.graphicsContext = graphicsDevice.getGraphicsContext();
-        this.assetManager = new AssetManager(graphicsDevice, guiManager);
+        this.assetManager = new AssetManager(assetProperties, graphicsDevice, guiManager);
         this.sceneManager = new SceneManager(window);
         this.renderManager = new RenderManager(this.graphicsDevice, this.graphicsContext, this.window, this.sceneManager, this.assetManager);
+    }
+
+    public void initialize() {
+        assetManager.initialize();
     }
 
     public abstract void run(Game game);

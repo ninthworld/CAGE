@@ -26,7 +26,6 @@ import java.io.*;
 import java.nio.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -36,41 +35,48 @@ import java.util.logging.*;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.stb.STBEasyFont;
 import org.lwjgl.stb.STBImage;
 import org.lwjgl.system.MemoryStack;
 
 public class AssetManager {
 
-    static {
-        Logger.getLogger(Parse.class.getName()).setLevel(Level.SEVERE);
-        Logger.getLogger(Build.class.getName()).setLevel(Level.SEVERE);
-    }
-
-    public static final String ASSETS_ROOT_DIR = "assets/";
-
+    private AssetProperties assetProperties;
     private GraphicsDevice graphicsDevice;
     private GUIManager guiManager;
-    private Path assetsDir;
-    private Shader defaultGeometryShader;
-    private Shader defaultLightingShader;
     private Map<String, Model> models;
     private Map<String, Texture> textures;
     private Map<String, GUIFont> fonts;
     private Map<String, GUIImage> images;
+    private Shader defaultGeometryShader;
+    private Shader defaultLightingShader;
+    private Shader defaultFXAAShader;
+    private GUIFont defaultFont;
 
-    public AssetManager(GraphicsDevice graphicsDevice, GUIManager guiManager) {
+    public AssetManager(Path assetProperties, GraphicsDevice graphicsDevice, GUIManager guiManager) {
+        this.assetProperties = new AssetProperties(assetProperties);
         this.graphicsDevice = graphicsDevice;
         this.guiManager = guiManager;
-        this.assetsDir = Paths.get(ASSETS_ROOT_DIR);
 
         this.models = new HashMap<>();
         this.textures = new HashMap<>();
         this.fonts = new HashMap<>();
         this.images = new HashMap<>();
 
-        this.defaultGeometryShader = loadShader("geometry/material.vs.glsl", "geometry/material.fs.glsl");
-        this.defaultLightingShader = loadShader("fx/fx.vs.glsl", "fx/lighting.fs.glsl");
+        this.assetProperties.setDefault("assets.shaders.default.geometry.vertex", "geometry/material.vs.glsl");
+        this.assetProperties.setDefault("assets.shaders.default.geometry.fragment", "geometry/material.fs.glsl");
+        this.assetProperties.setDefault("assets.shaders.default.fx.vertex", "fx/fx.vs.glsl");
+        this.assetProperties.setDefault("assets.shaders.default.lighting.fragment", "fx/lighting.fs.glsl");
+        this.assetProperties.setDefault("assets.shaders.default.fxaa.fragment", "fx/fxaa.fs.glsl");
+        this.assetProperties.setDefault("assets.fonts.default", "arial.ttf");
+        this.assetProperties.setDefault("assets.fonts.default.name", "Arial");
+
+        this.defaultGeometryShader = loadShader("default.geometry");
+        this.defaultLightingShader = loadShader("default.fx", "default.lighting");
+        this.defaultFXAAShader = loadShader("default.fx", "default.fxaa");
+    }
+
+    public void initialize() {
+        this.defaultFont = loadFont("default");
     }
 
     public Shader getDefaultGeometryShader() {
@@ -81,14 +87,26 @@ public class AssetManager {
         return defaultLightingShader;
     }
 
-    public GUIFont loadFont(String name, String file) {
+    public Shader getDefaultFXAAShader() {
+        return defaultFXAAShader;
+    }
+
+    public GUIFont getDefaultFont() {
+        return defaultFont;
+    }
+
+    public GUIFont loadFont(String configKey) {
+        return loadFontFile(assetProperties.getValue("assets.fonts." + configKey + ".name"), assetProperties.getValuePath("assets.fonts." + configKey).toString());
+    }
+
+    public GUIFont loadFontFile(String name, String file) {
         String concat = file.concat(name);
         if(fonts.containsKey(concat)) {
             return fonts.get(concat);
         }
         else {
             try {
-                Path path = assetsDir.resolve("fonts/").resolve(file);
+                Path path = assetProperties.getFontsPath().resolve(file);
                 byte[] data = Files.readAllBytes(path);
                 ByteBuffer buffer = BufferUtils.createByteBuffer(data.length);
                 buffer.put(data);
@@ -103,12 +121,16 @@ public class AssetManager {
         }
     }
 
-    public GUIImage loadImage(String file) {
+    public GUIImage loadImage(String configKey) {
+        return loadImageFile(assetProperties.getValuePath("assets.images." + configKey).toString());
+    }
+
+    public GUIImage loadImageFile(String file) {
         if(images.containsKey(file)) {
             return images.get(file);
         }
         else {
-            ImageData img = getImageData(assetsDir.resolve("images/").resolve(file).toString());
+            ImageData img = getImageData(assetProperties.getImagesPath().resolve(file).toString());
             if(img == null) {
                 return null;
             }
@@ -118,14 +140,18 @@ public class AssetManager {
         }
     }
 
-    public Model loadOBJModel(String file) {
+    public Model loadOBJModel(String configKey) {
+        return loadOBJModelFile(assetProperties.getValuePath("assets.models." + configKey).toString());
+    }
+
+    public Model loadOBJModelFile(String file) {
         if(models.containsKey(file)) {
             return models.get(file);
         }
         else {
             try {
                 Build builder = new Build();
-                new Parse(builder, assetsDir.resolve("models/").resolve(file).toString());
+                new Parse(builder, assetProperties.getModelsPath().resolve(file).toString());
 
                 HashMap<FaceVertex, Integer> indexMap = new HashMap<>();
                 ArrayList<FaceVertex> faceVertices = new ArrayList<>();
@@ -215,15 +241,15 @@ public class AssetManager {
                     material.setShininess((float)mtl.nsExponent);
 
                     if(mtl.mapKdFilename != null) {
-                        material.setDiffuse(loadTexture(mtl.mapKdFilename));
+                        material.setDiffuse(loadTextureFile(mtl.mapKdFilename));
                     }
 
                     if(mtl.mapKsFilename != null) {
-                        material.setSpecular(loadTexture(mtl.mapKsFilename));
+                        material.setSpecular(loadTextureFile(mtl.mapKsFilename));
                     }
 
                     if(mtl.mapNsFilename != null) {
-                        material.setHighlight(loadTexture(mtl.mapNsFilename));
+                        material.setHighlight(loadTextureFile(mtl.mapNsFilename));
                     }
                 }
 
@@ -240,18 +266,28 @@ public class AssetManager {
         return null;
     }
 
-    public Shader loadShader(String vertexFile, String fragmentFile) {
+    public Shader loadShader(String configKey) {
+        return loadShader(configKey, configKey);
+    }
+
+    public Shader loadShader(String configKeyVertex, String configKeyFrament) {
+        return loadShaderFile(
+                assetProperties.getValuePath("assets.shaders." + configKeyVertex + ".vertex").toString(),
+                assetProperties.getValuePath("assets.shaders." + configKeyFrament + ".fragment").toString());
+    }
+
+    public Shader loadShaderFile(String vertexFile, String fragmentFile) {
         Shader shader = graphicsDevice.createShader();
         try {
             String line;
 
-            BufferedReader vertexReader = Files.newBufferedReader(assetsDir.resolve("shaders/").resolve(vertexFile));
+            BufferedReader vertexReader = Files.newBufferedReader(assetProperties.getShadersPath().resolve(vertexFile));
             StringBuilder vertexShaderSrc = new StringBuilder();
             while ((line = vertexReader.readLine()) != null) {
                 vertexShaderSrc.append(line).append("\n");
             }
 
-            BufferedReader fragmentReader = Files.newBufferedReader(assetsDir.resolve("shaders/").resolve(fragmentFile));
+            BufferedReader fragmentReader = Files.newBufferedReader(assetProperties.getShadersPath().resolve(fragmentFile));
             StringBuilder fragmentShaderSrc = new StringBuilder();
             while ((line = fragmentReader.readLine()) != null) {
                 fragmentShaderSrc.append(line).append("\n");
@@ -267,13 +303,17 @@ public class AssetManager {
         return shader;
     }
 
-    public Texture2D loadTexture(String file) {
+    public Texture2D loadTexture(String configKey) {
+        return loadTextureFile(assetProperties.getValuePath("assets.textures." + configKey).toString());
+    }
+
+    public Texture2D loadTextureFile(String file) {
         Texture tex;
         if(textures.containsKey(file) && (tex = textures.get(file)) instanceof Texture2D) {
             return (Texture2D)tex;
         }
         else {
-            ImageData img = getImageData(assetsDir.resolve("textures/").resolve(file).toString());
+            ImageData img = getImageData(assetProperties.getTexturesPath().resolve(file).toString());
             if(img == null) {
                 return null;
             }
@@ -289,7 +329,17 @@ public class AssetManager {
         }
     }
 
-    public TextureCubeMap loadCubeMap(String rightFile, String leftFile, String topFile, String bottomFile, String backFile, String frontFile) {
+    public TextureCubeMap loadCubeMap(String configKey) {
+        return loadCubeMapFile(
+                assetProperties.getValuePath("assets.textures." + configKey + ".right").toString(),
+                assetProperties.getValuePath("assets.textures." + configKey + ".left").toString(),
+                assetProperties.getValuePath("assets.textures." + configKey + ".top").toString(),
+                assetProperties.getValuePath("assets.textures." + configKey + ".bottom").toString(),
+                assetProperties.getValuePath("assets.textures." + configKey + ".back").toString(),
+                assetProperties.getValuePath("assets.textures." + configKey + ".front").toString());
+    }
+
+    public TextureCubeMap loadCubeMapFile(String rightFile, String leftFile, String topFile, String bottomFile, String backFile, String frontFile) {
         String[] files = new String[] {
             rightFile, leftFile, topFile, bottomFile, backFile, frontFile
         };
@@ -302,7 +352,7 @@ public class AssetManager {
         else {
             ImageData[] imgs = new ImageData[6];
             for(int i=0; i<imgs.length; ++i) {
-                imgs[i] = getImageData(assetsDir.resolve("textures/").resolve(files[i]).toString());
+                imgs[i] = getImageData(assetProperties.getTexturesPath().resolve(files[i]).toString());
                 if(imgs[i] == null) {
                     return null;
                 }
@@ -350,5 +400,10 @@ public class AssetManager {
         public int width;
         public int height;
         public Buffer data;
+    }
+
+    static {
+        Logger.getLogger(Parse.class.getName()).setLevel(Level.SEVERE);
+        Logger.getLogger(Build.class.getName()).setLevel(Level.SEVERE);
     }
 }

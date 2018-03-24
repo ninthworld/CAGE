@@ -83,7 +83,7 @@ public class RenderManager {
 
         defaultFXAARenderStage = (FXAARenderStage)createFXRenderStage(FXAARenderStage::new);
         {
-            Shader shader = assetManager.loadShader("fx/fx.vs.glsl", "fx/fxaa.fs.glsl");
+            Shader shader = assetManager.getDefaultFXAAShader();
             shader.addUniformBuffer("Window", getDefaultWindowUniformBuffer());
             defaultFXAARenderStage.setShader(shader);
             defaultFXAARenderStage.addInputRenderStage(defaultLightingRenderStage);

@@ -8,6 +8,8 @@ import cage.opengl.engine.GLEngine;
 import cage.glfw.window.GLFWWindow;
 import cage.glfw.input.GLFWInputManager;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,6 +22,7 @@ public class GLFWBootstrap {
     private boolean vsync;
     private int refreshRate;
     private int samples;
+    private Path assetProperties;
     private InputManager inputManager;
     private GUIManager guiManager;
 
@@ -29,6 +32,7 @@ public class GLFWBootstrap {
         this.vsync = false;
         this.refreshRate = 60;
         this.samples = 1;
+        this.assetProperties = Paths.get("assets/cage.properties");
         this.inputManager = new GLFWInputManager();
         this.guiManager = new NVGGUIManager();
     }
@@ -48,6 +52,11 @@ public class GLFWBootstrap {
         return this;
     }
 
+    public GLFWBootstrap setAssetPropertiesPath(Path assetProperties) {
+        this.assetProperties = assetProperties;
+        return this;
+    }
+
     public GLFWBootstrap setInputManager(InputManager inputManager) {
         this.inputManager = inputManager;
         return this;
@@ -64,7 +73,7 @@ public class GLFWBootstrap {
         Game game = null;
         try {
             window = new GLFWWindow(title, width, height, vsync, refreshRate, samples);
-            engine = new GLEngine(window, inputManager, guiManager);
+            engine = new GLEngine(window, inputManager, guiManager, assetProperties);
             game = app.initialize(engine);
             engine.run(game);
         } catch(Exception e) {
