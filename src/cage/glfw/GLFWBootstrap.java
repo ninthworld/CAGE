@@ -67,7 +67,7 @@ public class GLFWBootstrap {
         return this;
     }
 
-    public void run(IGLGameConstructor app) {
+    public void run(GLGameConstructor app) {
         GLFWWindow window = null;
         GLEngine engine = null;
         Game game = null;
@@ -88,7 +88,7 @@ public class GLFWBootstrap {
         }
     }
 
-    public interface IGLGameConstructor {
+    public interface GLGameConstructor {
         Game initialize(GLEngine engine);
     }
 }

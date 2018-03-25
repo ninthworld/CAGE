@@ -65,10 +65,11 @@ public class GLGraphicsDevice implements GraphicsDevice {
 
         this.defaultRasterizer = (GLRasterizer)createRasterizer();
         this.defaultFXRasterizer = (GLRasterizer)createRasterizer();
+        this.defaultFXRasterizer.setDepthClipping(false);
         this.defaultSampler = (GLSampler)createSampler();
         this.defaultBlender = (GLBlender)createBlender();
 
-        this.graphicsContext = new GLGraphicsContext(this.window);
+        this.graphicsContext = new GLGraphicsContext(this.window, this.defaultBlender);
         this.graphicsContext.bindRasterizer(this.defaultRasterizer);
     }
 

@@ -80,6 +80,7 @@ public abstract class RenderTarget<T extends Texture> implements Destroyable, Si
             removeDepthTexture();
         }
         this.depthTexture = texture;
+        texture.setSizableParent(this);
     }
 
     public void removeDepthTexture() {

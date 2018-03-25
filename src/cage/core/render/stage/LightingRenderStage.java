@@ -1,6 +1,8 @@
 package cage.core.render.stage;
 
 import cage.core.graphics.GraphicsContext;
+import cage.core.graphics.buffer.ShaderStorageBuffer;
+import cage.core.graphics.buffer.UniformBuffer;
 import cage.core.graphics.rasterizer.Rasterizer;
 import cage.core.graphics.rendertarget.RenderTarget;
 import cage.core.graphics.shader.Shader;
@@ -15,20 +17,29 @@ import java.util.Iterator;
 public class LightingRenderStage extends FXRenderStage {
 
     private SceneManager sceneManager;
+    private UniformBuffer cameraUniform;
+    private ShaderStorageBuffer lightShaderStorage;
 
-    public LightingRenderStage(Model fxModel, Shader shader, RenderTarget renderTarget, Rasterizer rasterizer, GraphicsContext graphicsContext) {
+    public LightingRenderStage(SceneManager sceneManager, Model fxModel, Shader shader, RenderTarget renderTarget, Rasterizer rasterizer, GraphicsContext graphicsContext) {
         super(fxModel, shader, renderTarget, rasterizer, graphicsContext);
-        this.sceneManager = null;
+        this.sceneManager = sceneManager;
     }
 
     @Override
     public void preRender() {
+        if(cameraUniform == null) {
+            cameraUniform = getShader().getUniformBuffer("Camera");
+        }
+        if(lightShaderStorage == null) {
+            lightShaderStorage = getShader().getShaderStorageBuffer("Light");
+        }
+
         if(getInputRenderStageCount() > 0 && getInputRenderStage(0) instanceof GeometryRenderStage) {
-            GeometryRenderStage renderStage = (GeometryRenderStage)getInputRenderStage(0);
-            getShader().addTexture("diffuseTexture", renderStage.getDiffuseTextureOutput());
-            getShader().addTexture("specularTexture", renderStage.getSpecularTextureOutput());
-            getShader().addTexture("normalTexture", renderStage.getNormalTextureOutput());
-            getShader().addTexture("depthTexture", renderStage.getDepthTextureOutput());
+            GeometryRenderStage geometryRenderStage = (GeometryRenderStage)getInputRenderStage(0);
+            getShader().addTexture("diffuseTexture", geometryRenderStage.getDiffuseTextureOutput());
+            getShader().addTexture("specularTexture", geometryRenderStage.getSpecularTextureOutput());
+            getShader().addTexture("normalTexture", geometryRenderStage.getNormalTextureOutput());
+            getShader().addTexture("depthTexture", geometryRenderStage.getDepthTextureOutput());
 
             int capacity =  sceneManager.getLightCount() * Light.READ_SIZE;
             FloatBuffer lightBuffer = BufferUtils.createFloatBuffer(capacity);
@@ -37,8 +48,13 @@ public class LightingRenderStage extends FXRenderStage {
                 lightBuffer.put(it.next().readData());
             }
             lightBuffer.flip();
-            getShader().getShaderStorageBuffer("Light").writeData(lightBuffer);
-            getShader().getUniformBuffer("Camera").writeData(renderStage.getCamera().readData());
+            lightShaderStorage.writeData(lightBuffer);
+            cameraUniform.writeData(geometryRenderStage.getCamera().readData());
+
+            if(getInputRenderStageCount() > 1 && getInputRenderStage(1) instanceof ShadowRenderStage) {
+                ShadowRenderStage shadowRenderStage = (ShadowRenderStage)getInputRenderStage(1);
+                getShader().addTexture("shadowTexture", shadowRenderStage.getDiffuseTextureOutput());
+            }
         }
     }
 

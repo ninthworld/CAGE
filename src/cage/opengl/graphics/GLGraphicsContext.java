@@ -34,14 +34,16 @@ public class GLGraphicsContext implements GraphicsContext {
     private int patchSize;
     private int boundFBOId;
     private int boundShaderId;
+    private Blender defaultBlender;
 
-    public GLGraphicsContext(GLFWWindow window) {
+    public GLGraphicsContext(GLFWWindow window, Blender blender) {
 		this.window = window;
 		this.primitive = GL_TRIANGLES;
 		this.patchSize = 1;
 		this.boundFBOId = 0;
 		this.boundShaderId = 0;
-        setClearColor(new Color(0, 0, 0, 255));
+		this.defaultBlender = blender; // Workaround for glDisable(GL_BLEND) not working
+        setClearColor(new Color(0, 0, 0, 0));
     }
 
 	@Override
@@ -247,9 +249,10 @@ public class GLGraphicsContext implements GraphicsContext {
 
 	@Override
 	public void unbindBlender(Blender blender) {
-        if(blender instanceof GLBlender) {
-            ((GLBlender) blender).unbind();
-        }
+//        if(blender instanceof GLBlender) {
+//            ((GLBlender) blender).unbind();
+//        }
+		bindBlender(defaultBlender); // Workaround
 	}
 
 	@Override

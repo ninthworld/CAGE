@@ -1,7 +1,5 @@
 #version 430 core
 
-#define MAX_LIGHTS 3
-
 in vec2 vs_texCoord;
 
 layout(location=0) out vec4 fs_color;
@@ -10,10 +8,12 @@ uniform sampler2D diffuseTexture;
 uniform sampler2D specularTexture;
 uniform sampler2D normalTexture;
 uniform sampler2D depthTexture;
+uniform sampler2D shadowTexture;
 
 #define AMBIENT_TYPE        0.0
 #define POINT_TYPE          1.0
 #define DIRECTIONAL_TYPE    2.0
+
 struct Light_t {
 	vec4 ambientColor;
     vec4 diffuseColor;
@@ -25,9 +25,6 @@ struct Light_t {
     float attQuadratic;
 };
 
-//layout(std140) uniform Light {
-//     Light_t light[MAX_LIGHTS];
-//};
 layout(std140) buffer Light {
     Light_t lights[];
 };
@@ -49,16 +46,19 @@ vec3 worldPosFromDepth(float depth) {
 }
 
 void main() {
-	vec3 diffuse = texture(diffuseTexture, vs_texCoord).rgb;
-	vec3 specular = texture(specularTexture, vs_texCoord).rgb;
-	float power = texture(specularTexture, vs_texCoord).a * 128.0;
-	vec3 normal = texture(normalTexture, vs_texCoord).rgb * 2.0 - 1.0;
 	float depth = texture(depthTexture, vs_texCoord).r;
-	vec3 position = worldPosFromDepth(depth);
-	vec3 camPosition = vec3(camera.viewMatrix * vec4(0.0, 0.0, 0.0, 1.0));
+    vec3 position = worldPosFromDepth(depth);
+    mat4 camView = inverse(camera.viewMatrix);
+    vec3 camPosition = vec3(camView[3]) / camView[3].w;
 
 	vec3 color = vec3(0.0, 0.0, 0.0);
 	if(depth < 1.0) {
+	    vec3 diffuse = texture(diffuseTexture, vs_texCoord).rgb;
+        vec3 specular = texture(specularTexture, vs_texCoord).rgb;
+        float power = texture(specularTexture, vs_texCoord).a * 128.0;
+        vec3 normal = texture(normalTexture, vs_texCoord).rgb * 2.0 - 1.0;
+
+	    // Material Lighting
 		for(int i = 0; i < lights.length(); ++i) {
 		    Light_t light = lights[i];
             if(light.type == AMBIENT_TYPE) {
@@ -87,7 +87,7 @@ void main() {
                 color += clamp(diffuse * light.diffuseColor.rgb * cosTheta * att, 0.0, 1.0);
 
                 // Specular
-                vec3 vertexToCam = normalize(camPosition - position);
+                vec3 vertexToCam = -normalize(camPosition - position);
                 vec3 lightReflect = normalize(reflect(relLightDir, normal));
                 float factor = dot(vertexToCam, lightReflect);
                 if(factor > 0.0) {
@@ -96,6 +96,9 @@ void main() {
                 }
             }
 		}
+
+        float shadow = 1.0 - texture(shadowTexture, vs_texCoord).r;
+        color *= clamp(shadow, 0.3, 1.0);
 	}
 	else {
 		color = atmosphere(

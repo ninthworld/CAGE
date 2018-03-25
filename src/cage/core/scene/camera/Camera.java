@@ -6,6 +6,7 @@ import cage.core.scene.Node;
 import cage.core.scene.SceneManager;
 import cage.core.scene.SceneNode;
 import org.joml.Matrix4f;
+import org.joml.Matrix4fc;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
 
@@ -38,18 +39,16 @@ public abstract class Camera extends SceneNode implements Readable {
         viewMatrix.translate(getWorldPosition().mul(-1.0f, new Vector3f()));
 
         buffer.clear();
-        buffer.position(16);
-        viewMatrix.get(buffer);
-        buffer.position(48);
-        viewMatrix.invert().get(buffer);
+        viewMatrix.get(16, buffer);
+        getViewMatrix().invert(new Matrix4f()).get(48, buffer);
         buffer.rewind();
     }
 
-    public Matrix4f getViewMatrix() {
+    public Matrix4fc getViewMatrix() {
         return viewMatrix;
     }
 
-    public abstract Matrix4f getProjectionMatrix();
+    public abstract Matrix4fc getProjectionMatrix();
 
     public float getZNear() {
         return zNear;
@@ -57,6 +56,7 @@ public abstract class Camera extends SceneNode implements Readable {
 
     public void setZNear(float zNear) {
         this.zNear = zNear;
+        notifyUpdate();
     }
 
     public float getZFar() {
@@ -65,6 +65,7 @@ public abstract class Camera extends SceneNode implements Readable {
 
     public void setZFar(float zFar) {
         this.zFar = zFar;
+        notifyUpdate();
     }
 
     @Override

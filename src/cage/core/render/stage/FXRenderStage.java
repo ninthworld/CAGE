@@ -23,7 +23,7 @@ public class FXRenderStage extends RenderStage {
         getGraphicsContext().clear();
         getGraphicsContext().bindVertexArray(fxModel.getVertexArray());
         getGraphicsContext().bindShader(getShader());
-        fxModel.getMeshIterator().forEachRemaining((Mesh mesh) -> getGraphicsContext().drawIndexed(mesh.getIndexBuffer()));
+        getGraphicsContext().drawIndexed(fxModel.getMesh(0).getIndexBuffer());
         getGraphicsContext().unbindShader(getShader());
         getGraphicsContext().unbindVertexArray(fxModel.getVertexArray());
     }

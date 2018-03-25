@@ -3,6 +3,7 @@ package cage.core.scene.camera;
 import cage.core.scene.Node;
 import cage.core.scene.SceneManager;
 import org.joml.Matrix4f;
+import org.joml.Matrix4fc;
 
 public class OrthographicCamera extends Camera {
 
@@ -29,13 +30,12 @@ public class OrthographicCamera extends Camera {
         projMatrix.ortho(left, right, bottom, top, getZNear(), getZFar());
 
         projMatrix.get(buffer);
-        buffer.position(32);
-        projMatrix.invert().get(buffer);
+        getProjectionMatrix().invert(new Matrix4f()).get(32, buffer);
         buffer.rewind();
     }
 
     @Override
-    public Matrix4f getProjectionMatrix() {
+    public Matrix4fc getProjectionMatrix() {
         return projMatrix;
     }
 
@@ -45,6 +45,7 @@ public class OrthographicCamera extends Camera {
 
     public void setLeft(float left) {
         this.left = left;
+        notifyUpdate();
     }
 
     public float getRight() {
@@ -53,6 +54,7 @@ public class OrthographicCamera extends Camera {
 
     public void setRight(float right) {
         this.right = right;
+        notifyUpdate();
     }
 
     public float getBottom() {
@@ -61,6 +63,7 @@ public class OrthographicCamera extends Camera {
 
     public void setBottom(float bottom) {
         this.bottom = bottom;
+        notifyUpdate();
     }
 
     public float getTop() {
@@ -69,5 +72,6 @@ public class OrthographicCamera extends Camera {
 
     public void setTop(float top) {
         this.top = top;
+        notifyUpdate();
     }
 }

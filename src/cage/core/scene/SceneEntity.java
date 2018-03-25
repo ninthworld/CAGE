@@ -13,11 +13,13 @@ public class SceneEntity extends SceneNode implements Readable {
     public static final int READ_SIZE = READ_LAYOUT.getUnitSize() / 4;
 
     private Model model;
+    private boolean castShadow;
     protected FloatBuffer buffer;
 
     public SceneEntity(SceneManager sceneManager, Node parent, Model model) {
         super(sceneManager, parent);
         this.model = model;
+        this.castShadow = true;
         this.buffer = BufferUtils.createFloatBuffer(READ_SIZE);
     }
 
@@ -35,6 +37,14 @@ public class SceneEntity extends SceneNode implements Readable {
 
     public void setModel(Model model) {
         this.model = model;
+    }
+
+    public boolean isCastShadow() {
+        return castShadow;
+    }
+
+    public void setCastShadow(boolean castShadow) {
+        this.castShadow = castShadow;
     }
 
     @Override

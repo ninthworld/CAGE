@@ -44,9 +44,11 @@ public class GLEngine extends Engine {
 
             game.update(this, deltaTime);
             getSceneManager().update(deltaTime);
+
             game.render(this);
             getRenderManager().render();
             getGUIManager().render();
+
             getGraphicsContext().swapBuffers();
 
             getWindow().update();

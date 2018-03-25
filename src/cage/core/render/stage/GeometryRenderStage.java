@@ -23,10 +23,10 @@ public class GeometryRenderStage extends RenderStage {
     private Camera camera;
     private SceneNode node;
 
-    public GeometryRenderStage(Shader shader, RenderTarget renderTarget, Rasterizer rasterizer, GraphicsContext graphicsContext) {
+    public GeometryRenderStage(Camera camera, SceneNode node, Shader shader, RenderTarget renderTarget, Rasterizer rasterizer, GraphicsContext graphicsContext) {
         super(shader, renderTarget, rasterizer, graphicsContext);
-        this.node = null;
-        this.camera = null;
+        this.camera = camera;
+        this.node = node;
     }
 
     @Override
@@ -34,11 +34,9 @@ public class GeometryRenderStage extends RenderStage {
         if(cameraUniform == null) {
             cameraUniform = getShader().getUniformBuffer("Camera");
         }
-
         if(entityUniform == null) {
             entityUniform = getShader().getUniformBuffer("Entity");
         }
-
         if(materialUniform == null) {
             materialUniform = getShader().getUniformBuffer("Material");
         }

@@ -6,6 +6,7 @@ import cage.core.common.listener.ResizeListener;
 import cage.core.scene.Node;
 import cage.core.scene.SceneManager;
 import org.joml.Matrix4f;
+import org.joml.Matrix4fc;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -40,6 +41,7 @@ public class PerspectiveCamera extends Camera implements Sizable {
 
     public void setFOV(float fov) {
         this.fov = fov;
+        notifyUpdate();
     }
 
     @Override
@@ -50,13 +52,12 @@ public class PerspectiveCamera extends Camera implements Sizable {
         projMatrix.perspective(fov, (float)width / (float)height, getZNear(), getZFar());
 
         projMatrix.get(buffer);
-        buffer.position(32);
-        projMatrix.invert().get(buffer);
+        getProjectionMatrix().invert(new Matrix4f()).get(32, buffer);
         buffer.rewind();
     }
 
     @Override
-    public Matrix4f getProjectionMatrix() {
+    public Matrix4fc getProjectionMatrix() {
         return projMatrix;
     }
 
@@ -79,6 +80,7 @@ public class PerspectiveCamera extends Camera implements Sizable {
 
     @Override
     public void notifyResize() {
+        notifyUpdate();
         for(Listener listener : listeners) {
             if(listener instanceof ResizeListener) {
                 ((ResizeListener) listener).onResize(width, height);

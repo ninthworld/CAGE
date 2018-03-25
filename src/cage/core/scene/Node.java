@@ -101,7 +101,7 @@ public abstract class Node implements Destroyable {
         return localPosition;
     }
 
-    public void setLocalPosition(Vector3f position) {
+    public void setLocalPosition(Vector3fc position) {
         localPosition.set(position);
         notifyUpdate();
     }
@@ -123,7 +123,7 @@ public abstract class Node implements Destroyable {
         return localScale;
     }
 
-    public void setLocalScale(Vector3f scale) {
+    public void setLocalScale(Vector3fc scale) {
         localScale.set(scale);
         notifyUpdate();
     }
@@ -214,7 +214,7 @@ public abstract class Node implements Destroyable {
         notifyUpdate();
     }
 
-    public void scale(Vector3f mul) {
+    public void scale(Vector3fc mul) {
         localScale.mul(mul);
         notifyUpdate();
     }
@@ -240,11 +240,11 @@ public abstract class Node implements Destroyable {
     }
 
     public void lookAt(Vector3fc target, Vector3fc up) {
-        localRotation.lookAlong(target.sub(localPosition, new Vector3f()), up);
+        localRotation.setLookAlong(target, up);
         notifyUpdate();
     }
 
-    public void lookAt(Vector3f target) {
+    public void lookAt(Vector3fc target) {
         lookAt(target, UP);
     }
 

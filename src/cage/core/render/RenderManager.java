@@ -2,6 +2,9 @@ package cage.core.render;
 
 import cage.core.common.listener.ResizeListener;
 import cage.core.graphics.GraphicsDevice;
+import cage.core.graphics.blender.Blender;
+import cage.core.graphics.type.BlendOpType;
+import cage.core.graphics.type.BlendType;
 import cage.core.window.Window;
 import cage.core.asset.AssetManager;
 import cage.core.graphics.*;
@@ -40,15 +43,19 @@ public class RenderManager {
     private SceneManager sceneManager;
     private AssetManager assetManager;
     private List<RenderStage> outputStages;
+    private Model defaultFXModel;
+
     private GeometryRenderStage defaultGeometryRenderStage;
+    private ShadowRenderStage defaultShadowRenderStage;
     private LightingRenderStage defaultLightingRenderStage;
     private FXAARenderStage defaultFXAARenderStage;
+
     private UniformBuffer defaultWindowUniformBuffer;
     private UniformBuffer defaultCameraUniformBuffer;
     private UniformBuffer defaultEntityUniformBuffer;
     private UniformBuffer defaultMaterialUniformBuffer;
     private ShaderStorageBuffer defaultLightShaderStorageBuffer;
-    private Model defaultFXModel;
+    private UniformBuffer defaultShadowUniformBuffer;
 
     public RenderManager(GraphicsDevice graphicsDevice, GraphicsContext graphicsContext, Window window, SceneManager sceneManager, AssetManager assetManager) {
         this.outputStages = new ArrayList<>();
@@ -57,6 +64,7 @@ public class RenderManager {
         this.window = window;
         this.sceneManager = sceneManager;
         this.assetManager = assetManager;
+        this.defaultFXModel = createDefaultFXModel();
 
         defaultWindowUniformBuffer = graphicsDevice.createUniformBuffer();
         defaultWindowUniformBuffer.setLayout(Window.READ_LAYOUT);
@@ -75,19 +83,38 @@ public class RenderManager {
         defaultLightShaderStorageBuffer = graphicsDevice.createShaderStorageBuffer();
         defaultLightShaderStorageBuffer.setLayout(Light.READ_LAYOUT);
 
-        defaultFXModel = createDefaultFXModel();
+        defaultShadowUniformBuffer = graphicsDevice.createUniformBuffer();
+        defaultShadowUniformBuffer.setLayout(new LayoutConfig().mat4().mat4().mat4().mat4());
+
+        assetManager.getDefaultGeometryShader().addUniformBuffer("Camera", defaultCameraUniformBuffer);
+        assetManager.getDefaultGeometryShader().addUniformBuffer("Entity", defaultEntityUniformBuffer);
+        assetManager.getDefaultGeometryShader().addUniformBuffer("Material", defaultMaterialUniformBuffer);
+
+        UniformBuffer simpleCameraUniform = graphicsDevice.createUniformBuffer();
+        simpleCameraUniform.setLayout(Camera.READ_LAYOUT);
+        assetManager.getDefaultSimpleGeometryShader().addUniformBuffer("Camera", simpleCameraUniform);
+        assetManager.getDefaultSimpleGeometryShader().addUniformBuffer("Entity", defaultEntityUniformBuffer);
+
+        assetManager.getDefaultLightingShader().addUniformBuffer("Camera", defaultCameraUniformBuffer);
+        assetManager.getDefaultLightingShader().addShaderStorageBuffer("Light", defaultLightShaderStorageBuffer);
+
+        assetManager.getDefaultShadowShader().addUniformBuffer("Camera", defaultCameraUniformBuffer);
+        assetManager.getDefaultShadowShader().addUniformBuffer("Shadow", defaultShadowUniformBuffer);
+
+        assetManager.getDefaultFXAAShader().addUniformBuffer("Window", defaultWindowUniformBuffer);
 
         defaultGeometryRenderStage = createGeometryRenderStage(sceneManager.getDefaultCamera());
+
+        defaultShadowRenderStage = createShadowRenderStage();
+        defaultShadowRenderStage.addInputRenderStage(defaultGeometryRenderStage);
+
         defaultLightingRenderStage = createLightingRenderStage();
         defaultLightingRenderStage.addInputRenderStage(defaultGeometryRenderStage);
+        defaultLightingRenderStage.addInputRenderStage(defaultShadowRenderStage);
 
-        defaultFXAARenderStage = (FXAARenderStage)createFXRenderStage(FXAARenderStage::new);
-        {
-            Shader shader = assetManager.getDefaultFXAAShader();
-            shader.addUniformBuffer("Window", getDefaultWindowUniformBuffer());
-            defaultFXAARenderStage.setShader(shader);
-            defaultFXAARenderStage.addInputRenderStage(defaultLightingRenderStage);
-        }
+        defaultFXAARenderStage = createFXAARenderStage();
+        defaultFXAARenderStage.addInputRenderStage(defaultLightingRenderStage);
+
         addOutputRenderStage(defaultFXAARenderStage);
     }
 
@@ -99,14 +126,14 @@ public class RenderManager {
         outputStages.forEach(RenderStage::postRender);
     }
 
-    public RenderStage createRenderStage(IRenderStageConstructor stage) {
+    public RenderStage createRenderStage(RenderStageConstructor stage) {
         RenderTarget renderTarget = graphicsDevice.createRenderTarget2D();
     	RenderStage renderStage = stage.init(null, renderTarget, graphicsDevice.getDefaultRasterizer(), graphicsContext);
     	renderStage.setSizableParent(window);
     	return renderStage;
     }
 
-    public FXRenderStage createFXRenderStage(IFXRenderStageConstructor stage) {
+    public FXRenderStage createFXRenderStage(FXRenderStageConstructor stage) {
         RenderTarget renderTarget = graphicsDevice.createRenderTarget2D();
         FXRenderStage renderStage = stage.init(defaultFXModel, null, renderTarget, graphicsDevice.getDefaultFXRasterizer(), graphicsContext);
         renderStage.setSizableParent(window);
@@ -114,37 +141,52 @@ public class RenderManager {
     }
 
     public GeometryRenderStage createGeometryRenderStage(Camera camera) {
-        GeometryRenderStage renderStage = (GeometryRenderStage)createRenderStage(GeometryRenderStage::new);
-        Shader shader = assetManager.getDefaultGeometryShader();
-        shader.addUniformBuffer("Camera", defaultCameraUniformBuffer);
-        shader.addUniformBuffer("Entity", defaultEntityUniformBuffer);
-        shader.addUniformBuffer("Material", defaultMaterialUniformBuffer);
-        renderStage.getRenderTarget().addColorTexture(1,
-                graphicsDevice.createTexture2D(renderStage.getRenderTarget().getWidth(), renderStage.getRenderTarget().getHeight()));
-        renderStage.getRenderTarget().addColorTexture(2,
-                graphicsDevice.createTexture2D(renderStage.getRenderTarget().getWidth(), renderStage.getRenderTarget().getHeight()));
-        renderStage.setShader(shader);
-        renderStage.setSceneNode(sceneManager.getRootSceneNode());
-        renderStage.setCamera(camera);
-        return renderStage;
+        return (GeometryRenderStage)createRenderStage((shader, renderTarget, rasterizer, graphicsContext) -> {
+            renderTarget.addColorTexture(1, graphicsDevice.createTexture2D(renderTarget.getWidth(), renderTarget.getHeight()));
+            renderTarget.addColorTexture(2, graphicsDevice.createTexture2D(renderTarget.getWidth(), renderTarget.getHeight()));
+            return new GeometryRenderStage(camera, sceneManager.getRootSceneNode(), assetManager.getDefaultGeometryShader(), renderTarget, rasterizer, graphicsContext);
+        });
+    }
+
+    public ShadowRenderStage createShadowRenderStage() {
+        return (ShadowRenderStage)createRenderStage((shader, renderTarget, rasterizer, graphicsContext) -> {
+            RenderTarget[] shadowRenderTargets = new RenderTarget[4];
+            for(int i=0; i<shadowRenderTargets.length; ++i) {
+                shadowRenderTargets[i] = graphicsDevice.createRenderTarget2D(ShadowRenderStage.SHADOW_RESOLUTION, ShadowRenderStage.SHADOW_RESOLUTION);
+            }
+            return new ShadowRenderStage(
+                    sceneManager, defaultFXModel,
+                    assetManager.getDefaultSimpleGeometryShader(), assetManager.getDefaultShadowShader(),
+                    shadowRenderTargets, renderTarget,
+                    rasterizer, graphicsDevice.getDefaultFXRasterizer(),
+                    graphicsDevice.getDefaultBlender(), graphicsContext);
+        });
     }
 
     public LightingRenderStage createLightingRenderStage() {
-        LightingRenderStage renderStage = (LightingRenderStage)createFXRenderStage(LightingRenderStage::new);
-        Shader shader = assetManager.getDefaultLightingShader();
-        assetManager.getDefaultLightingShader().addUniformBuffer("Camera", defaultCameraUniformBuffer);
-        assetManager.getDefaultLightingShader().addShaderStorageBuffer("Light", defaultLightShaderStorageBuffer);
-        renderStage.setShader(shader);
-        renderStage.setSceneManager(sceneManager);
-        return renderStage;
+        return (LightingRenderStage)createFXRenderStage((fxModel, shader, renderTarget, rasterizer, graphicsContext) ->
+                new LightingRenderStage(sceneManager, fxModel, assetManager.getDefaultLightingShader(), renderTarget, rasterizer, graphicsContext));
+    }
+
+    public FXAARenderStage createFXAARenderStage() {
+        return (FXAARenderStage)createFXRenderStage((fxModel, shader, renderTarget, rasterizer, graphicsContext) ->
+                new FXAARenderStage(fxModel, assetManager.getDefaultFXAAShader(), renderTarget, rasterizer, graphicsContext));
     }
 
     public GeometryRenderStage getDefaultGeometryRenderStage() {
         return defaultGeometryRenderStage;
     }
 
+    public ShadowRenderStage getDefaultShadowRenderStage() {
+        return defaultShadowRenderStage;
+    }
+
     public LightingRenderStage getDefaultLightingRenderStage() {
         return defaultLightingRenderStage;
+    }
+
+    public FXAARenderStage getDefaultFXAARenderStage() {
+        return defaultFXAARenderStage;
     }
 
     public UniformBuffer getDefaultWindowUniformBuffer() {
@@ -165,6 +207,10 @@ public class RenderManager {
 
     public ShaderStorageBuffer getDefaultLightShaderStorageBuffer() {
         return defaultLightShaderStorageBuffer;
+    }
+
+    public UniformBuffer getDefaultShadowUniformBuffer() {
+        return defaultShadowUniformBuffer;
     }
 
     public Model getDefaultFXModel() {
@@ -233,11 +279,11 @@ public class RenderManager {
         return quadModel;
     }
     
-    public interface IRenderStageConstructor {
+    public interface RenderStageConstructor {
         RenderStage init(Shader shader, RenderTarget renderTarget, Rasterizer rasterizer, GraphicsContext graphicsContext);
     }
     
-    public interface IFXRenderStageConstructor {
+    public interface FXRenderStageConstructor {
         FXRenderStage init(Model fxModel, Shader shader, RenderTarget renderTarget, Rasterizer rasterizer, GraphicsContext graphicsContext);
     }
 }

@@ -48,7 +48,9 @@ public class AssetManager {
     private Map<String, GUIFont> fonts;
     private Map<String, GUIImage> images;
     private Shader defaultGeometryShader;
+    private Shader defaultSimpleGeometryShader;
     private Shader defaultLightingShader;
+    private Shader defaultShadowShader;
     private Shader defaultFXAAShader;
     private GUIFont defaultFont;
 
@@ -64,15 +66,20 @@ public class AssetManager {
 
         this.assetProperties.setDefault("assets.shaders.default.geometry.vertex", "geometry/material.vs.glsl");
         this.assetProperties.setDefault("assets.shaders.default.geometry.fragment", "geometry/material.fs.glsl");
+        this.assetProperties.setDefault("assets.shaders.default.geometry.simple.vertex", "geometry/simple.vs.glsl");
+        this.assetProperties.setDefault("assets.shaders.default.geometry.simple.fragment", "geometry/simple.fs.glsl");
         this.assetProperties.setDefault("assets.shaders.default.fx.vertex", "fx/fx.vs.glsl");
-        this.assetProperties.setDefault("assets.shaders.default.lighting.fragment", "fx/lighting.fs.glsl");
-        this.assetProperties.setDefault("assets.shaders.default.fxaa.fragment", "fx/fxaa.fs.glsl");
+        this.assetProperties.setDefault("assets.shaders.default.fx.lighting.fragment", "fx/lighting.fs.glsl");
+        this.assetProperties.setDefault("assets.shaders.default.fx.shadow.fragment", "fx/shadow.fs.glsl");
+        this.assetProperties.setDefault("assets.shaders.default.fx.fxaa.fragment", "fx/fxaa.fs.glsl");
         this.assetProperties.setDefault("assets.fonts.default", "arial.ttf");
         this.assetProperties.setDefault("assets.fonts.default.name", "Arial");
 
         this.defaultGeometryShader = loadShader("default.geometry");
-        this.defaultLightingShader = loadShader("default.fx", "default.lighting");
-        this.defaultFXAAShader = loadShader("default.fx", "default.fxaa");
+        this.defaultSimpleGeometryShader = loadShader("default.geometry.simple");
+        this.defaultLightingShader = loadShader("default.fx", "default.fx.lighting");
+        this.defaultShadowShader = loadShader("default.fx", "default.fx.shadow");
+        this.defaultFXAAShader = loadShader("default.fx", "default.fx.fxaa");
     }
 
     public void initialize() {
@@ -83,8 +90,16 @@ public class AssetManager {
         return defaultGeometryShader;
     }
 
+    public Shader getDefaultSimpleGeometryShader() {
+        return defaultSimpleGeometryShader;
+    }
+
     public Shader getDefaultLightingShader() {
         return defaultLightingShader;
+    }
+
+    public Shader getDefaultShadowShader() {
+        return defaultShadowShader;
     }
 
     public Shader getDefaultFXAAShader() {
