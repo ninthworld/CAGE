@@ -1,5 +1,8 @@
 #version 430 core
 
+#define PI 3.141592
+#define MAX_SOURCES     100.0
+
 in vec2 vs_texCoord;
 
 layout(location=0) out vec4 fs_color;
@@ -9,20 +12,24 @@ uniform sampler2D specularTexture;
 uniform sampler2D normalTexture;
 uniform sampler2D depthTexture;
 uniform sampler2D shadowTexture;
+uniform sampler2D skydomeTexture;
+uniform samplerCube skyboxTexture;
 
 #define AMBIENT_TYPE        0.0
 #define POINT_TYPE          1.0
 #define DIRECTIONAL_TYPE    2.0
 
+#define ATT_LINEAR          1.0
+#define ATT_QUADRATIC       2.0
+
 struct Light_t {
-	vec4 ambientColor;
     vec4 diffuseColor;
     vec4 specularColor;
     vec4 worldPosition;
     float type;
     float range;
-    float attLinear;
-    float attQuadratic;
+    float attenuation;
+    float castShadow;
 };
 
 layout(std140) buffer Light {
@@ -36,7 +43,15 @@ layout(std140) uniform Camera {
     mat4 invViewMatrix;
 } camera;
 
-#define SUN_POS vec3(0.0, 1.0, 0.0)
+layout(std140) uniform Skybox {
+    vec4 skyColor;
+    vec4 sunPosition;
+    float useSkybox;
+    float useSkydome;
+    float useAtmosphere;
+    float _padding;
+} skybox;
+
 vec3 atmosphere(vec3 r, vec3 r0, vec3 pSun, float iSun, float rPlanet, float rAtmos, vec3 kRlh, float kMie, float shRlh, float shMie, float g);
 
 vec3 worldPosFromDepth(float depth) {
@@ -59,13 +74,15 @@ void main() {
         vec3 normal = texture(normalTexture, vs_texCoord).rgb * 2.0 - 1.0;
 
 	    // Material Lighting
+	    float numShadows = 0.0;
 		for(int i = 0; i < lights.length(); ++i) {
 		    Light_t light = lights[i];
             if(light.type == AMBIENT_TYPE) {
                 // Ambient
-                color += diffuse * light.ambientColor.rgb;
+                color += diffuse * light.diffuseColor.rgb;
             }
             else {
+                numShadows += light.castShadow;
                 vec3 relLightDir = vec3(0.0, 0.0, 0.0);
                 if(light.type == POINT_TYPE) {
                     relLightDir = -normalize(position - light.worldPosition.xyz);
@@ -78,9 +95,9 @@ void main() {
                 float dist = distance(light.worldPosition.xyz, position);
                 float cosTheta = dot(normal, relLightDir);
                 float att = 1.0;
-                if(light.range > 0.0 && (light.attLinear > 0.0 || light.attQuadratic > 0.0)) {
+                if(light.range > 0.0 && light.attenuation >= ATT_LINEAR) {
                     att = clamp(1.0 - dist/light.range, 0.0, 1.0);
-                    if(light.attQuadratic > 0.0) {
+                    if(light.attenuation == ATT_QUADRATIC) {
                         att *= att;
                     }
                 }
@@ -96,18 +113,33 @@ void main() {
                 }
             }
 		}
-
-        float shadow = 1.0 - texture(shadowTexture, vs_texCoord).r;
-        color *= clamp(shadow, 0.3, 1.0);
+		if(numShadows > 0.0) {
+            float shadow = (texture(shadowTexture, vs_texCoord).r / numShadows) * MAX_SOURCES;
+            color *= clamp(shadow, 0.3, 1.0);
+        }
 	}
 	else {
-		color = atmosphere(
-		    -normalize(camPosition - position),
-            vec3(0, 6372e3, 0),
-            SUN_POS, 22.0,
-            6371e3, 6471e3,
-            vec3(5.5e-6, 13.0e-6, 22.4e-6),
-            21e-6, 8e3, 1.2e3, 0.758);
+	    vec3 direction = -normalize(camPosition - position);
+	    if(skybox.useSkybox > 0.0) {
+	        color = textureCube(skyboxTexture, direction).rgb;
+	    }
+	    else if(skybox.useSkydome > 0.0) {
+            float angle = atan(direction.z, direction.x);
+            vec2 uv = vec2((angle + PI) / (2.0 * PI), 1.0 - direction.y);
+            color = texture(skydomeTexture, uv).rgb;
+	    }
+	    else if(skybox.useAtmosphere > 0.0) {
+            color = atmosphere(
+                direction,
+                vec3(0, 6372e3, 0),
+                -skybox.sunPosition.xyz, 22.0,
+                6371e3, 6471e3,
+                vec3(5.5e-6, 13.0e-6, 22.4e-6),
+                21e-6, 8e3, 1.2e3, 0.758);
+        }
+        else {
+            color = skybox.skyColor.rgb;
+        }
 	}
 
 	fs_color = vec4(color, 1.0);
@@ -118,7 +150,6 @@ void main() {
  * Licensed under The Unlicense
  */
 
-#define PI 3.141592
 #define iSteps 16
 #define jSteps 8
 

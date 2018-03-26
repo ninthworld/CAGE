@@ -1,10 +1,11 @@
 #version 430 core
 
+#define MAX_SOURCES     100.0
 #define MAX_SHADOWS     4
-#define SHADOW_DIST0   8.0
-#define SHADOW_DIST1   16.0
-#define SHADOW_DIST2   32.0
-#define SHADOW_DIST3   128.0
+#define SHADOW_DIST0    8.0
+#define SHADOW_DIST1    16.0
+#define SHADOW_DIST2    32.0
+#define SHADOW_DIST3    128.0
 
 in vec2 vs_texCoord;
 
@@ -87,39 +88,12 @@ void main() {
                 }
             }
         }
-
-        fs_color = shadowColor * (visibility / 9.0);
-        return;
-
-//	    if(camDistance < SHADOW_DIST0) {
-//            vec4 shadowCoord = biasMatrix * shadow.viewProjMatrix[0] * vec4(position, 1.0);
-//            if(texture(shadowTexture[0], shadowCoord.xy).r < shadowCoord.z - 0.005) {
-//                fs_color = shadowColor;
-//                return;
-//            }
-//	    }
-//	    else if(camDistance < SHADOW_DIST1) {
-//             vec4 shadowCoord = biasMatrix * shadow.viewProjMatrix[1] * vec4(position, 1.0);
-//             if(texture(shadowTexture[1], shadowCoord.xy).r < shadowCoord.z - 0.005) {
-//                 fs_color = shadowColor;
-//                 return;
-//             }
-//        }
-//        else if(camDistance < SHADOW_DIST2) {
-//             vec4 shadowCoord = biasMatrix * shadow.viewProjMatrix[2] * vec4(position, 1.0);
-//             if(texture(shadowTexture[2], shadowCoord.xy).r < shadowCoord.z - 0.005) {
-//                 fs_color = shadowColor;
-//                 return;
-//             }
-//        }
-//        else if(camDistance < SHADOW_DIST3) {
-//             vec4 shadowCoord = biasMatrix * shadow.viewProjMatrix[3] * vec4(position, 1.0);
-//             if(texture(shadowTexture[3], shadowCoord.xy).r < shadowCoord.z - 0.005) {
-//                 fs_color = shadowColor;
-//                 return;
-//             }
-//        }
+        visibility = 1.0 - (visibility / 9.0);
+        fs_color = vec4(visibility, visibility, visibility, 1.0);
+	}
+	else {
+	    fs_color = vec4(1.0, 1.0, 1.0, 1.0);
 	}
 
-	fs_color = vec4(0.0, 0.0, 0.0, 0.0);
+	fs_color /= MAX_SOURCES;
 }

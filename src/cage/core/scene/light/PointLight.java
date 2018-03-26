@@ -20,10 +20,9 @@ public class PointLight extends Light {
     @Override
     protected void updateNode() {
         super.updateNode();
-        buffer.put(16, 1.0f);
-        buffer.put(17, range);
-        buffer.put(18, (attenuationType == AttenuationType.LINEAR ? 1.0f : 0.0f));
-        buffer.put(19, (attenuationType == AttenuationType.QUADRATIC ? 1.0f : 0.0f));
+        buffer.put(12, 1.0f);
+        buffer.put(13, range);
+        buffer.put(14, (attenuationType == AttenuationType.LINEAR ? 1.0f : (attenuationType == AttenuationType.QUADRATIC ? 1.0f : 0.0f)));
         buffer.rewind();
     }
 

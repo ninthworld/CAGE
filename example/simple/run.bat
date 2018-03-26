@@ -1,0 +1,1 @@
+java -cp .;CAGE.jar test.MyGame

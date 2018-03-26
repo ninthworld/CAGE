@@ -15,4 +15,4 @@ Ni 1.000000
 d 1.000000
 # texture
 map_Kd tiles/tiles_color.jpg
-map_Ks tiles/tiles_rough.jpg
+map_Ks tiles/tiles_spec.jpg

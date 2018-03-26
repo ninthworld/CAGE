@@ -208,6 +208,14 @@ public class AssetManager {
                     }
                 }
 
+                IntBuffer indices = BufferUtils.createIntBuffer(builder.faces.size() * 3);
+                for (Face face : builder.faces) {
+                    for (FaceVertex vertex : face.vertices) {
+                        indices.put(indexMap.get(vertex));
+                    }
+                }
+                indices.flip();
+
                 FloatBuffer vertices = BufferUtils.createFloatBuffer(index * 3 * 2 * 3 * 3);
                 for (int i = 0; i < faceVertices.size(); ++i) {
                     FaceVertex vertex = faceVertices.get(i);
@@ -228,14 +236,6 @@ public class AssetManager {
                     vertices.put(tangent.x).put(tangent.y).put(tangent.z);
                 }
                 vertices.flip();
-
-                IntBuffer indices = BufferUtils.createIntBuffer(builder.faces.size() * 3);
-                for (Face face : builder.faces) {
-                    for (FaceVertex vertex : face.vertices) {
-                        indices.put(indexMap.get(vertex));
-                    }
-                }
-                indices.flip();
 
                 VertexBuffer vertexBuffer = graphicsDevice.createVertexBuffer();
                 vertexBuffer.setLayout(new LayoutConfig().float3().float2().float3().float3());

@@ -1,0 +1,1 @@
+javac -cp .;CAGE.jar test/*.java

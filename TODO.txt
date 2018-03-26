@@ -1,13 +1,12 @@
-* GUI implementation
+* Add Cascaded Shadow Mapping (Partially complete)
+* Add SSAO
 * More window properties like icon
 * 16bit Texture loading
-* AssetLoader read config file for paths
 * Add geometry, tess eval/ctrl shaders
 * Add terrain
 * Add skybox/dome (geometry based and/or shader based, w/ or w/o texture cubemap)
 * Update readme
 * Javadocs
-* Get programs to work from bat
 * Examples
 * FPCamera, OrbitCamera
 * Server/Client architecture

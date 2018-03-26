@@ -1,6 +1,7 @@
 package cage.core.scene;
 
 import cage.core.common.Destroyable;
+import cage.core.utils.math.Direction;
 import org.joml.*;
 
 import java.util.ArrayList;
@@ -8,10 +9,6 @@ import java.util.Iterator;
 import java.util.List;
 
 public abstract class Node implements Destroyable {
-
-    public static final Vector3fc FORWARD = new Vector3f(0.0f, 0.0f, 1.0f);
-    public static final Vector3fc RIGHT = new Vector3f(-1.0f, 0.0f, 0.0f);
-    public static final Vector3fc UP = new Vector3f(0.0f, 1.0f, 0.0f);
 
     private Vector3f worldPosition;
     private Vector3f worldScale;
@@ -228,15 +225,19 @@ public abstract class Node implements Destroyable {
     }
 
     public void pitch(float angle) {
-        rotate(angle, RIGHT);
+        rotate(angle, Direction.RIGHT);
     }
 
     public void yaw(float angle) {
-        rotate(angle, UP);
+        rotate(angle, Direction.UP);
+    }
+
+    public void yawGlobal(float angle) {
+        rotate(angle, getLocalUp());
     }
 
     public void roll(float angle) {
-        rotate(angle, FORWARD);
+        rotate(angle, Direction.FORWARD);
     }
 
     public void lookAt(Vector3fc target, Vector3fc up) {
@@ -245,11 +246,11 @@ public abstract class Node implements Destroyable {
     }
 
     public void lookAt(Vector3fc target) {
-        lookAt(target, UP);
+        lookAt(target, Direction.UP);
     }
 
     public void lookAt(float x, float y, float z) {
-        lookAt(new Vector3f(x, y, z), UP);
+        lookAt(new Vector3f(x, y, z), Direction.UP);
     }
 
     public void notifyUpdate() {

@@ -37,6 +37,12 @@ import java.util.List;
 
 public class RenderManager {
 
+    public static final LayoutConfig SHADOW_READ_LAYOUT = new LayoutConfig().mat4().mat4().mat4().mat4();
+    public static final int SHADOW_READ_SIZE = SHADOW_READ_LAYOUT.getUnitSize() / 4;
+
+    public static final LayoutConfig SKYBOX_READ_LAYOUT = new LayoutConfig().float4().float4().float1().float1().float2();
+    public static final int SKYBOX_READ_SIZE = SKYBOX_READ_LAYOUT.getUnitSize() / 4;
+
     private GraphicsDevice graphicsDevice;
     private GraphicsContext graphicsContext;
     private Window window;
@@ -56,6 +62,7 @@ public class RenderManager {
     private UniformBuffer defaultMaterialUniformBuffer;
     private ShaderStorageBuffer defaultLightShaderStorageBuffer;
     private UniformBuffer defaultShadowUniformBuffer;
+    private UniformBuffer defaultSkyboxUniformBuffer;
 
     public RenderManager(GraphicsDevice graphicsDevice, GraphicsContext graphicsContext, Window window, SceneManager sceneManager, AssetManager assetManager) {
         this.outputStages = new ArrayList<>();
@@ -84,7 +91,10 @@ public class RenderManager {
         defaultLightShaderStorageBuffer.setLayout(Light.READ_LAYOUT);
 
         defaultShadowUniformBuffer = graphicsDevice.createUniformBuffer();
-        defaultShadowUniformBuffer.setLayout(new LayoutConfig().mat4().mat4().mat4().mat4());
+        defaultShadowUniformBuffer.setLayout(SHADOW_READ_LAYOUT);
+
+        defaultSkyboxUniformBuffer = graphicsDevice.createUniformBuffer();
+        defaultSkyboxUniformBuffer.setLayout(SKYBOX_READ_LAYOUT);
 
         assetManager.getDefaultGeometryShader().addUniformBuffer("Camera", defaultCameraUniformBuffer);
         assetManager.getDefaultGeometryShader().addUniformBuffer("Entity", defaultEntityUniformBuffer);
@@ -95,6 +105,7 @@ public class RenderManager {
         assetManager.getDefaultSimpleGeometryShader().addUniformBuffer("Camera", simpleCameraUniform);
         assetManager.getDefaultSimpleGeometryShader().addUniformBuffer("Entity", defaultEntityUniformBuffer);
 
+        assetManager.getDefaultLightingShader().addUniformBuffer("Skybox", defaultSkyboxUniformBuffer);
         assetManager.getDefaultLightingShader().addUniformBuffer("Camera", defaultCameraUniformBuffer);
         assetManager.getDefaultLightingShader().addShaderStorageBuffer("Light", defaultLightShaderStorageBuffer);
 
