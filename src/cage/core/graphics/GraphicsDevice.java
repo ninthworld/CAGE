@@ -56,4 +56,5 @@ public interface GraphicsDevice extends Destroyable {
     Rasterizer getDefaultFXRasterizer();
     Sampler getDefaultSampler();
     Blender getDefaultBlender();
+    TextureCubeMap getDefaultTextureCubeMap(); // Necessary hack for lighting shader
 }

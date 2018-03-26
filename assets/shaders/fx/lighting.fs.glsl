@@ -1,4 +1,5 @@
 #version 430 core
+#extension GL_NV_shadow_samplers_cube : enable
 
 #define PI 3.141592
 #define MAX_SOURCES     100.0
@@ -12,6 +13,7 @@ uniform sampler2D specularTexture;
 uniform sampler2D normalTexture;
 uniform sampler2D depthTexture;
 uniform sampler2D shadowTexture;
+uniform sampler2D ssaoTexture;
 uniform sampler2D skydomeTexture;
 uniform samplerCube skyboxTexture;
 
@@ -117,6 +119,9 @@ void main() {
             float shadow = (texture(shadowTexture, vs_texCoord).r / numShadows) * MAX_SOURCES;
             color *= clamp(shadow, 0.3, 1.0);
         }
+
+        // TODO: Get SSAO working
+        // color *= texture(ssaoTexture, vs_texCoord).r;
 	}
 	else {
 	    vec3 direction = -normalize(camPosition - position);

@@ -50,6 +50,7 @@ public class GLGraphicsDevice implements GraphicsDevice {
     private GLRasterizer defaultFXRasterizer;
     private GLSampler defaultSampler;
     private GLBlender defaultBlender;
+    private GLTextureCubeMap defaultCubeMap;
 
     public GLGraphicsDevice(GLFWWindow window) {
         GLFWErrorCallback.createPrint(System.err);
@@ -68,6 +69,7 @@ public class GLGraphicsDevice implements GraphicsDevice {
         this.defaultFXRasterizer.setDepthClipping(false);
         this.defaultSampler = (GLSampler)createSampler();
         this.defaultBlender = (GLBlender)createBlender();
+        this.defaultCubeMap = (GLTextureCubeMap)createTextureCubeMap(1, 1);
 
         this.graphicsContext = new GLGraphicsContext(this.window, this.defaultBlender);
         this.graphicsContext.bindRasterizer(this.defaultRasterizer);
@@ -282,5 +284,10 @@ public class GLGraphicsDevice implements GraphicsDevice {
     @Override
     public Blender getDefaultBlender() {
         return defaultBlender;
+    }
+
+    @Override
+    public TextureCubeMap getDefaultTextureCubeMap() {
+        return defaultCubeMap;
     }
 }

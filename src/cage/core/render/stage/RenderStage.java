@@ -54,9 +54,6 @@ public abstract class RenderStage implements Sizable, Movable {
         this.renderTarget.setSizableParent(this);
     }
 
-    public void preRender() {
-    }
-
     public void render() {
         if(rendered) {
             return;
@@ -65,6 +62,13 @@ public abstract class RenderStage implements Sizable, Movable {
         inputStages.forEach(RenderStage::render);
         preRender();
         graphicsContext.bindRasterizer(rasterizer);
+        midRender();
+    }
+
+    protected void preRender() {
+    }
+
+    protected void midRender() {
     }
 
     public void postRender() {

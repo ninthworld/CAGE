@@ -1,10 +1,10 @@
 * Add Cascaded Shadow Mapping (Partially complete)
-* Add SSAO
+* Fix SSAO
+* Add frustum culling
 * More window properties like icon
 * 16bit Texture loading
 * Add geometry, tess eval/ctrl shaders
 * Add terrain
-* Add skybox/dome (geometry based and/or shader based, w/ or w/o texture cubemap)
 * Update readme
 * Javadocs
 * Examples

@@ -62,29 +62,21 @@ public class MyGame implements Game {
     @Override
     public void initialize(Engine engine) {
         engine.getGUIManager().getRootContainer().addComponent(monitor);
-        engine.getInputManager().addAction(engine.getInputManager().getKeyboardController(), Key.ESCAPE, InputActionType.PRESS, new CloseWindowAction(engine.getWindow()));
 
-        if(false) {
-            engine.getRenderManager().getDefaultLightingRenderStage().setUseAtmosphere(true);
-        }
+        engine.getRenderManager().getDefaultLightingRenderStage().setUseAtmosphere(true);
 
-        if(false) {
-            engine.getRenderManager().getDefaultLightingRenderStage().setUseSkydome(true);
-            Texture skydome = engine.getAssetManager().loadTextureFile("skydome/skydome.jpg");
-            engine.getRenderManager().getDefaultLightingRenderStage().setSkydomeTexture(skydome);
-        }
+//        engine.getRenderManager().getDefaultLightingRenderStage().setUseSkydome(true);
+//        Texture skydome = engine.getAssetManager().loadTextureFile("skydome/skydome.jpg");
+//        engine.getRenderManager().getDefaultLightingRenderStage().setSkydomeTexture(skydome);
+//
+//        engine.getRenderManager().getDefaultLightingRenderStage().setUseSkybox(true);
+//        TextureCubeMap skydome = engine.getAssetManager().loadCubeMap("skybox");
+//        engine.getRenderManager().getDefaultLightingRenderStage().setSkyboxTexture(skydome);
 
-        if(true) {
-            engine.getRenderManager().getDefaultLightingRenderStage().setUseSkybox(true);
-            TextureCubeMap skydome = engine.getAssetManager().loadCubeMap("skybox");
-            engine.getRenderManager().getDefaultLightingRenderStage().setSkyboxTexture(skydome);
-        }
-
-        RotationController rc = new RotationController(1.0f, Direction.UP);
+        RotationController rc = new RotationController(-1.0f, Direction.UP);
         engine.getSceneManager().addController(rc);
         rotateNode = engine.getSceneManager().getRootSceneNode().createSceneNode();
         rc.addNode(rotateNode);
-
 
         dolphinEntity = rotateNode.createSceneEntity(engine.getAssetManager().loadOBJModelFile("dolphin/dolphinHighPoly.obj"));
         dolphinEntity.translate(4.0f, 1.0f, 0.0f);
@@ -96,19 +88,48 @@ public class MyGame implements Game {
         Sampler groundSampler = engine.getGraphicsDevice().createSampler();
         groundSampler.setEdge(EdgeType.WRAP);
         groundSampler.setMipmapping(true);
-        tileMaterial.setNormalTexture(engine.getAssetManager().loadTextureFile("tiles/tiles_norm.jpg"));
+//        tileMaterial.setNormalTexture(engine.getAssetManager().loadTextureFile("tiles/tiles_norm.jpg"));
+//        tileMaterial.getNormalTexture().setSampler(groundSampler);
+//        tileMaterial.getNormalTexture().setMipmapping(true);
         tileMaterial.getDiffuseTexture().setSampler(groundSampler);
         tileMaterial.getDiffuseTexture().setMipmapping(true);
         tileMaterial.getSpecularTexture().setSampler(groundSampler);
         tileMaterial.getSpecularTexture().setMipmapping(true);
-        tileMaterial.getNormalTexture().setSampler(groundSampler);
-        tileMaterial.getNormalTexture().setMipmapping(true);
 
         Model cubeModel = engine.getAssetManager().loadOBJModelFile("cube/cube.obj");
         cubeModel.getMesh(0).setMaterial(tileMaterial);
-        SceneEntity cubeEntity = engine.getSceneManager().getRootSceneNode().createSceneEntity(cubeModel);
-        cubeEntity.moveUp(1.0f);
-        cubeEntity.setCastShadow(true);
+        Model slopeModel = engine.getAssetManager().loadOBJModelFile("slope/slope.obj");
+        slopeModel.getMesh(0).setMaterial(tileMaterial);
+
+        SceneEntity cubeEntity1 = engine.getSceneManager().getRootSceneNode().createSceneEntity(cubeModel);
+        cubeEntity1.moveUp(0.5f);
+
+        SceneEntity cubeEntity2 = engine.getSceneManager().getRootSceneNode().createSceneEntity(cubeModel);
+        cubeEntity2.moveUp(1.5f);
+        cubeEntity2.moveForward(2.0f);
+
+        SceneEntity cubeEntity3 = engine.getSceneManager().getRootSceneNode().createSceneEntity(cubeModel);
+        cubeEntity3.moveUp(1.5f);
+        cubeEntity3.moveForward(3.0f);
+
+        SceneEntity cubeEntity4 = engine.getSceneManager().getRootSceneNode().createSceneEntity(cubeModel);
+        cubeEntity4.moveUp(0.5f);
+        cubeEntity4.moveForward(3.0f);
+
+        SceneEntity slopeEntity1 = engine.getSceneManager().getRootSceneNode().createSceneEntity(slopeModel);
+        slopeEntity1.moveUp(0.5f);
+        slopeEntity1.moveLeft(1.0f);
+
+        SceneEntity slopeEntity2 = engine.getSceneManager().getRootSceneNode().createSceneEntity(slopeModel);
+        slopeEntity2.moveUp(0.5f);
+        slopeEntity2.moveForward(1.0f);
+        slopeEntity2.yawGlobal(Angle.fromDegrees(-90.0f));
+        slopeEntity2.pitch(Angle.fromDegrees(180.0f));
+
+        SceneEntity slopeEntity3 = engine.getSceneManager().getRootSceneNode().createSceneEntity(slopeModel);
+        slopeEntity3.moveUp(1.5f);
+        slopeEntity3.moveForward(1.0f);
+        slopeEntity3.yawGlobal(Angle.fromDegrees(90.0f));
 
         sunLight = engine.getSceneManager().getRootSceneNode().createDirectionalLight();
         sunLight.pitch(Angle.fromDegrees(-135.0f));
@@ -116,6 +137,12 @@ public class MyGame implements Game {
         sunLight.setDiffuseColor(1.0f, 1.0f, 1.0f);
         sunLight.setSpecularColor(1.0f, 1.0f, 1.0f);
         sunLight.setCastShadow(true);
+
+        initializeInput(engine);
+    }
+
+    private void initializeInput(Engine engine) {
+        engine.getInputManager().addAction(engine.getInputManager().getKeyboardController(), Key.ESCAPE, InputActionType.PRESS, new CloseWindowAction(engine.getWindow()));
 
         InputController mouse = engine.getInputManager().getMouseController();
         InputController keyboard = engine.getInputManager().getKeyboardController();
@@ -136,12 +163,10 @@ public class MyGame implements Game {
         engine.getInputManager().addAction(mouse, Axis.LEFT_Y, InputActionType.NONE, mouseAction);
         engine.getInputManager().addAction(mouse, Button.RIGHT, InputActionType.PRESS, ((deltaTime, event) -> {
             canLook = true;
-            engine.getWindow().setMouseCentered(true);
             engine.getWindow().setMouseVisible(false);
         }));
         engine.getInputManager().addAction(mouse, Button.RIGHT, InputActionType.RELEASE, ((deltaTime, event) -> {
             canLook = false;
-            engine.getWindow().setMouseCentered(false);
             engine.getWindow().setMouseVisible(true);
         }));
 

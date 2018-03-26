@@ -52,6 +52,8 @@ public class AssetManager {
     private Shader defaultLightingShader;
     private Shader defaultShadowShader;
     private Shader defaultFXAAShader;
+    private Shader defaultSSAOShader;
+    private Texture defaultNoiseTexture;
     private GUIFont defaultFont;
 
     public AssetManager(Path assetProperties, GraphicsDevice graphicsDevice, GUIManager guiManager) {
@@ -72,14 +74,18 @@ public class AssetManager {
         this.assetProperties.setDefault("assets.shaders.default.fx.lighting.fragment", "fx/lighting.fs.glsl");
         this.assetProperties.setDefault("assets.shaders.default.fx.shadow.fragment", "fx/shadow.fs.glsl");
         this.assetProperties.setDefault("assets.shaders.default.fx.fxaa.fragment", "fx/fxaa.fs.glsl");
+        this.assetProperties.setDefault("assets.shaders.default.fx.ssao.fragment", "fx/ssao.fs.glsl");
         this.assetProperties.setDefault("assets.fonts.default", "arial.ttf");
         this.assetProperties.setDefault("assets.fonts.default.name", "Arial");
+        this.assetProperties.setDefault("assets.textures.default.noise", "noise.bmp");
 
         this.defaultGeometryShader = loadShader("default.geometry");
         this.defaultSimpleGeometryShader = loadShader("default.geometry.simple");
         this.defaultLightingShader = loadShader("default.fx", "default.fx.lighting");
         this.defaultShadowShader = loadShader("default.fx", "default.fx.shadow");
         this.defaultFXAAShader = loadShader("default.fx", "default.fx.fxaa");
+        this.defaultSSAOShader = loadShader("default.fx", "default.fx.ssao");
+        this.defaultNoiseTexture = loadTexture("default.noise");
     }
 
     public void initialize() {
@@ -104,6 +110,14 @@ public class AssetManager {
 
     public Shader getDefaultFXAAShader() {
         return defaultFXAAShader;
+    }
+
+    public Shader getDefaultSSAOShader() {
+        return defaultSSAOShader;
+    }
+
+    public Texture getDefaultNoiseTexture() {
+        return defaultNoiseTexture;
     }
 
     public GUIFont getDefaultFont() {
@@ -282,16 +296,25 @@ public class AssetManager {
     }
 
     public Shader loadShader(String configKey) {
-        return loadShader(configKey, configKey);
+        return loadShader(configKey, configKey, configKey);
     }
 
-    public Shader loadShader(String configKeyVertex, String configKeyFrament) {
+    public Shader loadShader(String configKeyVertex, String configKeyFragment) {
+        return loadShader(configKeyVertex, "", configKeyFragment);
+    }
+
+    public Shader loadShader(String configKeyVertex, String configKeyGeometry, String configKeyFragment) {
         return loadShaderFile(
                 assetProperties.getValuePath("assets.shaders." + configKeyVertex + ".vertex").toString(),
-                assetProperties.getValuePath("assets.shaders." + configKeyFrament + ".fragment").toString());
+                assetProperties.getValuePath("assets.shaders." + configKeyGeometry + ".geometry").toString(),
+                assetProperties.getValuePath("assets.shaders." + configKeyFragment + ".fragment").toString());
     }
 
     public Shader loadShaderFile(String vertexFile, String fragmentFile) {
+        return loadShaderFile(vertexFile, "", fragmentFile);
+    }
+
+    public Shader loadShaderFile(String vertexFile, String geometryFile, String fragmentFile) {
         Shader shader = graphicsDevice.createShader();
         try {
             String line;
@@ -301,15 +324,24 @@ public class AssetManager {
             while ((line = vertexReader.readLine()) != null) {
                 vertexShaderSrc.append(line).append("\n");
             }
+            shader.setVertexShaderSource(vertexShaderSrc.toString());
 
             BufferedReader fragmentReader = Files.newBufferedReader(assetProperties.getShadersPath().resolve(fragmentFile));
             StringBuilder fragmentShaderSrc = new StringBuilder();
             while ((line = fragmentReader.readLine()) != null) {
                 fragmentShaderSrc.append(line).append("\n");
             }
-
-            shader.setVertexShaderSource(vertexShaderSrc.toString());
             shader.setFragmentShaderSource(fragmentShaderSrc.toString());
+
+            if(!geometryFile.isEmpty()) {
+                BufferedReader geometryReader = Files.newBufferedReader(assetProperties.getShadersPath().resolve(geometryFile));
+                StringBuilder geometryShaderSrc = new StringBuilder();
+                while ((line = geometryReader.readLine()) != null) {
+                    geometryShaderSrc.append(line).append("\n");
+                }
+                shader.setGeometryShaderSrc(geometryShaderSrc.toString());
+            }
+
             shader.compile();
         } catch(IOException e) {
             System.err.println("Failed to load shader");

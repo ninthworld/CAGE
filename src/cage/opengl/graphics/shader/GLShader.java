@@ -20,6 +20,7 @@ import static org.lwjgl.opengl.GL13.*;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.opengl.GL31.*;
+import static org.lwjgl.opengl.GL32.GL_GEOMETRY_SHADER;
 import static org.lwjgl.opengl.GL33.*;
 import static org.lwjgl.opengl.GL43.*;
 
@@ -234,6 +235,13 @@ public class GLShader extends Shader implements GLBindable {
 
             if (fragmentShaderId != GL_FALSE) {
                 glAttachShader(programId, fragmentShaderId);
+            }
+
+            if (getGeometryShaderSrc() != null) {
+                int geometryShaderId = compileShader(getGeometryShaderSrc(), GL_GEOMETRY_SHADER);
+                if (geometryShaderId != GL_FALSE) {
+                    glAttachShader(programId, geometryShaderId);
+                }
             }
 
             int[] param = new int[1];

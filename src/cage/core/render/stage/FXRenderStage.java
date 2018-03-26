@@ -17,8 +17,8 @@ public class FXRenderStage extends RenderStage {
     }
 
     @Override
-    public void render() {
-        super.render();
+    protected void midRender() {
+        super.midRender();
         getGraphicsContext().bindRenderTarget(getRenderTarget());
         getGraphicsContext().clear();
         getGraphicsContext().bindVertexArray(fxModel.getVertexArray());

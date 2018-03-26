@@ -49,7 +49,7 @@ public class LightingRenderStage extends FXRenderStage {
     }
 
     @Override
-    public void preRender() {
+    protected void preRender() {
         if(cameraUniform == null) {
             cameraUniform = getShader().getUniformBuffer("Camera");
         }
@@ -96,11 +96,14 @@ public class LightingRenderStage extends FXRenderStage {
             getShader().addTexture("normalTexture", geometryRenderStage.getNormalTextureOutput());
             getShader().addTexture("depthTexture", geometryRenderStage.getDepthTextureOutput());
             cameraUniform.writeData(geometryRenderStage.getCamera().readData());
-
-            if(getInputRenderStageCount() > 1 && getInputRenderStage(1) instanceof ShadowRenderStage) {
-                ShadowRenderStage shadowRenderStage = (ShadowRenderStage)getInputRenderStage(1);
-                getShader().addTexture("shadowTexture", shadowRenderStage.getDiffuseTextureOutput());
-            }
+        }
+        if(getInputRenderStageCount() > 1 && getInputRenderStage(1) instanceof ShadowRenderStage) {
+            ShadowRenderStage shadowRenderStage = (ShadowRenderStage)getInputRenderStage(1);
+            getShader().addTexture("shadowTexture", shadowRenderStage.getDiffuseTextureOutput());
+        }
+        if(getInputRenderStageCount() > 2 && getInputRenderStage(2) instanceof SSAORenderStage) {
+            SSAORenderStage ssaoRenderStage = (SSAORenderStage)getInputRenderStage(2);
+            getShader().addTexture("ssaoTexture", ssaoRenderStage.getDiffuseTextureOutput());
         }
     }
 

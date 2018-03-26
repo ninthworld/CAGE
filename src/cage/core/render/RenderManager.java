@@ -26,7 +26,10 @@ import cage.core.scene.SceneManager;
 import cage.core.scene.camera.Camera;
 import cage.core.scene.light.Light;
 
+import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
+import org.lwjgl.system.MemoryStack;
 
 import java.awt.*;
 import java.nio.FloatBuffer;
@@ -34,6 +37,9 @@ import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
+
+import static org.lwjgl.system.MemoryStack.stackPush;
 
 public class RenderManager {
 
@@ -42,6 +48,10 @@ public class RenderManager {
 
     public static final LayoutConfig SKYBOX_READ_LAYOUT = new LayoutConfig().float4().float4().float1().float1().float2();
     public static final int SKYBOX_READ_SIZE = SKYBOX_READ_LAYOUT.getUnitSize() / 4;
+
+    public static final int SSAO_KERNEL_SIZE = 32;
+    public static final LayoutConfig SSAO_READ_LAYOUT = new LayoutConfig().mat4().mat4().mat4().mat4().mat4().mat4().mat4().mat4();
+    public static final int SSAO_READ_SIZE = SSAO_READ_LAYOUT.getUnitSize() / 4;
 
     private GraphicsDevice graphicsDevice;
     private GraphicsContext graphicsContext;
@@ -55,6 +65,7 @@ public class RenderManager {
     private ShadowRenderStage defaultShadowRenderStage;
     private LightingRenderStage defaultLightingRenderStage;
     private FXAARenderStage defaultFXAARenderStage;
+    private SSAORenderStage defaultSSAORenderStage;
 
     private UniformBuffer defaultWindowUniformBuffer;
     private UniformBuffer defaultCameraUniformBuffer;
@@ -63,6 +74,7 @@ public class RenderManager {
     private ShaderStorageBuffer defaultLightShaderStorageBuffer;
     private UniformBuffer defaultShadowUniformBuffer;
     private UniformBuffer defaultSkyboxUniformBuffer;
+    private UniformBuffer defaultSSAOUniformBuffer;
 
     public RenderManager(GraphicsDevice graphicsDevice, GraphicsContext graphicsContext, Window window, SceneManager sceneManager, AssetManager assetManager) {
         this.outputStages = new ArrayList<>();
@@ -96,6 +108,26 @@ public class RenderManager {
         defaultSkyboxUniformBuffer = graphicsDevice.createUniformBuffer();
         defaultSkyboxUniformBuffer.setLayout(SKYBOX_READ_LAYOUT);
 
+        defaultSSAOUniformBuffer = graphicsDevice.createUniformBuffer();
+        defaultSSAOUniformBuffer.setLayout(SSAO_READ_LAYOUT);
+
+
+        try(MemoryStack stack = stackPush()) {
+            FloatBuffer ssaoBuffer = stack.callocFloat(SSAO_READ_SIZE);
+            Random rand = new Random();
+            Vector3f kernel = new Vector3f();
+            for(int i=0; i<SSAO_KERNEL_SIZE; ++i) {
+                kernel.x = (rand.nextFloat() / (float)Integer.MAX_VALUE) * 2.0f - 1.0f;
+                kernel.y = (rand.nextFloat() / (float)Integer.MAX_VALUE) * 2.0f - 1.0f;
+                kernel.z = (rand.nextFloat() / (float)Integer.MAX_VALUE);
+                kernel.normalize();
+                kernel.mul((float)Math.max(Math.min(Math.pow(i / 32.0f, 2), 1.0f), 0.1f));
+                ssaoBuffer.put(i * 4, kernel.x).put(i * 4 + 1, kernel.y).put(i * 4 + 2, kernel.z);
+            }
+            ssaoBuffer.rewind();
+            defaultSSAOUniformBuffer.writeData(ssaoBuffer);
+        }
+
         assetManager.getDefaultGeometryShader().addUniformBuffer("Camera", defaultCameraUniformBuffer);
         assetManager.getDefaultGeometryShader().addUniformBuffer("Entity", defaultEntityUniformBuffer);
         assetManager.getDefaultGeometryShader().addUniformBuffer("Material", defaultMaterialUniformBuffer);
@@ -114,14 +146,22 @@ public class RenderManager {
 
         assetManager.getDefaultFXAAShader().addUniformBuffer("Window", defaultWindowUniformBuffer);
 
+        assetManager.getDefaultSSAOShader().addUniformBuffer("Camera", defaultCameraUniformBuffer);
+        assetManager.getDefaultSSAOShader().addUniformBuffer("Window", defaultWindowUniformBuffer);
+        assetManager.getDefaultSSAOShader().addUniformBuffer("SSAO", defaultSSAOUniformBuffer);
+
         defaultGeometryRenderStage = createGeometryRenderStage(sceneManager.getDefaultCamera());
 
         defaultShadowRenderStage = createShadowRenderStage();
         defaultShadowRenderStage.addInputRenderStage(defaultGeometryRenderStage);
 
+        defaultSSAORenderStage = createSSAORenderStage();
+        defaultSSAORenderStage.addInputRenderStage(defaultGeometryRenderStage);
+
         defaultLightingRenderStage = createLightingRenderStage();
         defaultLightingRenderStage.addInputRenderStage(defaultGeometryRenderStage);
         defaultLightingRenderStage.addInputRenderStage(defaultShadowRenderStage);
+        defaultLightingRenderStage.addInputRenderStage(defaultSSAORenderStage);
 
         defaultFXAARenderStage = createFXAARenderStage();
         defaultFXAARenderStage.addInputRenderStage(defaultLightingRenderStage);
@@ -175,13 +215,21 @@ public class RenderManager {
     }
 
     public LightingRenderStage createLightingRenderStage() {
-        return (LightingRenderStage)createFXRenderStage((fxModel, shader, renderTarget, rasterizer, graphicsContext) ->
-                new LightingRenderStage(sceneManager, fxModel, assetManager.getDefaultLightingShader(), renderTarget, rasterizer, graphicsContext));
+        return (LightingRenderStage)createFXRenderStage((fxModel, shader, renderTarget, rasterizer, graphicsContext) -> {
+            LightingRenderStage renderStage = new LightingRenderStage(sceneManager, fxModel, assetManager.getDefaultLightingShader(), renderTarget, rasterizer, graphicsContext);
+            renderStage.setSkyboxTexture(graphicsDevice.getDefaultTextureCubeMap());
+            return renderStage;
+        });
     }
 
     public FXAARenderStage createFXAARenderStage() {
         return (FXAARenderStage)createFXRenderStage((fxModel, shader, renderTarget, rasterizer, graphicsContext) ->
                 new FXAARenderStage(fxModel, assetManager.getDefaultFXAAShader(), renderTarget, rasterizer, graphicsContext));
+    }
+
+    public SSAORenderStage createSSAORenderStage() {
+        return (SSAORenderStage)createFXRenderStage((fxModel, shader, renderTarget, rasterizer, graphicsContext) ->
+                new SSAORenderStage(assetManager.getDefaultNoiseTexture(), fxModel, assetManager.getDefaultSSAOShader(), renderTarget, rasterizer, graphicsContext));
     }
 
     public GeometryRenderStage getDefaultGeometryRenderStage() {
@@ -220,8 +268,12 @@ public class RenderManager {
         return defaultLightShaderStorageBuffer;
     }
 
-    public UniformBuffer getDefaultShadowUniformBuffer() {
-        return defaultShadowUniformBuffer;
+    public UniformBuffer getDefaultSkyboxUniformBuffer() {
+        return defaultSkyboxUniformBuffer;
+    }
+
+    public UniformBuffer getDefaultSSAOUniformBuffer() {
+        return defaultSSAOUniformBuffer;
     }
 
     public Model getDefaultFXModel() {

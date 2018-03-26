@@ -30,7 +30,7 @@ public class GeometryRenderStage extends RenderStage {
     }
 
     @Override
-    public void preRender() {
+    protected void preRender() {
         if(cameraUniform == null) {
             cameraUniform = getShader().getUniformBuffer("Camera");
         }
@@ -45,8 +45,8 @@ public class GeometryRenderStage extends RenderStage {
     }
 
     @Override
-    public void render() {
-        super.render();
+    protected void midRender() {
+        super.midRender();
 
         getGraphicsContext().bindRenderTarget(getRenderTarget());
         getGraphicsContext().clear();

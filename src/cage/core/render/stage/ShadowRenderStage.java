@@ -58,7 +58,7 @@ public class ShadowRenderStage extends RenderStage {
     }
 
     @Override
-    public void preRender() {
+    protected void preRender() {
         if(simpleCameraUniform == null) {
             simpleCameraUniform = simpleShader.getUniformBuffer("Camera");
         }
@@ -79,8 +79,8 @@ public class ShadowRenderStage extends RenderStage {
     }
 
     @Override
-    public void render() {
-        super.render();
+    protected void midRender() {
+        super.midRender();
 
         if(getInputRenderStageCount() > 0 && getInputRenderStage(0) instanceof GeometryRenderStage) {
             GeometryRenderStage geometryRenderStage = (GeometryRenderStage) getInputRenderStage(0);

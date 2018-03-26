@@ -13,6 +13,7 @@ public abstract class Shader implements Destroyable {
     protected Map<Integer, UniformBuffer> uniformBuffers;
     protected Map<Integer, Texture> textures;
     private String vertexShaderSrc;
+    private String geometryShaderSrc;
     private String fragmentShaderSrc;
 
     public Shader() {
@@ -165,6 +166,14 @@ public abstract class Shader implements Destroyable {
 
     public String getVertexShaderSource() {
         return vertexShaderSrc;
+    }
+
+    public void setGeometryShaderSrc(String src) {
+        this.geometryShaderSrc = src;
+    }
+
+    public String getGeometryShaderSrc() {
+        return geometryShaderSrc;
     }
 
     public void setFragmentShaderSource(String src) {
