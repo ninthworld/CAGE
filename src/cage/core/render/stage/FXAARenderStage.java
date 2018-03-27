@@ -8,8 +8,8 @@ import cage.core.model.Model;
 
 public class FXAARenderStage extends FXRenderStage {
 
-    public FXAARenderStage(Model fxModel, Shader shader, RenderTarget renderTarget, Rasterizer rasterizer, GraphicsContext graphicsContext) {
-        super(fxModel, shader, renderTarget, rasterizer, graphicsContext);
+    public FXAARenderStage(Model fxModel, Shader shader, RenderTarget renderTarget, GraphicsContext graphicsContext) {
+        super(fxModel, shader, renderTarget, graphicsContext);
     }
 
     @Override

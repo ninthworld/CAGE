@@ -2,7 +2,6 @@ package cage.core.render.stage;
 
 import cage.core.graphics.*;
 import cage.core.graphics.buffer.UniformBuffer;
-import cage.core.graphics.rasterizer.Rasterizer;
 import cage.core.graphics.rendertarget.RenderTarget;
 import cage.core.graphics.shader.Shader;
 import cage.core.graphics.texture.Texture;
@@ -23,8 +22,8 @@ public class GeometryRenderStage extends RenderStage {
     private Camera camera;
     private SceneNode node;
 
-    public GeometryRenderStage(Camera camera, SceneNode node, Shader shader, RenderTarget renderTarget, Rasterizer rasterizer, GraphicsContext graphicsContext) {
-        super(shader, renderTarget, rasterizer, graphicsContext);
+    public GeometryRenderStage(Camera camera, SceneNode node, Shader shader, RenderTarget renderTarget, GraphicsContext graphicsContext) {
+        super(shader, renderTarget, graphicsContext);
         this.camera = camera;
         this.node = node;
     }
@@ -86,11 +85,13 @@ public class GeometryRenderStage extends RenderStage {
                     getShader().addTexture("highlightTexture", material.getHighlightTexture());
                 }
 
+                getGraphicsContext().setPrimitive(mesh.getPrimitive());
+                getGraphicsContext().bindRasterizer(mesh.getRasterizer());
                 getGraphicsContext().bindShader(getShader());
                 getGraphicsContext().drawIndexed(mesh.getIndexBuffer());
             });
-            getGraphicsContext().unbindShader(getShader());
-            getGraphicsContext().unbindVertexArray(model.getVertexArray());
+            //getGraphicsContext().unbindShader(getShader());
+            //getGraphicsContext().unbindVertexArray(model.getVertexArray());
         }
     }
 

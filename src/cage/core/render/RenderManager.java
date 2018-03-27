@@ -177,59 +177,58 @@ public class RenderManager {
         outputStages.forEach(RenderStage::postRender);
     }
 
-    public RenderStage createRenderStage(RenderStageConstructor stage) {
+    public RenderStage createRenderStage(Shader shader, RenderStageConstructor stage) {
         RenderTarget renderTarget = graphicsDevice.createRenderTarget2D();
-    	RenderStage renderStage = stage.init(null, renderTarget, graphicsDevice.getDefaultRasterizer(), graphicsContext);
+    	RenderStage renderStage = stage.init(shader, renderTarget, graphicsContext);
     	renderStage.setSizableParent(window);
     	return renderStage;
     }
 
-    public FXRenderStage createFXRenderStage(FXRenderStageConstructor stage) {
+    public FXRenderStage createFXRenderStage(Shader shader, FXRenderStageConstructor stage) {
         RenderTarget renderTarget = graphicsDevice.createRenderTarget2D();
-        FXRenderStage renderStage = stage.init(defaultFXModel, null, renderTarget, graphicsDevice.getDefaultFXRasterizer(), graphicsContext);
+        FXRenderStage renderStage = stage.init(defaultFXModel, shader, renderTarget, graphicsContext);
         renderStage.setSizableParent(window);
         return renderStage;
     }
 
     public GeometryRenderStage createGeometryRenderStage(Camera camera) {
-        return (GeometryRenderStage)createRenderStage((shader, renderTarget, rasterizer, graphicsContext) -> {
+        return (GeometryRenderStage)createRenderStage(assetManager.getDefaultGeometryShader(), (shader, renderTarget, graphicsContext) -> {
             renderTarget.addColorTexture(1, graphicsDevice.createTexture2D(renderTarget.getWidth(), renderTarget.getHeight()));
             renderTarget.addColorTexture(2, graphicsDevice.createTexture2D(renderTarget.getWidth(), renderTarget.getHeight()));
-            return new GeometryRenderStage(camera, sceneManager.getRootSceneNode(), assetManager.getDefaultGeometryShader(), renderTarget, rasterizer, graphicsContext);
+            return new GeometryRenderStage(camera, sceneManager.getRootSceneNode(), shader, renderTarget, graphicsContext);
         });
     }
 
     public ShadowRenderStage createShadowRenderStage() {
-        return (ShadowRenderStage)createRenderStage((shader, renderTarget, rasterizer, graphicsContext) -> {
+        return (ShadowRenderStage)createRenderStage(assetManager.getDefaultShadowShader(), (shader, renderTarget, graphicsContext) -> {
             RenderTarget[] shadowRenderTargets = new RenderTarget[4];
             for(int i=0; i<shadowRenderTargets.length; ++i) {
                 shadowRenderTargets[i] = graphicsDevice.createRenderTarget2D(ShadowRenderStage.SHADOW_RESOLUTION, ShadowRenderStage.SHADOW_RESOLUTION);
             }
             return new ShadowRenderStage(
                     sceneManager, defaultFXModel,
-                    assetManager.getDefaultSimpleGeometryShader(), assetManager.getDefaultShadowShader(),
+                    assetManager.getDefaultSimpleGeometryShader(), shader,
                     shadowRenderTargets, renderTarget,
-                    rasterizer, graphicsDevice.getDefaultFXRasterizer(),
                     graphicsDevice.getDefaultBlender(), graphicsContext);
         });
     }
 
     public LightingRenderStage createLightingRenderStage() {
-        return (LightingRenderStage)createFXRenderStage((fxModel, shader, renderTarget, rasterizer, graphicsContext) -> {
-            LightingRenderStage renderStage = new LightingRenderStage(sceneManager, fxModel, assetManager.getDefaultLightingShader(), renderTarget, rasterizer, graphicsContext);
+        return (LightingRenderStage)createFXRenderStage(assetManager.getDefaultLightingShader(), (fxModel, shader, renderTarget, graphicsContext) -> {
+            LightingRenderStage renderStage = new LightingRenderStage(sceneManager, fxModel, shader, renderTarget, graphicsContext);
             renderStage.setSkyboxTexture(graphicsDevice.getDefaultTextureCubeMap());
             return renderStage;
         });
     }
 
     public FXAARenderStage createFXAARenderStage() {
-        return (FXAARenderStage)createFXRenderStage((fxModel, shader, renderTarget, rasterizer, graphicsContext) ->
-                new FXAARenderStage(fxModel, assetManager.getDefaultFXAAShader(), renderTarget, rasterizer, graphicsContext));
+        return (FXAARenderStage)createFXRenderStage(assetManager.getDefaultFXAAShader(), (fxModel, shader, renderTarget, graphicsContext) ->
+                new FXAARenderStage(fxModel, shader, renderTarget, graphicsContext));
     }
 
     public SSAORenderStage createSSAORenderStage() {
-        return (SSAORenderStage)createFXRenderStage((fxModel, shader, renderTarget, rasterizer, graphicsContext) ->
-                new SSAORenderStage(assetManager.getDefaultNoiseTexture(), fxModel, assetManager.getDefaultSSAOShader(), renderTarget, rasterizer, graphicsContext));
+        return (SSAORenderStage)createFXRenderStage(assetManager.getDefaultSSAOShader(), (fxModel, shader, renderTarget, graphicsContext) ->
+                new SSAORenderStage(assetManager.getDefaultNoiseTexture(), fxModel, shader, renderTarget, graphicsContext));
     }
 
     public GeometryRenderStage getDefaultGeometryRenderStage() {
@@ -337,16 +336,16 @@ public class RenderManager {
         quadVertexArray.addVertexBuffer(quadVertexBuffer);
 
         Model quadModel = new Model(quadVertexArray);
-        quadModel.addMesh(new Mesh(quadIndexBuffer, new Material()));
+        quadModel.addMesh(new Mesh(quadIndexBuffer, new Material(), graphicsDevice.getDefaultFXRasterizer()));
 
         return quadModel;
     }
     
     public interface RenderStageConstructor {
-        RenderStage init(Shader shader, RenderTarget renderTarget, Rasterizer rasterizer, GraphicsContext graphicsContext);
+        RenderStage init(Shader shader, RenderTarget renderTarget, GraphicsContext graphicsContext);
     }
     
     public interface FXRenderStageConstructor {
-        FXRenderStage init(Model fxModel, Shader shader, RenderTarget renderTarget, Rasterizer rasterizer, GraphicsContext graphicsContext);
+        FXRenderStage init(Model fxModel, Shader shader, RenderTarget renderTarget, GraphicsContext graphicsContext);
     }
 }

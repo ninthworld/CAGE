@@ -28,15 +28,13 @@ public abstract class RenderStage implements Sizable, Movable {
 
     private GraphicsContext graphicsContext;
     private List<RenderStage> inputStages;
-    private Rasterizer rasterizer;
     private Shader shader;
     private RenderTarget renderTarget;
     private boolean rendered;
 
-    public RenderStage(Shader shader, RenderTarget renderTarget, Rasterizer rasterizer, GraphicsContext graphicsContext) {
+    public RenderStage(Shader shader, RenderTarget renderTarget, GraphicsContext graphicsContext) {
         this.graphicsContext = graphicsContext;
         this.inputStages = new ArrayList<>();
-        this.rasterizer = rasterizer;
         this.shader = shader;
         this.renderTarget = renderTarget;
         this.rendered = false;
@@ -61,7 +59,6 @@ public abstract class RenderStage implements Sizable, Movable {
         rendered = true;
         inputStages.forEach(RenderStage::render);
         preRender();
-        graphicsContext.bindRasterizer(rasterizer);
         midRender();
     }
 
@@ -99,14 +96,6 @@ public abstract class RenderStage implements Sizable, Movable {
     public void setRenderTarget(RenderTarget renderTarget) {
         this.renderTarget = renderTarget;
         this.renderTarget.setSizableParent(this);
-    }
-
-    public Rasterizer getRasterizer() {
-        return rasterizer;
-    }
-
-    public void setRasterizer(Rasterizer rasterizer) {
-        this.rasterizer = rasterizer;
     }
 
     public boolean isRendered() {

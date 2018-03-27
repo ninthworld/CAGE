@@ -13,8 +13,8 @@ public class SSAORenderStage extends FXRenderStage {
     private UniformBuffer cameraUniform;
     private Texture noiseTexture;
 
-    public SSAORenderStage(Texture noiseTexture, Model fxModel, Shader shader, RenderTarget renderTarget, Rasterizer rasterizer, GraphicsContext graphicsContext) {
-        super(fxModel, shader, renderTarget, rasterizer, graphicsContext);
+    public SSAORenderStage(Texture noiseTexture, Model fxModel, Shader shader, RenderTarget renderTarget, GraphicsContext graphicsContext) {
+        super(fxModel, shader, renderTarget, graphicsContext);
         this.noiseTexture = noiseTexture;
     }
 

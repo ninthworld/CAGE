@@ -283,7 +283,7 @@ public class AssetManager {
                 }
 
                 Model model = new Model(vertexArray);
-                model.addMesh(new Mesh(indexBuffer, material));
+                model.addMesh(new Mesh(indexBuffer, material, graphicsDevice.getDefaultRasterizer()));
 
                 models.put(file, model);
                 return model;

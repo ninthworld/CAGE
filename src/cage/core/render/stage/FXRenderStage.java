@@ -11,8 +11,8 @@ public class FXRenderStage extends RenderStage {
 
     private Model fxModel;
 
-    public FXRenderStage(Model fxModel, Shader shader, RenderTarget renderTarget, Rasterizer rasterizer, GraphicsContext graphicsContext) {
-        super(shader, renderTarget, rasterizer, graphicsContext);
+    public FXRenderStage(Model fxModel, Shader shader, RenderTarget renderTarget, GraphicsContext graphicsContext) {
+        super(shader, renderTarget, graphicsContext);
         this.fxModel = fxModel;
     }
 
@@ -21,11 +21,15 @@ public class FXRenderStage extends RenderStage {
         super.midRender();
         getGraphicsContext().bindRenderTarget(getRenderTarget());
         getGraphicsContext().clear();
+
+        Mesh mesh = fxModel.getMesh(0);
+        getGraphicsContext().setPrimitive(mesh.getPrimitive());
+        getGraphicsContext().bindRasterizer(mesh.getRasterizer());
         getGraphicsContext().bindVertexArray(fxModel.getVertexArray());
         getGraphicsContext().bindShader(getShader());
-        getGraphicsContext().drawIndexed(fxModel.getMesh(0).getIndexBuffer());
-        getGraphicsContext().unbindShader(getShader());
-        getGraphicsContext().unbindVertexArray(fxModel.getVertexArray());
+        getGraphicsContext().drawIndexed(mesh.getIndexBuffer());
+        //getGraphicsContext().unbindShader(getShader());
+        //getGraphicsContext().unbindVertexArray(fxModel.getVertexArray());
     }
     
     public Model getFXModel() {

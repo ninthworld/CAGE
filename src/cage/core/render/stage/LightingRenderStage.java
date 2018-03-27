@@ -37,8 +37,8 @@ public class LightingRenderStage extends FXRenderStage {
     private boolean useSkydome;
     private boolean useAtmosphere;
 
-    public LightingRenderStage(SceneManager sceneManager, Model fxModel, Shader shader, RenderTarget renderTarget, Rasterizer rasterizer, GraphicsContext graphicsContext) {
-        super(fxModel, shader, renderTarget, rasterizer, graphicsContext);
+    public LightingRenderStage(SceneManager sceneManager, Model fxModel, Shader shader, RenderTarget renderTarget, GraphicsContext graphicsContext) {
+        super(fxModel, shader, renderTarget, graphicsContext);
         this.sceneManager = sceneManager;
         this.skyboxTexture = null;
         this.skyColor = new Vector3f(0.0f, 0.0f, 0.0f);

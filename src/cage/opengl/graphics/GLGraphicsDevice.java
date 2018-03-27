@@ -71,7 +71,7 @@ public class GLGraphicsDevice implements GraphicsDevice {
         this.defaultBlender = (GLBlender)createBlender();
         this.defaultCubeMap = (GLTextureCubeMap)createTextureCubeMap(1, 1);
 
-        this.graphicsContext = new GLGraphicsContext(this.window, this.defaultBlender);
+        this.graphicsContext = new GLGraphicsContext(this.window);
         this.graphicsContext.bindRasterizer(this.defaultRasterizer);
     }
 

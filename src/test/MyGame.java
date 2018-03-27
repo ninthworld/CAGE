@@ -73,7 +73,7 @@ public class MyGame implements Game {
 //        TextureCubeMap skydome = engine.getAssetManager().loadCubeMap("skybox");
 //        engine.getRenderManager().getDefaultLightingRenderStage().setSkyboxTexture(skydome);
 
-        RotationController rc = new RotationController(-1.0f, Direction.UP);
+        RotationController rc = new RotationController(-0.4f, Direction.UP);
         engine.getSceneManager().addController(rc);
         rotateNode = engine.getSceneManager().getRootSceneNode().createSceneNode();
         rc.addNode(rotateNode);
@@ -88,18 +88,26 @@ public class MyGame implements Game {
         Sampler groundSampler = engine.getGraphicsDevice().createSampler();
         groundSampler.setEdge(EdgeType.WRAP);
         groundSampler.setMipmapping(true);
-//        tileMaterial.setNormalTexture(engine.getAssetManager().loadTextureFile("tiles/tiles_norm.jpg"));
-//        tileMaterial.getNormalTexture().setSampler(groundSampler);
-//        tileMaterial.getNormalTexture().setMipmapping(true);
+        tileMaterial.setNormalTexture(engine.getAssetManager().loadTextureFile("tiles/tiles_norm.jpg"));
+        tileMaterial.getNormalTexture().setSampler(groundSampler);
+        tileMaterial.getNormalTexture().setMipmapping(true);
         tileMaterial.getDiffuseTexture().setSampler(groundSampler);
         tileMaterial.getDiffuseTexture().setMipmapping(true);
         tileMaterial.getSpecularTexture().setSampler(groundSampler);
         tileMaterial.getSpecularTexture().setMipmapping(true);
 
+        Material tileMaterial2 = new Material();
+        tileMaterial2.setDiffuse(tileMaterial.getDiffuseTexture());
+        tileMaterial2.setDiffuse(tileMaterial.getDiffuseColor());
+        tileMaterial2.setSpecular(tileMaterial.getSpecularTexture());
+        tileMaterial2.setSpecular(tileMaterial.getSpecularColor());
+        tileMaterial2.setHighlight(tileMaterial.getHighlightTexture());
+        tileMaterial2.setShininess(tileMaterial.getShininess());
+
         Model cubeModel = engine.getAssetManager().loadOBJModelFile("cube/cube.obj");
         cubeModel.getMesh(0).setMaterial(tileMaterial);
         Model slopeModel = engine.getAssetManager().loadOBJModelFile("slope/slope.obj");
-        slopeModel.getMesh(0).setMaterial(tileMaterial);
+        slopeModel.getMesh(0).setMaterial(tileMaterial2);
 
         SceneEntity cubeEntity1 = engine.getSceneManager().getRootSceneNode().createSceneEntity(cubeModel);
         cubeEntity1.moveUp(0.5f);

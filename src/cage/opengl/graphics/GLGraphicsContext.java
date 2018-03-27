@@ -32,17 +32,21 @@ public class GLGraphicsContext implements GraphicsContext {
     private GLFWWindow window;
     private int primitive;
     private int patchSize;
-    private int boundFBOId;
-    private int boundShaderId;
-    private Blender defaultBlender;
+	private Rasterizer boundRasterizer;
+	private Blender boundBlender;
+	private VertexArray boundVertexArray;
+	private Shader boundShader;
+	private RenderTarget boundRenderTarget;
 
-    public GLGraphicsContext(GLFWWindow window, Blender blender) {
+    public GLGraphicsContext(GLFWWindow window) {
 		this.window = window;
 		this.primitive = GL_TRIANGLES;
 		this.patchSize = 1;
-		this.boundFBOId = 0;
-		this.boundShaderId = 0;
-		this.defaultBlender = blender; // Workaround for glDisable(GL_BLEND) not working
+		this.boundRasterizer = null;
+		this.boundBlender = null;
+        this.boundVertexArray = null;
+		this.boundShader = null;
+		this.boundRenderTarget = null;
         setClearColor(new Color(0, 0, 0, 0));
     }
 
@@ -131,7 +135,7 @@ public class GLGraphicsContext implements GraphicsContext {
     public void bindBackBuffer() {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         setViewport(new Rectangle(0, 0, window.getWidth(), window.getHeight()));
-        boundFBOId = 0;
+        boundRenderTarget = null;
     }
 
     @Override
@@ -169,8 +173,8 @@ public class GLGraphicsContext implements GraphicsContext {
 	                GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT,
 	                GL_NEAREST);
 	        checkError("glBlitFramebuffer");
-	
-	        glBindFramebuffer(GL_FRAMEBUFFER, boundFBOId);
+
+	        bindRenderTarget(boundRenderTarget);
 		}
 	}
 
@@ -200,30 +204,32 @@ public class GLGraphicsContext implements GraphicsContext {
 	            checkError("glBlitFramebuffer");
 	        });
 
-	        glBindFramebuffer(GL_FRAMEBUFFER, boundFBOId);
+            bindRenderTarget(boundRenderTarget);
 		}
 	}
 
 	@Override
 	public void bindRasterizer(Rasterizer rasterizer) {
-		if(rasterizer instanceof GLRasterizer) {
+		if(rasterizer != boundRasterizer && rasterizer instanceof GLRasterizer) {
             ((GLRasterizer) rasterizer).bind();
+            boundRasterizer = rasterizer;
 		}
 	}
 
 	@Override
 	public void bindBlender(Blender blender) {
-        if(blender instanceof GLBlender) {
+        if(blender != boundBlender && blender instanceof GLBlender) {
             ((GLBlender) blender).bind();
+            boundBlender = blender;
         }
 	}
 
 	@Override
 	public void bindRenderTarget(RenderTarget renderTarget) {
-        if(renderTarget instanceof GLRenderTarget) {
+        if(renderTarget != boundRenderTarget && renderTarget instanceof GLRenderTarget) {
             ((GLRenderTarget) renderTarget).bind();
             setViewport(new Rectangle(0, 0, renderTarget.getWidth(), renderTarget.getHeight()));
-            boundFBOId = ((GLRenderTarget) renderTarget).getFramebufferId();
+            boundRenderTarget = renderTarget;
         }
 	}
 
@@ -231,9 +237,9 @@ public class GLGraphicsContext implements GraphicsContext {
 	public void bindShader(Shader shader) {
 		if(shader instanceof GLShader) {
 			GLShader glShader = (GLShader)shader;
-			if(glShader.getProgramId() != boundShaderId) {
+			if(shader != boundShader) {
                 glShader.bind();
-                boundShaderId = glShader.getProgramId();
+                boundShader = shader;
             }
             glShader.bindTextures();
 		}
@@ -241,18 +247,19 @@ public class GLGraphicsContext implements GraphicsContext {
 
 	@Override
 	public void bindVertexArray(VertexArray vertexArray) {
-		if(vertexArray instanceof GLVertexArray) {
+		if(vertexArray != boundVertexArray && vertexArray instanceof GLVertexArray) {
 			GLVertexArray glVertexArray = (GLVertexArray)vertexArray;
 			glVertexArray.bind();
+			boundVertexArray = vertexArray;
 		}
 	}
 
 	@Override
 	public void unbindBlender(Blender blender) {
-//        if(blender instanceof GLBlender) {
-//            ((GLBlender) blender).unbind();
-//        }
-		bindBlender(defaultBlender); // Workaround
+        if(blender instanceof GLBlender) {
+            ((GLBlender) blender).unbind();
+            boundBlender = null;
+        }
 	}
 
 	@Override
@@ -260,7 +267,7 @@ public class GLGraphicsContext implements GraphicsContext {
 		if(shader instanceof GLShader) {
 			GLShader glShader = (GLShader)shader;
 			glShader.unbind();
-            boundShaderId = 0;
+			boundShader = null;
 		}
 	}
 
@@ -269,6 +276,7 @@ public class GLGraphicsContext implements GraphicsContext {
 		if(vertexArray instanceof GLVertexArray) {
 			GLVertexArray glVertexArray = (GLVertexArray)vertexArray;
 			glVertexArray.unbind();
+			boundVertexArray = null;
 		}
 	}
 

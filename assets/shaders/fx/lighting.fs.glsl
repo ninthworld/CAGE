@@ -71,8 +71,8 @@ void main() {
 	vec3 color = vec3(0.0, 0.0, 0.0);
 	if(depth < 1.0) {
 	    vec3 diffuse = texture(diffuseTexture, vs_texCoord).rgb;
-        vec3 specular = texture(specularTexture, vs_texCoord).rgb;
-        float power = texture(specularTexture, vs_texCoord).a * 128.0;
+        float specular = texture(specularTexture, vs_texCoord).r;
+        float power = texture(specularTexture, vs_texCoord).g * 128.0;
         vec3 normal = texture(normalTexture, vs_texCoord).rgb * 2.0 - 1.0;
 
 	    // Material Lighting

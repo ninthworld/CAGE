@@ -29,7 +29,6 @@ public class ShadowRenderStage extends RenderStage {
 
     private Shader simpleShader;
     private RenderTarget[] shadowRenderTargets;
-    private Rasterizer shadowRasterizer;
     private Model fxModel;
     private Blender blender;
     private SceneManager sceneManager;
@@ -44,12 +43,10 @@ public class ShadowRenderStage extends RenderStage {
             SceneManager sceneManager, Model fxModel,
             Shader simpleShader, Shader shadowShader,
             RenderTarget[] shadowRenderTargets, RenderTarget outputRenderTarget,
-            Rasterizer simpleRasterizer, Rasterizer shadowRasterizer,
             Blender blender, GraphicsContext graphicsContext) {
-        super(shadowShader, outputRenderTarget, simpleRasterizer, graphicsContext);
+        super(shadowShader, outputRenderTarget, graphicsContext);
         this.simpleShader = simpleShader;
         this.shadowRenderTargets = shadowRenderTargets;
-        this.shadowRasterizer = shadowRasterizer;
         this.fxModel = fxModel;
         this.blender = blender;
         this.sceneManager = sceneManager;
@@ -98,7 +95,6 @@ public class ShadowRenderStage extends RenderStage {
                     // Setup the Shadow Camera
                     shadowCamera.lookAt(((DirectionalLight) light).getDirection());
 
-                    getGraphicsContext().bindRasterizer(getRasterizer());
                     shadowData.clear();
                     for(int i=0; i<RANGES.length; ++i) {
                         float radius = RANGES[i];
@@ -125,15 +121,18 @@ public class ShadowRenderStage extends RenderStage {
                     shadowUniform.writeData(shadowData);
 
                     // Render to Output
-                    getGraphicsContext().bindRasterizer(shadowRasterizer);
                     getGraphicsContext().bindRenderTarget(getRenderTarget());
+
+                    Mesh mesh = fxModel.getMesh(0);
+                    getGraphicsContext().setPrimitive(mesh.getPrimitive());
+                    getGraphicsContext().bindRasterizer(mesh.getRasterizer());
                     getGraphicsContext().bindVertexArray(fxModel.getVertexArray());
                     getGraphicsContext().bindShader(getShader());
                     getGraphicsContext().bindBlender(blender);
-                    getGraphicsContext().drawIndexed(fxModel.getMesh(0).getIndexBuffer());
+                    getGraphicsContext().drawIndexed(mesh.getIndexBuffer());
                     getGraphicsContext().unbindBlender(blender);
-                    getGraphicsContext().unbindShader(getShader());
-                    getGraphicsContext().unbindVertexArray(fxModel.getVertexArray());
+                    //getGraphicsContext().unbindShader(getShader());
+                    //getGraphicsContext().unbindVertexArray(fxModel.getVertexArray());
                 }
             });
         }
@@ -154,10 +153,12 @@ public class ShadowRenderStage extends RenderStage {
             getGraphicsContext().bindVertexArray(model.getVertexArray());
             getGraphicsContext().bindShader(simpleShader);
             model.getMeshIterator().forEachRemaining((Mesh mesh) -> {
+                getGraphicsContext().setPrimitive(mesh.getPrimitive());
+                getGraphicsContext().bindRasterizer(mesh.getRasterizer());
                 getGraphicsContext().drawIndexed(mesh.getIndexBuffer());
             });
-            getGraphicsContext().unbindShader(simpleShader);
-            getGraphicsContext().unbindVertexArray(model.getVertexArray());
+            //getGraphicsContext().unbindShader(simpleShader);
+            //getGraphicsContext().unbindVertexArray(model.getVertexArray());
         }
     }
 

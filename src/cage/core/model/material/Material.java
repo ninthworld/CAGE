@@ -47,8 +47,8 @@ public class Material implements Readable {
         return diffuseMap;
     }
 
-    public void setDiffuse(Vector3f diffuse) {
-        this.diffuse = diffuse;
+    public void setDiffuse(Vector3fc diffuse) {
+        this.diffuse.set(diffuse);
     }
 
     public void setDiffuse(float r, float g, float b) {
@@ -67,8 +67,8 @@ public class Material implements Readable {
         return specularMap;
     }
 
-    public void setSpecular(Vector3f specular) {
-        this.specular = specular;
+    public void setSpecular(Vector3fc specular) {
+        this.specular.set(specular);
     }
 
     public void setSpecular(float r, float g, float b) {
@@ -103,8 +103,8 @@ public class Material implements Readable {
         return emissiveMap;
     }
 
-    public void setEmissive(Vector3f emissive) {
-        this.emissive = emissive;
+    public void setEmissive(Vector3fc emissive) {
+        this.emissive.set(emissive);
     }
 
     public void setEmissive(float r, float g, float b) {

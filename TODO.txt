@@ -1,8 +1,13 @@
+* Add rasterizer and face-type to mesh
+* Add current rasterizer/blender/shader/fbo/etc to graphicscontext and gate the bind()'s (null rendertarget is backbuffer bound)
+* Add frustum to camera and implement frustum culling in geometry and shadow renderstage's
+* Add JBullet <-> abstract physics implementation (for sceneentity bounds and collision)
+* Add OpenAL <-> audio abstract implementation
+* Split AssetManager into STBAssetManager <-> abstract AssetManager
+* Add 16bit texture loading support
+* Add icon support to window
 * Add Cascaded Shadow Mapping (Partially complete)
 * Fix SSAO
-* Add frustum culling
-* More window properties like icon
-* 16bit Texture loading
 * Add geometry, tess eval/ctrl shaders
 * Add terrain
 * Update readme
@@ -10,5 +15,3 @@
 * Examples
 * FPCamera, OrbitCamera
 * Server/Client architecture
-* Physics
-* Audio
