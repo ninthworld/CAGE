@@ -267,7 +267,7 @@ public abstract class Node implements Destroyable {
     public void addNode(Node node) {
         if(node != this) {
             if(node.parent != null) {
-                node.parent.removeNode(this);
+                node.parent.removeNode(node);
             }
             node.parent = this;
             children.add(node);

@@ -37,5 +37,11 @@
 	<classpathentry kind="lib" path="lib/lwjgl/lwjgl-sources.jar"/>
 	<classpathentry kind="lib" path="lib/lwjgl/lwjgl.jar"/>
 	<classpathentry kind="lib" path="lib/oObjLoader/oObjLoader.jar"/>
+	<classpathentry kind="lib" path="lib/lwjgl-nanovg/lwjgl-nanovg-javadoc.jar"/>
+	<classpathentry kind="lib" path="lib/lwjgl-nanovg/lwjgl-nanovg-natives-linux.jar"/>
+	<classpathentry kind="lib" path="lib/lwjgl-nanovg/lwjgl-nanovg-natives-macos.jar"/>
+	<classpathentry kind="lib" path="lib/lwjgl-nanovg/lwjgl-nanovg-natives-windows.jar"/>
+	<classpathentry kind="lib" path="lib/lwjgl-nanovg/lwjgl-nanovg-sources.jar"/>
+	<classpathentry kind="lib" path="lib/lwjgl-nanovg/lwjgl-nanovg.jar"/>
 	<classpathentry kind="output" path="out/production/CAGE"/>
 </classpath>

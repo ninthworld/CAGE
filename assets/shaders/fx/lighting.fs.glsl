@@ -110,7 +110,7 @@ void main() {
                 vec3 lightReflect = normalize(reflect(relLightDir, normal));
                 float factor = dot(vertexToCam, lightReflect);
                 if(factor > 0.0) {
-                factor = pow(factor, power);
+                	factor = pow(factor, power);
                     color += clamp(att * specular * light.specularColor.rgb * factor, 0.0, 1.0);
                 }
             }

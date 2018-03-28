@@ -146,6 +146,13 @@ public class MyGame implements Game {
         sunLight.setSpecularColor(1.0f, 1.0f, 1.0f);
         sunLight.setCastShadow(true);
 
+        DirectionalLight dirLight = engine.getSceneManager().getRootSceneNode().createDirectionalLight();
+        dirLight.pitch(Angle.fromDegrees(-135.0f));
+        dirLight.yawGlobal(Angle.fromDegrees(-45.0f));
+        dirLight.setDiffuseColor(1.0f, 1.0f, 1.0f);
+        dirLight.setSpecularColor(1.0f, 1.0f, 1.0f);
+        dirLight.setCastShadow(true);
+		
         initializeInput(engine);
     }
 

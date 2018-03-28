@@ -68,7 +68,7 @@ public class MyGame implements Game {
 //        engine.getRenderManager().getDefaultLightingRenderStage().setUseSkydome(true);
 //        Texture skydome = engine.getAssetManager().loadTextureFile("skydome/skydome.jpg");
 //        engine.getRenderManager().getDefaultLightingRenderStage().setSkydomeTexture(skydome);
-//
+
 //        engine.getRenderManager().getDefaultLightingRenderStage().setUseSkybox(true);
 //        TextureCubeMap skydome = engine.getAssetManager().loadCubeMap("skybox");
 //        engine.getRenderManager().getDefaultLightingRenderStage().setSkyboxTexture(skydome);
@@ -139,6 +139,8 @@ public class MyGame implements Game {
         slopeEntity3.moveForward(1.0f);
         slopeEntity3.yawGlobal(Angle.fromDegrees(90.0f));
 
+        engine.getSceneManager().getDefaultAmbientLight().setDiffuseColor(engine.getSceneManager().getDefaultAmbientLight().getDiffuseColor().mul(4.0f, new Vector3f()));
+        
         sunLight = engine.getSceneManager().getRootSceneNode().createDirectionalLight();
         sunLight.pitch(Angle.fromDegrees(-135.0f));
         sunLight.yawGlobal(Angle.fromDegrees(45.0f));
@@ -150,10 +152,13 @@ public class MyGame implements Game {
     }
 
     private void initializeInput(Engine engine) {
-        engine.getInputManager().addAction(engine.getInputManager().getKeyboardController(), Key.ESCAPE, InputActionType.PRESS, new CloseWindowAction(engine.getWindow()));
-
         InputController mouse = engine.getInputManager().getMouseController();
         InputController keyboard = engine.getInputManager().getKeyboardController();
+        
+        engine.getInputManager().addAction(keyboard, Key.ESCAPE, InputActionType.PRESS, new CloseWindowAction(engine.getWindow()));
+        engine.getInputManager().addAction(keyboard, Key.F1, InputActionType.PRESS, ((deltaTime, event) -> {
+        	engine.getWindow().setFullscreen(!engine.getWindow().isFullscreen());
+        }));
 
         Camera defaultCamera = engine.getSceneManager().getDefaultCamera();
         defaultCamera.moveUp(4.0f);
@@ -223,7 +228,7 @@ public class MyGame implements Game {
             Light light = it.next();
             light.notifyUpdate();
         }
-
+        
         engine.getRenderManager().getDefaultLightingRenderStage().setSunPosition(sunLight.getDirection());
 
         monitor.update(deltaTime);
