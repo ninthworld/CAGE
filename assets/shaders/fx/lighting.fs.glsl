@@ -2,12 +2,14 @@
 #extension GL_NV_shadow_samplers_cube : enable
 
 #define PI 3.141592
-#define MAX_SOURCES     100.0
+#define MAX_SOURCES 100.0
+#define WATER_LEVEL 128.0
 
 in vec2 vs_texCoord;
 
 layout(location=0) out vec4 fs_color;
 
+uniform sampler2D dudvTexture;
 uniform sampler2D diffuseTexture;
 uniform sampler2D specularTexture;
 uniform sampler2D normalTexture;
@@ -51,10 +53,16 @@ layout(std140) uniform Skybox {
     float useSkybox;
     float useSkydome;
     float useAtmosphere;
-    float _padding;
+    float time;
 } skybox;
 
 vec3 atmosphere(vec3 r, vec3 r0, vec3 pSun, float iSun, float rPlanet, float rAtmos, vec3 kRlh, float kMie, float shRlh, float shMie, float g);
+
+#define NEAR 0.1
+#define FAR 1000.0
+float linearizeDepth(float depth) {
+    return (2.0 * NEAR) / (FAR + NEAR - depth * (FAR - NEAR));
+}
 
 vec3 worldPosFromDepth(float depth) {
 	vec4 ssPos = camera.invProjMatrix * vec4(vs_texCoord * 2.0 - 1.0, depth * 2.0 - 1.0, 1.0);
@@ -68,12 +76,13 @@ void main() {
     mat4 camView = inverse(camera.viewMatrix);
     vec3 camPosition = vec3(camView[3]) / camView[3].w;
 
+    vec3 normal = texture(normalTexture, vs_texCoord).rgb * 2.0 - 1.0;
+
 	vec3 color = vec3(0.0, 0.0, 0.0);
 	if(depth < 1.0) {
 	    vec3 diffuse = texture(diffuseTexture, vs_texCoord).rgb;
         float specular = texture(specularTexture, vs_texCoord).r;
         float power = texture(specularTexture, vs_texCoord).g * 128.0;
-        vec3 normal = texture(normalTexture, vs_texCoord).rgb * 2.0 - 1.0;
 
 	    // Material Lighting
 	    float numShadows = 0.0;
@@ -123,7 +132,7 @@ void main() {
         // TODO: Get SSAO working
         // color *= texture(ssaoTexture, vs_texCoord).r;
 	}
-	else {
+	else if(camPosition.y > WATER_LEVEL) {
 	    vec3 direction = -normalize(camPosition - position);
 	    if(skybox.useSkybox > 0.0) {
 	        color = textureCube(skyboxTexture, direction).rgb;
@@ -147,10 +156,30 @@ void main() {
         }
 	}
 
+    if(camPosition.y < WATER_LEVEL) {
+        float dist = distance(position, camPosition);
+        color = mix(color, mix(vec3(0.0, 0.1, 0.2), vec3(0.0, 0.5, 0.7), clamp((1.0 + position.y / WATER_LEVEL) / 2.0, 0.0, 1.0)), clamp(dist / 500.0, 0.0, 1.0));
+
+        if(depth < 1.0) {
+            float delta = skybox.time * 1.5;
+            vec2 texCoord = position.xz;
+            vec2 distortedTexCoord = texture(dudvTexture, vec2(texCoord.x + delta, texCoord.y) * 0.02).rg;
+            distortedTexCoord = (texCoord + vec2(distortedTexCoord.x, distortedTexCoord.y + delta)) * 0.02;
+            vec2 distortion = (texture(dudvTexture, distortedTexCoord).rg * 2.0 - 1.0);
+
+            distortion = clamp(abs(distortion), 0.0, 1.0);
+            float value = pow(1.0 - (distortion.x + distortion.y), 4.0) * 0.5;
+            float cosTheta = clamp(dot(normal, -skybox.sunPosition.xyz), 0.0, 1.0);
+
+            color += value * cosTheta * clamp(1.0 - dist / (position.y * 2.0), 0.0, 1.0) * clamp(position.y / WATER_LEVEL, 0.0, 1.0);
+        }
+    }
+
 	fs_color = vec4(color, 1.0);
 }
 
-/* GLSL-Atmosphere by wwwtyro
+/**
+ * GLSL-Atmosphere by wwwtyro
  * Source: https://github.com/wwwtyro/glsl-atmosphere
  * Licensed under The Unlicense
  */

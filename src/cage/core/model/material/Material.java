@@ -27,8 +27,8 @@ public class Material implements Readable {
     private FloatBuffer buffer;
 
     public Material() {
-        this.diffuse = new Vector3f();
-        this.specular = new Vector3f();
+        this.diffuse = new Vector3f(1.0f, 1.0f, 1.0f);
+        this.specular = new Vector3f(1.0f, 1.0f, 1.0f);
         this.emissive = new Vector3f();
         this.shininess = 0.0f;
         this.diffuseMap = null;
@@ -99,7 +99,7 @@ public class Material implements Readable {
         return emissive;
     }
 
-    public Texture getEmissiveMap() {
+    public Texture getEmissiveTexture() {
         return emissiveMap;
     }
 
@@ -119,7 +119,7 @@ public class Material implements Readable {
         return normalMap;
     }
 
-    public void setNormalTexture(Texture normal) {
+    public void setNormal(Texture normal) {
         this.normalMap = normal;
     }
 

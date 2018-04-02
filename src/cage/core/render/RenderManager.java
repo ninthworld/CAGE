@@ -169,6 +169,10 @@ public class RenderManager {
         addOutputRenderStage(defaultFXAARenderStage);
     }
 
+    public void update(float deltaTime) {
+        outputStages.forEach((RenderStage renderStage) -> renderStage.update(deltaTime));
+    }
+
     public void render() {
         outputStages.forEach(RenderStage::render);
         graphicsContext.bindBackBuffer();

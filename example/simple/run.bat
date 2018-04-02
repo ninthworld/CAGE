@@ -1,1 +1,1 @@
-java -cp .;CAGE.jar test.MyGame
+java -cp .;CAGE.jar biggerfish.BiggerFishGame

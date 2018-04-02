@@ -7,6 +7,7 @@ import cage.core.graphics.rasterizer.Rasterizer;
 import cage.core.graphics.rendertarget.RenderTarget;
 import cage.core.graphics.shader.Shader;
 import cage.core.graphics.texture.Texture;
+import cage.core.graphics.type.LayoutType;
 import cage.core.graphics.type.PrimitiveType;
 import cage.core.graphics.vertexarray.VertexArray;
 import cage.glfw.window.GLFWWindow;
@@ -81,7 +82,7 @@ public class GLGraphicsContext implements GraphicsContext {
 			glBuffer.bind();
 			glDrawElements(
 					primitive, indexCount,
-                    GL_UNSIGNED_INT, // FIX ME
+                    GL_UNSIGNED_INT,
 					startIndex);
 			checkError("glDrawElements");
 			glBuffer.unbind();
@@ -119,7 +120,7 @@ public class GLGraphicsContext implements GraphicsContext {
 			glBuffer.bind();
 			glDrawElementsInstanced(
 					primitive, indexCount,
-                    GL_UNSIGNED_INT, // FIX ME
+                    GL_UNSIGNED_INT,
 					startIndex, instances);
 			checkError("glDrawElements");
 			glBuffer.unbind();

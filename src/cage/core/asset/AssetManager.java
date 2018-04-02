@@ -8,6 +8,7 @@ import cage.core.graphics.texture.Texture;
 import cage.core.graphics.texture.Texture2D;
 import cage.core.graphics.texture.TextureCubeMap;
 import cage.core.graphics.type.CubeFaceType;
+import cage.core.graphics.type.FormatType;
 import cage.core.graphics.vertexarray.VertexArray;
 import cage.core.gui.graphics.GUIFont;
 import cage.core.gui.graphics.GUIImage;
@@ -159,7 +160,7 @@ public class AssetManager {
             return images.get(file);
         }
         else {
-            ImageData img = getImageData(assetProperties.getImagesPath().resolve(file).toString());
+            ImageData img = getImageData(assetProperties.getImagesPath().resolve(file).toString(), FormatType.RGBA_8_UNORM);
             if(img == null) {
                 return null;
             }
@@ -351,20 +352,28 @@ public class AssetManager {
     }
 
     public Texture2D loadTexture(String configKey) {
-        return loadTextureFile(assetProperties.getValuePath("assets.textures." + configKey).toString());
+        return loadTexture(configKey, FormatType.RGBA_8_UNORM);
+    }
+
+    public Texture2D loadTexture(String configKey, FormatType format) {
+        return loadTextureFile(assetProperties.getValuePath("assets.textures." + configKey).toString(), format);
     }
 
     public Texture2D loadTextureFile(String file) {
+        return loadTextureFile(file, FormatType.RGBA_8_UNORM);
+    }
+
+    public Texture2D loadTextureFile(String file, FormatType format) {
         Texture tex;
         if(textures.containsKey(file) && (tex = textures.get(file)) instanceof Texture2D) {
             return (Texture2D)tex;
         }
         else {
-            ImageData img = getImageData(assetProperties.getTexturesPath().resolve(file).toString());
+            ImageData img = getImageData(assetProperties.getTexturesPath().resolve(file).toString(), format);
             if(img == null) {
                 return null;
             }
-            Texture2D texture = graphicsDevice.createTexture2D(img.width, img.height);
+            Texture2D texture = graphicsDevice.createTexture2D(img.width, img.height, format);
             if(img.data instanceof ByteBuffer) {
                 texture.writeData((ByteBuffer)img.data);
             }
@@ -399,7 +408,7 @@ public class AssetManager {
         else {
             ImageData[] imgs = new ImageData[6];
             for(int i=0; i<imgs.length; ++i) {
-                imgs[i] = getImageData(assetProperties.getTexturesPath().resolve(files[i]).toString());
+                imgs[i] = getImageData(assetProperties.getTexturesPath().resolve(files[i]).toString(), FormatType.RGBA_8_UNORM);
                 if(imgs[i] == null) {
                     return null;
                 }
@@ -419,15 +428,19 @@ public class AssetManager {
         }
     }
 
-    private ImageData getImageData(String file) {
-        // TODO: Add support for 16-bit PNG
-        ByteBuffer data;
+    private ImageData getImageData(String file, FormatType format) {
+        Buffer data;
         int width, height;
         try(MemoryStack stack = MemoryStack.stackPush()) {
             IntBuffer w = stack.mallocInt(1);
             IntBuffer h = stack.mallocInt(1);
             IntBuffer comp = stack.mallocInt(1);
-            data = STBImage.stbi_load(file, w, h, comp, 4);
+            if(format.getBits() == 16) {
+                data = STBImage.stbi_load_16(file, w, h, comp, format.getChannels());
+            }
+            else {
+                data = STBImage.stbi_load(file, w, h, comp, format.getChannels());
+            }
             if(data == null) {
                 System.err.println("Failed to load texture '" + file + "'\n" + STBImage.stbi_failure_reason());
                 return null;

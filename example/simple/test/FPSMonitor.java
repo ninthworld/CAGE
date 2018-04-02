@@ -1,4 +1,4 @@
-package test;
+package biggerfish;
 
 import cage.core.application.Timer;
 import cage.core.gui.component.GUIComponent;

@@ -31,6 +31,7 @@ public abstract class RenderStage implements Sizable, Movable {
     private Shader shader;
     private RenderTarget renderTarget;
     private boolean rendered;
+    private boolean updated;
 
     public RenderStage(Shader shader, RenderTarget renderTarget, GraphicsContext graphicsContext) {
         this.graphicsContext = graphicsContext;
@@ -38,6 +39,7 @@ public abstract class RenderStage implements Sizable, Movable {
         this.shader = shader;
         this.renderTarget = renderTarget;
         this.rendered = false;
+        this.updated = false;
 
         this.posX = 0;
         this.posY = 0;
@@ -70,7 +72,20 @@ public abstract class RenderStage implements Sizable, Movable {
 
     public void postRender() {
         rendered = false;
+        updated = false;
         inputStages.forEach(RenderStage::postRender);
+    }
+
+    public void update(float deltaTime) {
+        if(updated) {
+            return;
+        }
+        updated = true;
+        inputStages.forEach((RenderStage renderStage) -> renderStage.update(deltaTime));
+        midUpdate(deltaTime);
+    }
+
+    protected void midUpdate(float deltaTime) {
     }
 
     public GraphicsContext getGraphicsContext() {
@@ -132,6 +147,10 @@ public abstract class RenderStage implements Sizable, Movable {
 
     public RenderStage getInputRenderStage(int index) {
         return inputStages.get(index);
+    }
+
+    public void setInputRenderStage(int index, RenderStage renderStage) {
+        inputStages.set(index, renderStage);
     }
 
     public Iterator<RenderStage> getInputRenderStageIterator() {

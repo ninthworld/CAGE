@@ -1,4 +1,4 @@
-package test;
+package biggerfish;
 
 import cage.core.engine.Engine;
 

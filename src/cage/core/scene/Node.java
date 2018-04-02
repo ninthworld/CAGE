@@ -64,21 +64,20 @@ public abstract class Node implements Destroyable {
 
         // Update world transform
         if(parent != null) {
-            worldPosition.set(parent.getWorldPosition());
             worldRotation.set(parent.getWorldRotation());
             worldScale.set(parent.getWorldScale());
             worldTransform.set(parent.getWorldTransform());
         }
         else {
-            worldTransform.identity();
-            worldPosition.set(new Vector3f());
             worldRotation.identity();
-            worldScale.set(new Vector3f(1.0f));
+            worldScale.set(1.0f, 1.0f, 1.0f);
+            worldTransform.identity();
         }
-        worldPosition.add(localPosition);
         worldRotation.mul(localRotation);
         worldScale.mul(localScale);
         worldTransform.mul(localTransform);
+        Vector4f wp = new Vector4f(0.0f, 0.0f, 0.0f, 1.0f).mul(worldTransform);
+        worldPosition.set(wp.x, wp.y, wp.z);
     }
 
     public Node getParentNode() {
@@ -256,6 +255,7 @@ public abstract class Node implements Destroyable {
     public void notifyUpdate() {
         localUpdated = true;
     }
+
     public boolean isEnabled() {
         return enabled;
     }
@@ -284,7 +284,9 @@ public abstract class Node implements Destroyable {
     }
 
     public void removeAllNodes() {
-        children.forEach(this::removeNode);
+        while(!children.isEmpty()) {
+            removeNode(0);
+        }
     }
 
     public int getNodeCount() {
@@ -301,5 +303,9 @@ public abstract class Node implements Destroyable {
 
     public Iterator<Node> getNodeIterator() {
         return children.iterator();
+    }
+
+    @Override
+    public void destroy() {
     }
 }

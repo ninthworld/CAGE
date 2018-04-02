@@ -36,6 +36,7 @@ public class LightingRenderStage extends FXRenderStage {
     private boolean useSkybox;
     private boolean useSkydome;
     private boolean useAtmosphere;
+    private float time;
 
     public LightingRenderStage(SceneManager sceneManager, Model fxModel, Shader shader, RenderTarget renderTarget, GraphicsContext graphicsContext) {
         super(fxModel, shader, renderTarget, graphicsContext);
@@ -46,6 +47,7 @@ public class LightingRenderStage extends FXRenderStage {
         this.useSkybox = false;
         this.useSkydome = false;
         this.useAtmosphere = false;
+        this.time = 0.0f;
     }
 
     @Override
@@ -75,6 +77,7 @@ public class LightingRenderStage extends FXRenderStage {
             skyboxBuffer.put(8, (useSkybox ? 1.0f : 0.0f));
             skyboxBuffer.put(9, (useSkydome ? 1.0f : 0.0f));
             skyboxBuffer.put(10, (useAtmosphere ? 1.0f : 0.0f));
+            skyboxBuffer.put(11, time);
             skyboxBuffer.rewind();
             skyboxUniform.writeData(skyboxBuffer);
         }
@@ -105,6 +108,11 @@ public class LightingRenderStage extends FXRenderStage {
             SSAORenderStage ssaoRenderStage = (SSAORenderStage)getInputRenderStage(2);
             getShader().addTexture("ssaoTexture", ssaoRenderStage.getDiffuseTextureOutput());
         }
+    }
+
+    @Override
+    protected void midUpdate(float deltaTime) {
+        time += deltaTime;
     }
 
     public SceneManager getSceneManager() {
@@ -169,5 +177,13 @@ public class LightingRenderStage extends FXRenderStage {
 
     public void setUseSkydome(boolean useSkydome) {
         this.useSkydome = useSkydome;
+    }
+
+    public float getTime() {
+        return time;
+    }
+
+    public void setTime(float time) {
+        this.time = time;
     }
 }

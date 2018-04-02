@@ -1,1 +1,1 @@
-javac -cp .;CAGE.jar test/*.java
+javac -cp .;CAGE.jar biggerfish/*.java
