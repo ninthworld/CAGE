@@ -44,10 +44,14 @@ public class QuadTree extends SceneNode {
         this.model = generateModel(graphicsDevice);
         this.camera = sceneManager.getDefaultCamera();
         scale(lodRanges[0]);
+        initialize();
+    }
+    
+    protected void initialize() {
         addNode(new QuadTreeNode(this, this, 0, new Vector2i(0, 0)));
         addNode(new QuadTreeNode(this, this, 0, new Vector2i(0, 1)));
         addNode(new QuadTreeNode(this, this, 0, new Vector2i(1, 0)));
-        addNode(new QuadTreeNode(this, this, 0, new Vector2i(1, 1)));
+        addNode(new QuadTreeNode(this, this, 0, new Vector2i(1, 1)));    	
     }
     
     public float[] getLodRanges() {

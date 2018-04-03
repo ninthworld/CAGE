@@ -1,6 +1,9 @@
 package biggerfish.terrain;
 
+import org.joml.Vector2i;
+
 import biggerfish.quadtree.QuadTree;
+import biggerfish.quadtree.QuadTreeNode;
 import cage.core.asset.AssetManager;
 import cage.core.graphics.GraphicsDevice;
 import cage.core.graphics.sampler.Sampler;
@@ -37,5 +40,13 @@ public class TerrainManager extends QuadTree {
         material.getDiffuseTexture().setSampler(sampler);
         material.getSpecularTexture().setSampler(sampler);
         material.getNormalTexture().setSampler(sampler);
+    }
+    
+    @Override
+    protected void initialize() {
+        addNode(new TerrainNode(this, this, 0, new Vector2i(0, 0)));
+        addNode(new TerrainNode(this, this, 0, new Vector2i(0, 1)));
+        addNode(new TerrainNode(this, this, 0, new Vector2i(1, 0)));
+        addNode(new TerrainNode(this, this, 0, new Vector2i(1, 1)));    	
     }
 }

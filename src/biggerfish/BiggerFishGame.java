@@ -19,6 +19,7 @@ import cage.core.graphics.shader.Shader;
 import cage.core.graphics.texture.Texture;
 import cage.core.graphics.type.CullType;
 import cage.core.graphics.type.EdgeType;
+import cage.core.graphics.type.FillType;
 import cage.core.graphics.type.FormatType;
 import cage.core.graphics.vertexarray.VertexArray;
 import cage.core.input.action.CloseWindowAction;
@@ -131,7 +132,15 @@ public class BiggerFishGame implements Game {
         engine.getInputManager().addAction(keyboard, Key.F1, InputActionType.PRESS, ((deltaTime, event) -> {
         	engine.getWindow().setFullscreen(!engine.getWindow().isFullscreen());
         }));
-
+        engine.getInputManager().addAction(keyboard, Key.F2, InputActionType.PRESS, ((deltaTime, event) -> {
+        	if(terrainManager.getModel().getMesh(0).getRasterizer().getFillType() == FillType.SOLID) {
+        		terrainManager.getModel().getMesh(0).getRasterizer().setFillType(FillType.WIREFRAME);
+        	}
+        	else {
+        		terrainManager.getModel().getMesh(0).getRasterizer().setFillType(FillType.SOLID);        		
+        	}
+        }));
+        
         Camera defaultCamera = engine.getSceneManager().getDefaultCamera();
         defaultCamera.moveUp(72.0f);
         InputAction mouseAction = (deltaTime, event) -> {

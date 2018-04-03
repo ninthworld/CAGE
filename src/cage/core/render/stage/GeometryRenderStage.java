@@ -60,38 +60,36 @@ public class GeometryRenderStage extends RenderStage {
         node.getNodeIterator().forEachRemaining(this::renderNode);
         if(node instanceof SceneEntity) {
             SceneEntity entity = (SceneEntity)node;
-            Model model = entity.getModel();
-
-            entityUniform.writeData(entity.readData());
-
-            getGraphicsContext().bindVertexArray(model.getVertexArray());
-            model.getMeshIterator().forEachRemaining((Mesh mesh) -> {
-                Material material = mesh.getMaterial();
-                materialUniform.writeData(material.readData());
-
-                if(material.getDiffuseTexture() != null && material.getDiffuseTexture() instanceof Texture2D) {
-                    getShader().addTexture("diffuseTexture", material.getDiffuseTexture());
-                }
-
-                if(material.getNormalTexture() != null && material.getNormalTexture() instanceof Texture2D) {
-                    getShader().addTexture("normalTexture", material.getNormalTexture());
-                }
-
-                if(material.getSpecularTexture() != null && material.getSpecularTexture() instanceof Texture2D) {
-                    getShader().addTexture("specularTexture", material.getSpecularTexture());
-                }
-
-                if(material.getHighlightTexture() != null && material.getHighlightTexture() instanceof Texture2D) {
-                    getShader().addTexture("highlightTexture", material.getHighlightTexture());
-                }
-
-                getGraphicsContext().setPrimitive(mesh.getPrimitive());
-                getGraphicsContext().bindRasterizer(mesh.getRasterizer());
-                getGraphicsContext().bindShader(getShader());
-                getGraphicsContext().drawIndexed(mesh.getIndexBuffer());
-            });
-            //getGraphicsContext().unbindShader(getShader());
-            //getGraphicsContext().unbindVertexArray(model.getVertexArray());
+            if(camera.getFrustum().inFrustum(entity.getWorldBounds())) {
+	            entityUniform.writeData(entity.readData());            
+	            Model model = entity.getModel();
+	            getGraphicsContext().bindVertexArray(model.getVertexArray());
+	            model.getMeshIterator().forEachRemaining((Mesh mesh) -> {
+	                Material material = mesh.getMaterial();
+	                materialUniform.writeData(material.readData());
+	
+	                if(material.getDiffuseTexture() != null && material.getDiffuseTexture() instanceof Texture2D) {
+	                    getShader().addTexture("diffuseTexture", material.getDiffuseTexture());
+	                }
+	
+	                if(material.getNormalTexture() != null && material.getNormalTexture() instanceof Texture2D) {
+	                    getShader().addTexture("normalTexture", material.getNormalTexture());
+	                }
+	
+	                if(material.getSpecularTexture() != null && material.getSpecularTexture() instanceof Texture2D) {
+	                    getShader().addTexture("specularTexture", material.getSpecularTexture());
+	                }
+	
+	                if(material.getHighlightTexture() != null && material.getHighlightTexture() instanceof Texture2D) {
+	                    getShader().addTexture("highlightTexture", material.getHighlightTexture());
+	                }
+	
+	                getGraphicsContext().setPrimitive(mesh.getPrimitive());
+	                getGraphicsContext().bindRasterizer(mesh.getRasterizer());
+	                getGraphicsContext().bindShader(getShader());
+	                getGraphicsContext().drawIndexed(mesh.getIndexBuffer());
+	            });
+	        }
         }
     }
 

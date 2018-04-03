@@ -85,7 +85,7 @@ public class TerrainRenderStage extends GeometryRenderStage {
         node.getNodeIterator().forEachRemaining(this::renderNode);
         if(node instanceof QuadTreeNode) {
             QuadTreeNode entity = (QuadTreeNode)node;
-            if(entity.isLeaf()) {
+            if(entity.isLeaf() && getCamera().getFrustum().inFrustum(entity.getWorldBounds())) {
                 Model model = entity.getModel();
                 Mesh mesh = model.getMesh(entity.getMeshIndex());
                 entityUniform.writeData(entity.readData());

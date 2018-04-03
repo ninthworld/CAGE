@@ -37,11 +37,7 @@ public class QuadTreeNode extends SceneEntity {
             if(getNodeCount() == 0) {
                 for(int i = 0; i < 2; ++i) {
                     for(int j = 0; j < 2; ++j) {
-                        addNode(new QuadTreeNode(
-                                quadTree,
-                                this,
-                                lod + 1,
-                                new Vector2i(i, j)));
+                        addNewChild(quadTree, this, lod + 1, new Vector2i(i, j));
                     }
                 }
             }
@@ -90,6 +86,10 @@ public class QuadTreeNode extends SceneEntity {
         return leaf;
     }
 
+    protected void addNewChild(QuadTree quadTree, Node parent, int lod, Vector2i nodeIndex) {
+    	addNode(new QuadTreeNode(quadTree, parent, lod, nodeIndex));
+    }
+    
     private boolean checkNeighbor(Node node, Vector2fc worldPos) {
         if(node.getNodeCount() > 0) {
             Vector2f nodePos = new Vector2f(node.getWorldPosition().x(), node.getWorldPosition().z());

@@ -5,6 +5,8 @@ import cage.core.graphics.config.LayoutConfig;
 import cage.core.scene.Node;
 import cage.core.scene.SceneManager;
 import cage.core.scene.SceneNode;
+import cage.core.utils.math.Frustum;
+
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 import org.joml.Vector3f;
@@ -19,14 +21,18 @@ public abstract class Camera extends SceneNode implements Readable {
 
     private float zNear;
     private float zFar;
+    private Frustum frustum;
     private Matrix4f viewMatrix;
+    protected Matrix4f projMatrix;
     protected FloatBuffer buffer;
 
     public Camera(SceneManager sceneManager, Node parent) {
         super(sceneManager, parent);
         this.zNear = 0.1f;
         this.zFar = 1000.0f;
+        this.frustum = new Frustum();
         this.viewMatrix = new Matrix4f().identity();
+        this.projMatrix = new Matrix4f().identity();
         this.buffer = BufferUtils.createFloatBuffer(READ_SIZE);
     }
 
@@ -44,11 +50,17 @@ public abstract class Camera extends SceneNode implements Readable {
         buffer.rewind();
     }
 
+    public Frustum getFrustum() {
+    	return frustum;
+    }
+    
     public Matrix4fc getViewMatrix() {
         return viewMatrix;
     }
 
-    public abstract Matrix4fc getProjectionMatrix();
+    public Matrix4fc getProjectionMatrix() {
+        return projMatrix;
+    }
 
     public float getZNear() {
         return zNear;

@@ -161,13 +161,13 @@ void main() {
         color = mix(color, mix(vec3(0.0, 0.1, 0.2), vec3(0.0, 0.5, 0.7), clamp((1.0 + position.y / WATER_LEVEL) / 2.0, 0.0, 1.0)), clamp(dist / 500.0, 0.0, 1.0));
 
         if(depth < 1.0) {
-            float delta = skybox.time * 1.5;
+            float delta = skybox.time * 0.8;
             vec2 texCoord = position.xz;
-            vec2 distortedTexCoord = texture(dudvTexture, vec2(texCoord.x + delta, texCoord.y) * 0.02).rg;
-            distortedTexCoord = (texCoord + vec2(distortedTexCoord.x, distortedTexCoord.y + delta)) * 0.02;
+            vec2 distortedTexCoord = texture(dudvTexture, vec2(texCoord.x + delta, texCoord.y) * 0.01).rg;
+            distortedTexCoord = (texCoord + vec2(distortedTexCoord.x, distortedTexCoord.y + delta)) * 0.01;
             vec2 distortion = (texture(dudvTexture, distortedTexCoord).rg * 2.0 - 1.0);
 
-            distortion = clamp(abs(distortion), 0.0, 1.0);
+            distortion = clamp(abs(distortion), 0.0, 0.5);
             float value = pow(1.0 - (distortion.x + distortion.y), 4.0) * 0.5;
             float cosTheta = clamp(dot(normal, -skybox.sunPosition.xyz), 0.0, 1.0);
 

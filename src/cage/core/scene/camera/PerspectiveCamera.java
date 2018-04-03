@@ -21,12 +21,10 @@ public class PerspectiveCamera extends Camera implements Sizable {
     private List<Listener> listeners;
 
     private float fov;
-    private Matrix4f projMatrix;
 
     public PerspectiveCamera(SceneManager sceneManager, Node parent) {
         super(sceneManager, parent);
         this.fov = 45.0f;
-        this.projMatrix = new Matrix4f().identity();
 
         this.width = 1;
         this.height = 1;
@@ -50,15 +48,11 @@ public class PerspectiveCamera extends Camera implements Sizable {
 
         projMatrix.identity();
         projMatrix.perspective(fov, (float)width / (float)height, getZNear(), getZFar());
+        getFrustum().setFrustum(getViewMatrix(), projMatrix);
 
         projMatrix.get(buffer);
         getProjectionMatrix().invert(new Matrix4f()).get(32, buffer);
         buffer.rewind();
-    }
-
-    @Override
-    public Matrix4fc getProjectionMatrix() {
-        return projMatrix;
     }
 
     @Override

@@ -11,7 +11,6 @@ public class OrthographicCamera extends Camera {
     private float right;
     private float bottom;
     private float top;
-    private Matrix4f projMatrix;
 
     public OrthographicCamera(SceneManager sceneManager, Node parent) {
         super(sceneManager, parent);
@@ -19,7 +18,6 @@ public class OrthographicCamera extends Camera {
         this.right = 1.0f;
         this.bottom = -1.0f;
         this.top = 1.0f;
-        this.projMatrix = new Matrix4f().identity();
     }
 
     @Override
@@ -28,15 +26,11 @@ public class OrthographicCamera extends Camera {
 
         projMatrix.identity();
         projMatrix.ortho(left, right, bottom, top, getZNear(), getZFar());
+        getFrustum().setFrustum(getViewMatrix(), projMatrix);
 
         projMatrix.get(buffer);
         getProjectionMatrix().invert(new Matrix4f()).get(32, buffer);
         buffer.rewind();
-    }
-
-    @Override
-    public Matrix4fc getProjectionMatrix() {
-        return projMatrix;
     }
 
     public float getLeft() {
