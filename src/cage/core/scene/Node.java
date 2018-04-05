@@ -106,12 +106,12 @@ public abstract class Node implements Destroyable {
         setLocalPosition(new Vector3f(x, y, z));
     }
 
-    public Matrix3f getLocalRotation() {
-        return new Matrix3f(localRotation);
+    public Matrix3fc getLocalRotation() {
+        return localRotation;
     }
 
-    public void setLocalRotation(Matrix3f rotation) {
-        localRotation = rotation;
+    public void setLocalRotation(Matrix3fc rotation) {
+        localRotation.set(rotation);
         notifyUpdate();
     }
 
@@ -240,8 +240,11 @@ public abstract class Node implements Destroyable {
     }
 
     public void lookAt(Vector3fc target, Vector3fc up) {
-        localRotation.setLookAlong(target, up);
-        notifyUpdate();
+        Vector3f along = new Vector3f(target).sub(getLocalPosition());
+        if(along.length() > 0.0f) {
+            localRotation.setLookAlong(along, up);
+            notifyUpdate();
+        }
     }
 
     public void lookAt(Vector3fc target) {
@@ -250,6 +253,23 @@ public abstract class Node implements Destroyable {
 
     public void lookAt(float x, float y, float z) {
         lookAt(new Vector3f(x, y, z), Direction.UP);
+    }
+
+    public void lookAlong(Vector3fc target, Vector3fc up) {
+        localRotation.setLookAlong(target, up);
+        notifyUpdate();
+    }
+
+    public void lookAlong(Vector3fc target) {
+        lookAlong(target, Direction.UP);
+    }
+
+    public void lookAlong(float x, float y, float z) {
+        lookAlong(new Vector3f(x, y, z), Direction.UP);
+    }
+
+    public boolean isLocalUpdated() {
+        return localUpdated;
     }
 
     public void notifyUpdate() {

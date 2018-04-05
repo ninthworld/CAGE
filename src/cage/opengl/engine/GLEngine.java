@@ -35,15 +35,16 @@ public class GLEngine extends Engine {
     @Override
     public void run(Game game) {
         game.initialize(this);
-        getSceneManager().update(0.0f);
+        getSceneManager().updateNodes(0.0f);
 
         float deltaTime;
         while(!getWindow().isClosed()) {
             deltaTime = timer.getElapsedTime();
             timer.reset();
 
+            getSceneManager().updateControllers(deltaTime);
             game.update(this, deltaTime);
-            getSceneManager().update(deltaTime);
+            getSceneManager().updateNodes(deltaTime);
             getRenderManager().update(deltaTime);
 
             game.render(this);

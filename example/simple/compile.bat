@@ -1,1 +1,0 @@
-javac -cp .;CAGE.jar biggerfish/*.java

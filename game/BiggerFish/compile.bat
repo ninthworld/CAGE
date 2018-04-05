@@ -1,0 +1,1 @@
+javac -cp .;CAGE.jar biggerfish/*.java biggerfish/gui/*.java biggerfish/networking/*.java biggerfish/quadtree/*.java biggerfish/terrain/*.java biggerfish/water/*.java

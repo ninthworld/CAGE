@@ -1,1 +1,0 @@
-java -cp .;CAGE.jar biggerfish.BiggerFishGame

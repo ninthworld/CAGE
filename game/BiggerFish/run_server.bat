@@ -1,0 +1,1 @@
+java -cp .;CAGE.jar biggerfish.networking.BiggerFishServer 8888

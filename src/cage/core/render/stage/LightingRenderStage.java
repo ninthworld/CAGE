@@ -104,10 +104,6 @@ public class LightingRenderStage extends FXRenderStage {
             ShadowRenderStage shadowRenderStage = (ShadowRenderStage)getInputRenderStage(1);
             getShader().addTexture("shadowTexture", shadowRenderStage.getDiffuseTextureOutput());
         }
-        if(getInputRenderStageCount() > 2 && getInputRenderStage(2) instanceof SSAORenderStage) {
-            SSAORenderStage ssaoRenderStage = (SSAORenderStage)getInputRenderStage(2);
-            getShader().addTexture("ssaoTexture", ssaoRenderStage.getDiffuseTextureOutput());
-        }
     }
 
     @Override

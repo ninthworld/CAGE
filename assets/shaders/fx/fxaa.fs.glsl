@@ -5,6 +5,13 @@
 
 #version 430 core
 
+#include "..\common.glsl"
+
+#define THRESHOLD       0.1
+#define MUL_REDUCE      1.0 / 8.0
+#define MIN_REDUCE      1.0 / 128.0
+#define MAX_SPAN        8.0
+
 in vec2 vs_texCoord;
 
 layout(location=0) out vec4 fs_color;
@@ -15,15 +22,6 @@ layout(std140) uniform Window {
     vec2 windowSize;
     vec2 texelSize;
 } window;
-
-#define THRESHOLD       0.1
-#define MUL_REDUCE      1.0 / 8.0
-#define MIN_REDUCE      1.0 / 128.0
-#define MAX_SPAN        8.0
-
-float getLuma(vec3 color) {
-    return dot(color, vec3(0.299, 0.587, 0.114));
-}
 
 void main() {
 	vec3 diffuse = texture(diffuseTexture, vs_texCoord).rgb;

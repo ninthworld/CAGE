@@ -1,11 +1,15 @@
 package biggerfish;
 
 import biggerfish.gui.FPSMonitor;
+import biggerfish.networking.BiggerFishClient;
+import biggerfish.networking.PlayerEntity;
 import biggerfish.terrain.TerrainManager;
 import biggerfish.terrain.TerrainRenderStage;
 import biggerfish.water.CombineRenderStage;
+import biggerfish.water.UnderwaterRenderStage;
 import biggerfish.water.WaterManager;
 import biggerfish.water.WaterRenderStage;
+import cage.core.application.Timer;
 import cage.core.engine.Engine;
 
 import cage.core.application.Game;
@@ -38,14 +42,19 @@ import cage.core.scene.SceneEntity;
 import cage.core.scene.SceneNode;
 import cage.core.scene.camera.Camera;
 import cage.core.scene.controller.RotationController;
+import cage.core.scene.controller.TPCameraController;
 import cage.core.scene.light.DirectionalLight;
 import cage.core.scene.light.Light;
 import cage.core.utils.math.Angle;
 import cage.core.utils.math.Direction;
 import cage.glfw.GLFWBootstrap;
+import cage.opengl.engine.GLEngine;
 import org.joml.Vector3f;
 import org.lwjgl.system.MemoryStack;
+import ray.networking.IGameConnection;
 
+import java.io.IOException;
+import java.net.InetAddress;
 import java.nio.FloatBuffer;
 import java.util.Iterator;
 
@@ -53,16 +62,44 @@ import static org.lwjgl.system.MemoryStack.stackPush;
 
 public class BiggerFishGame implements Game {
 
+    private BiggerFishClient client;
+    private boolean multiplayer;
+    private boolean connected;
+
+    private PlayerEntity player;
+
     private FPSMonitor monitor;
     private boolean canLook;
     private DirectionalLight sunLight;
-
     private TerrainManager terrainManager;
     private WaterManager waterManager;
 
-    public BiggerFishGame(Engine engine) {
+    public BiggerFishGame(Engine engine, String[] args) {
         this.monitor = new FPSMonitor(engine.createTimer());
         this.canLook = false;
+
+        Model dolphinModel = engine.getAssetManager().loadOBJModelFile("dolphin/dolphinHighPoly.obj");
+        this.player = new PlayerEntity(null, engine.getSceneManager(), engine.getSceneManager().getRootSceneNode(), dolphinModel);
+        this.player.scale(4.0f);
+        this.player.moveUp(68.0f);
+        this.player.addNode(engine.getSceneManager().getDefaultCamera());
+
+        this.multiplayer = false;
+        this.connected = false;
+        if(args.length > 0) {
+            String[] split = args[0].split(":");
+            if(split.length == 2) {
+                String serverAddress = split[0];
+                int serverPort = Integer.parseInt(split[1]);
+                try {
+                    this.client = new BiggerFishClient(InetAddress.getByName(serverAddress), serverPort, IGameConnection.ProtocolType.UDP, this, engine);
+                    this.multiplayer = true;
+                    this.client.sendJoinMessage();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     @Override
@@ -112,14 +149,20 @@ public class BiggerFishGame implements Game {
                 (shader, renderTarget, graphicsContext) -> new WaterRenderStage(waterManager, shader, renderTarget, graphicsContext));
         waterRenderStage.addInputRenderStage(engine.getRenderManager().getDefaultLightingRenderStage());
 
+        Shader underwaterShader = engine.getAssetManager().loadShaderFile("fx/fx.vs.glsl", "water/underwater.fs.glsl");
+        underwaterShader.addUniformBuffer("Camera", engine.getRenderManager().getDefaultCameraUniformBuffer());
+        underwaterShader.addUniformBuffer("Skybox", engine.getRenderManager().getDefaultSkyboxUniformBuffer());
+        underwaterShader.addTexture("dudvTexture", dudvTexture);
+        UnderwaterRenderStage underwaterRenderStage = (UnderwaterRenderStage) engine.getRenderManager().createFXRenderStage(underwaterShader, UnderwaterRenderStage::new);
+        underwaterRenderStage.addInputRenderStage(engine.getRenderManager().getDefaultLightingRenderStage());
+
         Shader combineShader = engine.getAssetManager().loadShaderFile("fx/fx.vs.glsl", "fx/combine.fs.glsl");
         CombineRenderStage combineRenderStage = (CombineRenderStage)engine.getRenderManager().createFXRenderStage(combineShader, CombineRenderStage::new);
         combineRenderStage.addInputRenderStage(waterRenderStage);
-        combineRenderStage.addInputRenderStage(engine.getRenderManager().getDefaultLightingRenderStage());
+        combineRenderStage.addInputRenderStage(underwaterRenderStage);
+        combineRenderStage.setSecondDepthTexture(engine.getRenderManager().getDefaultGeometryRenderStage().getDepthTextureOutput());
 
         engine.getRenderManager().getDefaultFXAARenderStage().setInputRenderStage(0, combineRenderStage);
-
-        engine.getAssetManager().getDefaultLightingShader().addTexture("dudvTexture", dudvTexture);
 
         initializeInput(engine);
     }
@@ -127,11 +170,16 @@ public class BiggerFishGame implements Game {
     private void initializeInput(Engine engine) {
         InputController mouse = engine.getInputManager().getMouseController();
         InputController keyboard = engine.getInputManager().getKeyboardController();
-        
+
+        // Exit - ESC
         engine.getInputManager().addAction(keyboard, Key.ESCAPE, InputActionType.PRESS, new CloseWindowAction(engine.getWindow()));
+
+        // Fullscreen - F1
         engine.getInputManager().addAction(keyboard, Key.F1, InputActionType.PRESS, ((deltaTime, event) -> {
         	engine.getWindow().setFullscreen(!engine.getWindow().isFullscreen());
         }));
+
+        // Toggle Wireframe - F2
         engine.getInputManager().addAction(keyboard, Key.F2, InputActionType.PRESS, ((deltaTime, event) -> {
         	if(terrainManager.getModel().getMesh(0).getRasterizer().getFillType() == FillType.SOLID) {
         		terrainManager.getModel().getMesh(0).getRasterizer().setFillType(FillType.WIREFRAME);
@@ -140,75 +188,60 @@ public class BiggerFishGame implements Game {
         		terrainManager.getModel().getMesh(0).getRasterizer().setFillType(FillType.SOLID);        		
         	}
         }));
-        
+
+        // Sun Position
+        engine.getInputManager().addAction(keyboard, Key.LEFT, InputActionType.REPEAT, ((deltaTime, event) -> sunLight.yawGlobal(2.0f * deltaTime)));
+        engine.getInputManager().addAction(keyboard, Key.RIGHT, InputActionType.REPEAT, ((deltaTime, event) -> sunLight.yawGlobal(-2.0f * deltaTime)));
+        engine.getInputManager().addAction(keyboard, Key.UP, InputActionType.REPEAT, ((deltaTime, event) -> sunLight.pitch(-2.0f * deltaTime)));
+        engine.getInputManager().addAction(keyboard, Key.DOWN, InputActionType.REPEAT, ((deltaTime, event) -> sunLight.pitch(2.0f * deltaTime)));
+
+        // Camera
         Camera defaultCamera = engine.getSceneManager().getDefaultCamera();
-        defaultCamera.moveUp(72.0f);
-        InputAction mouseAction = (deltaTime, event) -> {
-            if(canLook) {
-                if (event.getComponent() == Axis.LEFT_X) {
-                    defaultCamera.rotate(0.5f * deltaTime * event.getValue(), new Vector3f(0.0f, 1.0f, 0.0f));
-                } else if (event.getComponent() == Axis.LEFT_Y) {
-                    defaultCamera.rotate(0.5f * deltaTime * event.getValue(), new Vector3f(defaultCamera.getLocalRight()));
-                }
-            }
-        };
-        engine.getInputManager().addAction(mouse, Axis.LEFT_X, InputActionType.NONE, mouseAction);
-        engine.getInputManager().addAction(mouse, Axis.LEFT_Y, InputActionType.NONE, mouseAction);
-        engine.getInputManager().addAction(mouse, Button.RIGHT, InputActionType.PRESS, ((deltaTime, event) -> {
-            canLook = true;
-            engine.getWindow().setMouseVisible(false);
-        }));
-        engine.getInputManager().addAction(mouse, Button.RIGHT, InputActionType.RELEASE, ((deltaTime, event) -> {
-            canLook = false;
-            engine.getWindow().setMouseVisible(true);
-        }));
+        TPCameraController cameraController = new TPCameraController(defaultCamera, engine.getWindow());
+        engine.getSceneManager().addController(cameraController);
+        cameraController.addNode(player);
+        cameraController.setLook(false);
+        cameraController.setRadius(4.0f);
+        cameraController.setAzimuth(Angle.fromDegrees(180.0f));
+        cameraController.setElevation(Angle.fromDegrees(30.0f));
 
-        engine.getInputManager().addAction(keyboard, Key.W, InputActionType.REPEAT, ((deltaTime, event) -> {
-            defaultCamera.moveForward(16.0f * deltaTime);
-        }));
-        engine.getInputManager().addAction(keyboard, Key.A, InputActionType.REPEAT, ((deltaTime, event) -> {
-            defaultCamera.moveLeft(16.0f * deltaTime);
-        }));
-        engine.getInputManager().addAction(keyboard, Key.S, InputActionType.REPEAT, ((deltaTime, event) -> {
-            defaultCamera.moveBackward(16.0f * deltaTime);
-        }));
-        engine.getInputManager().addAction(keyboard, Key.D, InputActionType.REPEAT, ((deltaTime, event) -> {
-            defaultCamera.moveRight(16.0f * deltaTime);
-        }));
-        engine.getInputManager().addAction(keyboard, Key.SPACE, InputActionType.REPEAT, ((deltaTime, event) -> {
-            defaultCamera.translate(Direction.UP.mul(16.0f * deltaTime, new Vector3f()));
-        }));
-        engine.getInputManager().addAction(keyboard, Key.LSHIFT, InputActionType.REPEAT, ((deltaTime, event) -> {
-            defaultCamera.translate(Direction.UP.mul(-16.0f * deltaTime, new Vector3f()));
-        }));
-
-        // Sun position
-        engine.getInputManager().addAction(keyboard, Key.LEFT, InputActionType.REPEAT, ((deltaTime, event) -> {
-            sunLight.yawGlobal(2.0f * deltaTime);
-        }));
-        engine.getInputManager().addAction(keyboard, Key.RIGHT, InputActionType.REPEAT, ((deltaTime, event) -> {
-            sunLight.yawGlobal(-2.0f * deltaTime);
-        }));
-        engine.getInputManager().addAction(keyboard, Key.UP, InputActionType.REPEAT, ((deltaTime, event) -> {
-            sunLight.pitch(-2.0f * deltaTime);
-        }));
-        engine.getInputManager().addAction(keyboard, Key.DOWN, InputActionType.REPEAT, ((deltaTime, event) -> {
-            sunLight.pitch(2.0f * deltaTime);
-        }));
+        engine.getInputManager().addAction(mouse, Axis.LEFT_X, InputActionType.NONE, cameraController.createAzimuthAction(-0.5f));
+        engine.getInputManager().addAction(mouse, Axis.LEFT_Y, InputActionType.NONE, cameraController.createElevationAction(0.5f));
+        engine.getInputManager().addAction(mouse, Axis.RIGHT_Y, InputActionType.NONE, cameraController.createRadiusAction(-32.0f));
+        engine.getInputManager().addAction(mouse, Button.RIGHT, InputActionType.PRESS_AND_RELEASE, cameraController.createToggleLookAction());
+        engine.getInputManager().addAction(keyboard, Key.W, InputActionType.REPEAT, cameraController.createForwardAction(-16.0f));
+        engine.getInputManager().addAction(keyboard, Key.S, InputActionType.REPEAT, cameraController.createForwardAction(16.0f));
+        engine.getInputManager().addAction(keyboard, Key.A, InputActionType.REPEAT, cameraController.createRightAction(16.0f));
+        engine.getInputManager().addAction(keyboard, Key.D, InputActionType.REPEAT, cameraController.createRightAction(-16.0f));
+//        engine.getInputManager().addAction(keyboard, Key.A, InputActionType.REPEAT, cameraController.createYawAction(2.0f));
+//        engine.getInputManager().addAction(keyboard, Key.D, InputActionType.REPEAT, cameraController.createYawAction(-2.0f));
+        engine.getInputManager().addAction(keyboard, Key.SPACE, InputActionType.REPEAT, cameraController.createUpAction(16.0f));
+        engine.getInputManager().addAction(keyboard, Key.LSHIFT, InputActionType.REPEAT, cameraController.createUpAction(-16.0f));
     }
 
     @Override
     public void destroy(Engine engine) {
+        if(multiplayer) {
+            if(connected) {
+                client.sendLeaveMessage();
+            }
+            try {
+                client.shutdown();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
     public void update(Engine engine, float deltaTime) {
-        Iterator<Light> it = engine.getSceneManager().getLightIterator();
-        while(it.hasNext()) {
-            Light light = it.next();
-            light.notifyUpdate();
+        if(multiplayer) {
+            if(player.isLocalUpdated()) {
+                client.sendUpdateMessage(player);
+            }
+            client.processPackets();
         }
-        
+
         engine.getRenderManager().getDefaultLightingRenderStage().setSunPosition(sunLight.getDirection());
 
         terrainManager.update(false);
@@ -221,7 +254,23 @@ public class BiggerFishGame implements Game {
     public void render(Engine engine) {
     }
 
+    public PlayerEntity getPlayer() {
+        return player;
+    }
+
+    public boolean isMultiplayer() {
+        return multiplayer;
+    }
+
+    public boolean isConnected() {
+        return connected;
+    }
+
+    public void setConnected(boolean connected) {
+        this.connected = connected;
+    }
+
     public static void main(String[] args) {
-        new GLFWBootstrap("Bigger Fish", 1600, 900).setSamples(2).run(BiggerFishGame::new);
+        new GLFWBootstrap("Bigger Fish", 1600, 900).setSamples(2).run(engine -> new BiggerFishGame(engine, args));
     }
 }

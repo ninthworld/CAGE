@@ -33,8 +33,11 @@ public class SceneManager {
         this.defaultAmbientLight.setAmbientColor(new Vector3f(0.2f));
     }
 
-    public void update(float deltaTime) {
+    public void updateControllers(float deltaTime) {
         controllers.forEach((NodeController controller) -> controller.update(deltaTime));
+    }
+
+    public void updateNodes(float deltaTime) {
         rootNode.update(false);
     }
 

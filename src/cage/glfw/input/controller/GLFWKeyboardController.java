@@ -53,6 +53,7 @@ public class GLFWKeyboardController extends KeyboardController {
                 }
 
                 if(actionUsed == actionState.getActionType() ||
+                        (actionState.getActionType() == InputActionType.PRESS_AND_RELEASE && (actionUsed == InputActionType.PRESS || actionUsed == InputActionType.RELEASE)) ||
                         (actionState.getActionType() == InputActionType.REPEAT && actionUsed == InputActionType.PRESS)) {
                     actionState.getAction().performAction(deltaTime, new InputEvent() {
                         @Override
@@ -62,7 +63,7 @@ public class GLFWKeyboardController extends KeyboardController {
 
                         @Override
                         public float getValue() {
-                            return 0.0f;
+                            return 1.0f;
                         }
                     });
                 }

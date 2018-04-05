@@ -83,7 +83,7 @@ public class ShadowRenderStage extends RenderStage {
             GeometryRenderStage geometryRenderStage = (GeometryRenderStage) getInputRenderStage(0);
             getShader().addTexture("depthTexture", geometryRenderStage.getDepthTextureOutput());
             cameraUniform.writeData(geometryRenderStage.getCamera().readData());
-            shadowCamera.setLocalPosition(geometryRenderStage.getCamera().getLocalPosition());
+            shadowCamera.setLocalPosition(geometryRenderStage.getCamera().getWorldPosition());
 
             // Clear Output
             getGraphicsContext().bindRenderTarget(getRenderTarget());
@@ -93,7 +93,7 @@ public class ShadowRenderStage extends RenderStage {
             sceneManager.getLightIterator().forEachRemaining((Light light) -> {
                 if (light instanceof ShadowCastableLight && ((ShadowCastableLight) light).isCastShadow() && light instanceof DirectionalLight) {
                     // Setup the Shadow Camera
-                    shadowCamera.lookAt(((DirectionalLight) light).getDirection());
+                    shadowCamera.lookAlong(((DirectionalLight) light).getDirection());
 
                     shadowData.clear();
                     for(int i=0; i<RANGES.length; ++i) {
@@ -131,8 +131,6 @@ public class ShadowRenderStage extends RenderStage {
                     getGraphicsContext().bindBlender(blender);
                     getGraphicsContext().drawIndexed(mesh.getIndexBuffer());
                     getGraphicsContext().unbindBlender(blender);
-                    //getGraphicsContext().unbindShader(getShader());
-                    //getGraphicsContext().unbindVertexArray(fxModel.getVertexArray());
                 }
             });
         }
@@ -145,20 +143,17 @@ public class ShadowRenderStage extends RenderStage {
         node.getNodeIterator().forEachRemaining(this::renderNode);
         if(node instanceof SceneEntity) {
             SceneEntity entity = (SceneEntity)node;
-            if(!entity.isCastShadow()) {
-                return;
+            if(entity.isCastShadow() && shadowCamera.getFrustum().inFrustum(entity.getWorldBounds())) {
+                Model model = entity.getModel();
+                simpleEntityUniform.writeData(entity.readData());
+                getGraphicsContext().bindVertexArray(model.getVertexArray());
+                getGraphicsContext().bindShader(simpleShader);
+                model.getMeshIterator().forEachRemaining((Mesh mesh) -> {
+                    getGraphicsContext().setPrimitive(mesh.getPrimitive());
+                    getGraphicsContext().bindRasterizer(mesh.getRasterizer());
+                    getGraphicsContext().drawIndexed(mesh.getIndexBuffer());
+                });
             }
-            Model model = entity.getModel();
-            simpleEntityUniform.writeData(entity.readData());
-            getGraphicsContext().bindVertexArray(model.getVertexArray());
-            getGraphicsContext().bindShader(simpleShader);
-            model.getMeshIterator().forEachRemaining((Mesh mesh) -> {
-                getGraphicsContext().setPrimitive(mesh.getPrimitive());
-                getGraphicsContext().bindRasterizer(mesh.getRasterizer());
-                getGraphicsContext().drawIndexed(mesh.getIndexBuffer());
-            });
-            //getGraphicsContext().unbindShader(simpleShader);
-            //getGraphicsContext().unbindVertexArray(model.getVertexArray());
         }
     }
 
