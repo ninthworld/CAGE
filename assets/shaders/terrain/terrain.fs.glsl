@@ -2,6 +2,7 @@
 
 #include "..\tiling.glsl"
 
+in vec3 gs_position;
 in vec2 gs_texCoord;
 in vec2 gs_texCoordNorm;
 in vec3 gs_tangent;
@@ -10,57 +11,65 @@ layout(location=0) out vec4 fs_diffuse;
 layout(location=1) out vec4 fs_specular;
 layout(location=2) out vec4 fs_normal;
 
-layout(std140) uniform Material {
-    float useDiffuseTexture;
-    float useSpecularTexture;
-    float useHighlightTexture;
-    float useEmissiveTexture;
-    float useNormalTexture;
-    float shininess;
-    vec4 diffuseColor;
-    vec4 specularColor;
-    vec4 emissiveColor;
-} material;
+uniform sampler2D terrainNormalTexture;
+uniform sampler2D splatTexture;
+uniform sampler2D waveNormalTexture;
 
-uniform sampler2D normalmapTexture;
-
-uniform sampler2D diffuseTexture;
-uniform sampler2D specularTexture;
-uniform sampler2D highlightTexture;
-uniform sampler2D emissiveTexture;
-uniform sampler2D normalTexture;
+uniform sampler2D diffuseTexture0;
+uniform sampler2D specularTexture0;
+uniform sampler2D normalTexture0;
+uniform sampler2D diffuseTexture1;
+uniform sampler2D specularTexture1;
+uniform sampler2D normalTexture1;
+uniform sampler2D diffuseTexture2;
+uniform sampler2D specularTexture2;
+uniform sampler2D normalTexture2;
 
 void main() {
-    fs_diffuse = vec4(1.0, 1.0, 1.0, 1.0);
-    if(material.useDiffuseTexture > 0.0) {
-        fs_diffuse = textureNoTile(diffuseTexture, gs_texCoord);
-    }
-    fs_diffuse.rgb *= material.diffuseColor.rgb;
+    vec3 normal = normalize(texture(terrainNormalTexture, gs_texCoordNorm).rbg * 2.0 - 1.0);
+    normal.xy *= -1.0;
 
-    fs_specular = vec4(1.0, 1.0, 1.0, 1.0);
-    if(material.useSpecularTexture > 0.0) {
-        fs_specular.r = textureNoTile(specularTexture, gs_texCoord).r;
-    }
-    fs_specular.r *= material.specularColor.r;
+    vec3 blending = abs(vec3(pow(normal.x, 2.0), pow(normal.y, 2.0), pow(normal.z, 2.0)));
+    //vec3 blending = abs(normal * vec3(1.0, 3.0, 1.0));
+    blending = normalize(max(blending, 0.00001));
+    float b = (blending.x + blending.y + blending.z);
+    blending /= vec3(b, b, b);
 
-    if(material.useHighlightTexture > 0.0) {
-        fs_specular.g = textureNoTile(highlightTexture, gs_texCoord).r / 128.0;
-    }
-    else {
-        fs_specular.g = material.shininess / 128.0;
-    }
+    const float topScale = 0.5;
+    const float sideScale = 0.1;
 
-    vec3 normal = normalize(texture(normalmapTexture, gs_texCoordNorm).rbg * 2.0 - 1.0);
-    normal.z *= -1.0;
+    const float barnacleScale = 4.0;
+    float barnacle = texture(splatTexture, gs_texCoordNorm).g;
 
-    if(material.useNormalTexture > 0.0) {
-        normal *= -1.0;
-        vec3 norm = textureNoTile(normalTexture, gs_texCoord).rgb * 2.0 - 1.0;
-        mat3 TBN = mat3(gs_tangent, normalize(cross(normal, gs_tangent)), normal);
-        norm = norm * TBN;
-        fs_normal = vec4((norm + 1.0) / 2.0, 1.0);
-    }
-    else {
-        fs_normal = vec4((normal + 1.0) / 2.0, 1.0);
-    }
+    // Diffuse
+    vec3 diffuseY = textureNoTile(diffuseTexture0, gs_position.xz * topScale).rgb;
+    vec3 diffuseZ = textureNoTile(diffuseTexture1, gs_position.xy * sideScale).rgb;
+    vec3 diffuseX = textureNoTile(diffuseTexture1, gs_position.yz * sideScale).rgb;
+    diffuseZ = mix(diffuseZ, textureNoTile(diffuseTexture2, gs_position.xy * sideScale * barnacleScale).rgb, barnacle);
+    diffuseX = mix(diffuseX, textureNoTile(diffuseTexture2, gs_position.yz * sideScale * barnacleScale).rgb, barnacle);
+    fs_diffuse = vec4(diffuseX * blending.x + diffuseY * blending.y + diffuseZ * blending.z, 1.0);
+
+    // Specular
+    float specularY = textureNoTile(specularTexture0, gs_position.xz * topScale).r;
+    float specularZ = textureNoTile(specularTexture1, gs_position.xy * sideScale).r;
+    float specularX = textureNoTile(specularTexture1, gs_position.yz * sideScale).r;
+    specularZ = mix(specularZ, textureNoTile(specularTexture2, gs_position.xy * sideScale * barnacleScale).r, barnacle);
+    specularX = mix(specularX, textureNoTile(specularTexture2, gs_position.yz * sideScale * barnacleScale).r, barnacle);
+    fs_specular = vec4(specularX * blending.x + specularY * blending.y + specularZ * blending.z, 32.0 / 128.0, 1.0, 1.0);
+
+    // Normal
+    vec3 nY = mix(
+        textureNoTile(normalTexture0, gs_position.xz * topScale).rgb * 2.0 - 1.0,
+        textureNoTile(waveNormalTexture, gs_position.xz * topScale * 0.25).rgb * 2.0 - 1.0,
+        texture(splatTexture, gs_texCoordNorm).r);
+    vec3 nZ = textureNoTile(normalTexture1, gs_position.xy * sideScale).rgb * 2.0 - 1.0;
+    vec3 nX = textureNoTile(normalTexture1, gs_position.yz * sideScale).rgb * 2.0 - 1.0;
+    nZ = mix(nZ, textureNoTile(normalTexture2, gs_position.xy * sideScale * barnacleScale).rgb * 2.0 - 1.0, barnacle);
+    nX = mix(nX, textureNoTile(normalTexture2, gs_position.yz * sideScale * barnacleScale).rgb * 2.0 - 1.0, barnacle);
+
+    vec3 norm = nX * blending.x + nY * blending.y + nZ * blending.z;
+
+    mat3 TBN = mat3(gs_tangent, normalize(cross(normal, gs_tangent)), normal);
+    norm = norm * TBN;
+    fs_normal = vec4((norm + 1.0) / 2.0, 1.0);
 }

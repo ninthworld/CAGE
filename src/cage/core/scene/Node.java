@@ -133,15 +133,15 @@ public abstract class Node implements Destroyable {
     }
 
     public Vector3fc getLocalRight() {
-        return localRotation.getRow(0, new Vector3f());
+        return localRotation.getColumn(0, new Vector3f());
     }
 
     public Vector3fc getLocalForward() {
-        return localRotation.getRow(2, new Vector3f()).mul(-1.0f);
+        return localRotation.getColumn(2, new Vector3f());
     }
 
     public Vector3fc getLocalUp() {
-        return localRotation.getRow(1, new Vector3f());
+        return localRotation.getColumn(1, new Vector3f());
     }
 
     public Vector3fc getWorldPosition() {
@@ -161,15 +161,15 @@ public abstract class Node implements Destroyable {
     }
 
     public Vector3fc getWorldRight() {
-        return worldRotation.getRow(0, new Vector3f());
+        return worldRotation.getColumn(0, new Vector3f());
     }
 
     public Vector3fc getWorldForward() {
-        return worldRotation.getRow(1, new Vector3f());
+        return worldRotation.getColumn(2, new Vector3f());
     }
 
     public Vector3fc getWorldUp() {
-        return worldRotation.getRow(2, new Vector3f());
+        return worldRotation.getColumn(1, new Vector3f());
     }
 
     public void translate(Vector3fc offset) {
@@ -210,6 +210,11 @@ public abstract class Node implements Destroyable {
         notifyUpdate();
     }
 
+    public void rotateLocal(float angle, Vector3fc axis) {
+        localRotation.rotateLocal(angle, axis.x(), axis.y(), axis.z());
+        notifyUpdate();
+    }
+
     public void scale(Vector3fc mul) {
         localScale.mul(mul);
         notifyUpdate();
@@ -231,12 +236,20 @@ public abstract class Node implements Destroyable {
         rotate(angle, Direction.UP);
     }
 
-    public void yawGlobal(float angle) {
-        rotate(angle, getLocalUp());
-    }
-
     public void roll(float angle) {
         rotate(angle, Direction.FORWARD);
+    }
+
+    public void pitchLocal(float angle) {
+        rotateLocal(angle, Direction.RIGHT);
+    }
+
+    public void yawLocal(float angle) {
+        rotateLocal(angle, Direction.UP);
+    }
+
+    public void rollLocal(float angle) {
+        rotateLocal(angle, Direction.FORWARD);
     }
 
     public void lookAt(Vector3fc target, Vector3fc up) {

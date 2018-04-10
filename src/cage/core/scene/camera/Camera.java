@@ -41,7 +41,7 @@ public abstract class Camera extends SceneNode implements Readable {
         super.updateNode();
 
         viewMatrix.identity();
-        viewMatrix.mul(new Matrix4f().identity().set(getWorldRotation()));
+        viewMatrix.mul(new Matrix4f().identity().set(getLocalRotation()));
         viewMatrix.translate(getWorldPosition().mul(-1.0f, new Vector3f()));
 
         buffer.clear();

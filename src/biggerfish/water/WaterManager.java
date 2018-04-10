@@ -23,7 +23,7 @@ import static org.lwjgl.system.MemoryStack.stackPush;
 
 public class WaterManager extends SceneEntity {
 
-    private static final float WATER_LEVEL = 128.0f;
+    private static final float WATER_LEVEL = 128.0f + 16.0f;
     private static final float WATER_SCALE = 2048.0f;
 
     private Camera camera;

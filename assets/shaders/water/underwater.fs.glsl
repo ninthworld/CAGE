@@ -43,7 +43,7 @@ void main() {
 
         if(depth < 1.0) {
             float normalMul = clamp(dot(normal, -skybox.sunPosition.xyz), 0.0, 1.0);
-            float radiusMul = clamp(1.0 - dist / (position.y * 2.0), 0.0, 1.0);
+            float radiusMul = 1.0 - clamp(dist / 256.0, 0.0, 1.0);
             float depthMul = clamp(position.y / WATER_LEVEL, 0.0, 1.0);
 
             float caOffset = 0.2;
@@ -56,9 +56,8 @@ void main() {
             for(int i=0; i<3; ++i) {
                 value[i] = (distortion[i].x + distortion[i].y) / 2.0;
                 value[i] = clamp(abs(value[i]), 0.0, 1.0);
-                value[i] = pow(1.0 - value[i], 16.0) * 0.2;
+                value[i] = pow(1.0 - value[i], 16.0) * 0.08;
             }
-
 
             color += vec3(value[0], value[1], value[2]) * normalMul * radiusMul * depthMul;
         }

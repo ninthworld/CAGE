@@ -1,7 +1,7 @@
 #ifndef COMMON_WATER_GLSL
 #define COMMON_WATER_GLSL
 
-#define WATER_LEVEL     128.0
+#define WATER_LEVEL     128.0 + 16.0
 
 vec2 getDistortedTexCoord(sampler2D dudv, vec2 texCoord, float freq0, float freq1, float amp, float delta) {
     float time = delta * 2.0;

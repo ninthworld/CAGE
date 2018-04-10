@@ -2,7 +2,6 @@
 #define COMMON_GLSL
 
 #define PI              3.14159265359
-#define BIAS_MATRIX     mat4(0.5, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0, 0.5, 0.5, 0.5, 1.0)
 
 float getLinearDepth(float depth) {
     const float near = 0.1;

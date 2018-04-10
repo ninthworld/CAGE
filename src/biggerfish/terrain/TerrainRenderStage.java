@@ -23,14 +23,9 @@ public class TerrainRenderStage extends GeometryRenderStage {
 
     private UniformBuffer cameraUniform;
     private UniformBuffer entityUniform;
-    private UniformBuffer materialUniform;
-    private Texture heightmapTexture;
-    private Texture normalmapTexture;
 
-    public TerrainRenderStage(Texture heightmapTexture, Texture normalmapTexture, TerrainManager node, Shader shader, RenderTarget renderTarget, GraphicsContext graphicsContext) {
+    public TerrainRenderStage(TerrainManager node, Shader shader, RenderTarget renderTarget, GraphicsContext graphicsContext) {
         super(node.getCamera(), node, shader, renderTarget, graphicsContext);
-        this.heightmapTexture = heightmapTexture;
-        this.normalmapTexture = normalmapTexture;
     }
 
     @Override
@@ -40,31 +35,6 @@ public class TerrainRenderStage extends GeometryRenderStage {
         }
         if(entityUniform == null) {
             entityUniform = getShader().getUniformBuffer("Entity");
-        }
-        if(materialUniform == null) {
-            materialUniform = getShader().getUniformBuffer("Material");
-        }
-
-        getShader().addTexture("heightmapTexture", heightmapTexture);
-        getShader().addTexture("normalmapTexture", normalmapTexture);
-
-        Material material = ((TerrainManager)getSceneNode()).getModel().getMesh(0).getMaterial();
-        materialUniform.writeData(material.readData());
-
-        if (material.getDiffuseTexture() != null && material.getDiffuseTexture() instanceof Texture2D) {
-            getShader().addTexture("diffuseTexture", material.getDiffuseTexture());
-        }
-
-        if (material.getNormalTexture() != null && material.getNormalTexture() instanceof Texture2D) {
-            getShader().addTexture("normalTexture", material.getNormalTexture());
-        }
-
-        if (material.getSpecularTexture() != null && material.getSpecularTexture() instanceof Texture2D) {
-            getShader().addTexture("specularTexture", material.getSpecularTexture());
-        }
-
-        if (material.getHighlightTexture() != null && material.getHighlightTexture() instanceof Texture2D) {
-            getShader().addTexture("highlightTexture", material.getHighlightTexture());
         }
 
         cameraUniform.writeData(getCamera().readData());
@@ -96,21 +66,5 @@ public class TerrainRenderStage extends GeometryRenderStage {
                 getGraphicsContext().drawIndexed(mesh.getIndexBuffer());
             }
         }
-    }
-
-    public Texture getHeightMapTexture() {
-        return heightmapTexture;
-    }
-
-    public void setHeightMapTexture(Texture heightTexture) {
-        this.heightmapTexture = heightTexture;
-    }
-
-    public Texture getNormalmapTexture() {
-        return normalmapTexture;
-    }
-
-    public void setNormalmapTexture(Texture normalmapTexture) {
-        this.normalmapTexture = normalmapTexture;
     }
 }

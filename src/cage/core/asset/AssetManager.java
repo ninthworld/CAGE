@@ -75,8 +75,8 @@ public class AssetManager {
         this.assetProperties.setDefault("assets.shaders.default.geometry.simple.fragment", "geometry/simple.fs.glsl");
         this.assetProperties.setDefault("assets.shaders.default.fx.vertex", "fx/fx.vs.glsl");
         this.assetProperties.setDefault("assets.shaders.default.fx.lighting.fragment", "fx/lighting.fs.glsl");
-        this.assetProperties.setDefault("assets.shaders.default.fx.shadow.fragment", "fx/shadow.fs.glsl");
         this.assetProperties.setDefault("assets.shaders.default.fx.fxaa.fragment", "fx/fxaa.fs.glsl");
+        this.assetProperties.setDefault("assets.shaders.default.shadow.fragment", "shadow/shadow.fs.glsl");
         this.assetProperties.setDefault("assets.fonts.default", "arial.ttf");
         this.assetProperties.setDefault("assets.fonts.default.name", "Arial");
         this.assetProperties.setDefault("assets.textures.default.noise", "noise.bmp");
@@ -84,7 +84,7 @@ public class AssetManager {
         this.defaultGeometryShader = loadShader("default.geometry");
         this.defaultSimpleGeometryShader = loadShader("default.geometry.simple");
         this.defaultLightingShader = loadShader("default.fx", "default.fx.lighting");
-        this.defaultShadowShader = loadShader("default.fx", "default.fx.shadow");
+        this.defaultShadowShader = loadShader("default.fx", "default.shadow");
         this.defaultFXAAShader = loadShader("default.fx", "default.fx.fxaa");
         this.defaultNoiseTexture = loadTexture("default.noise");
     }

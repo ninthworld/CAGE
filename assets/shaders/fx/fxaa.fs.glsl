@@ -7,7 +7,7 @@
 
 #include "..\common.glsl"
 
-#define THRESHOLD       0.1
+#define THRESHOLD       0.3
 #define MUL_REDUCE      1.0 / 8.0
 #define MIN_REDUCE      1.0 / 128.0
 #define MAX_SPAN        8.0

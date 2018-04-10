@@ -6,6 +6,7 @@ layout(triangle_strip, max_vertices=3) out;
 in vec2 vs_texCoord[];
 in vec2 vs_texCoordNorm[];
 
+out vec3 gs_position;
 out vec2 gs_texCoord;
 out vec2 gs_texCoordNorm;
 out vec3 gs_tangent;
@@ -42,6 +43,7 @@ void main() {
 	    gs_texCoord = vs_texCoord[i];
 	    gs_texCoordNorm = vs_texCoordNorm[i];
 	    gs_tangent = calcTangent();
+	    gs_position = gl_in[i].gl_Position.xyz;
 	    gl_Position = camera.projMatrix * camera.viewMatrix * gl_in[i].gl_Position;
 	    EmitVertex();
 	}

@@ -24,7 +24,7 @@ public class GLUtils {
     }
 
     public static void logWarning(String str){
-        System.out.println("Warning: " + str);
+        // System.out.println("Warning: " + str);
     }
 
     public static void logError(String str){

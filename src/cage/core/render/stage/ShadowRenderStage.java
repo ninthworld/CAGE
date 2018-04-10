@@ -24,8 +24,8 @@ import java.nio.FloatBuffer;
 
 public class ShadowRenderStage extends RenderStage {
 
-    public static final int SHADOW_RESOLUTION = 1024;
-    private static final float[] RANGES = new float[] { 8.0f, 16.0f, 32.0f, 128.0f };
+    public static final int SHADOW_RESOLUTION = 2048;
+    private static final float[] RANGES = new float[] { 16.0f, 32.0f, 64.0f, 128.0f };
 
     private Shader simpleShader;
     private RenderTarget[] shadowRenderTargets;

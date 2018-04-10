@@ -18,6 +18,8 @@ public class TPCameraController extends NodeController {
     private float maxRadius;
     private float minElevation;
     private float maxElevation;
+    private float minPitch;
+    private float maxPitch;
     private boolean look;
     private boolean updated;
     private float forward;
@@ -32,9 +34,11 @@ public class TPCameraController extends NodeController {
         this.radius = 1.0f;
         this.azimuth = 0.0f;
         this.elevation = 0.0f;
-        this.maxRadius = 8.0f;
+        this.maxRadius = 32.0f;
         this.minElevation = Angle.fromDegrees(-90.0f);
         this.maxElevation = Angle.fromDegrees(90.0f);
+        this.minPitch = Angle.fromDegrees(-45.0f);
+        this.maxPitch = Angle.fromDegrees(45.0f);
         this.look = true;
         this.updated = false;
         this.forward = 0.0f;
@@ -67,13 +71,22 @@ public class TPCameraController extends NodeController {
                 float y = radius * (float) Math.sin(elevation);
                 float z = radius * (float) (Math.cos(elevation) * Math.cos(azimuth));
                 camera.setLocalPosition(x, y, z);
-                camera.lookAt(0.0f, 0.0f, 0.0f);
+                camera.update(true);
+                
+                Vector3f along = camera.getParentNode().getWorldPosition().sub(camera.getWorldPosition(), new Vector3f());
+                if(along.length() > 0.0f) {
+                	camera.lookAlong(along);
+                }
             }
             else {
                 node.moveForward(forward);
                 node.moveRight(right);
                 node.translate(Direction.UP.mul(up, new Vector3f()));
-                node.yaw(yaw);
+                node.rotateLocal(yaw, Direction.UP);
+                float pitchAngle = node.getLocalForward().dot(Direction.UP);
+                if((pitch < 0.0f && pitchAngle < maxPitch / Math.PI * 2.0f) || (pitch > 0.0f && pitchAngle > minPitch / Math.PI * 2.0f)) {
+                    node.rotate(pitch, Direction.RIGHT);
+                }
             }
         }
     }
@@ -243,5 +256,21 @@ public class TPCameraController extends NodeController {
 
     public void setWindow(Window window) {
         this.window = window;
+    }
+
+    public float getMinPitch() {
+        return minPitch;
+    }
+
+    public void setMinPitch(float minPitch) {
+        this.minPitch = minPitch;
+    }
+
+    public float getMaxPitch() {
+        return maxPitch;
+    }
+
+    public void setMaxPitch(float maxPitch) {
+        this.maxPitch = maxPitch;
     }
 }
