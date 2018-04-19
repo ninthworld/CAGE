@@ -1,7 +1,6 @@
 #version 430 core
 
-#define WORLD_SCALE 2048.0
-#define WORLD_HEIGHT 256.0
+#include "common.terrain.glsl"
 
 layout(location=0) in vec2 in_position;
 

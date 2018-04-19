@@ -2,9 +2,6 @@ package cage.core.render;
 
 import cage.core.common.listener.ResizeListener;
 import cage.core.graphics.GraphicsDevice;
-import cage.core.graphics.blender.Blender;
-import cage.core.graphics.type.BlendOpType;
-import cage.core.graphics.type.BlendType;
 import cage.core.window.Window;
 import cage.core.asset.AssetManager;
 import cage.core.graphics.*;
@@ -13,7 +10,6 @@ import cage.core.graphics.buffer.ShaderStorageBuffer;
 import cage.core.graphics.buffer.UniformBuffer;
 import cage.core.graphics.buffer.VertexBuffer;
 import cage.core.graphics.config.LayoutConfig;
-import cage.core.graphics.rasterizer.Rasterizer;
 import cage.core.graphics.rendertarget.RenderTarget;
 import cage.core.graphics.shader.Shader;
 import cage.core.graphics.vertexarray.VertexArray;
@@ -26,10 +22,7 @@ import cage.core.scene.SceneManager;
 import cage.core.scene.camera.Camera;
 import cage.core.scene.light.Light;
 
-import org.joml.Vector3f;
-import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.system.MemoryStack;
 
 import java.awt.*;
 import java.nio.FloatBuffer;
@@ -37,9 +30,6 @@ import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
-
-import static org.lwjgl.system.MemoryStack.stackPush;
 
 public class RenderManager {
 
@@ -70,9 +60,10 @@ public class RenderManager {
     private UniformBuffer defaultCameraUniformBuffer;
     private UniformBuffer defaultEntityUniformBuffer;
     private UniformBuffer defaultMaterialUniformBuffer;
-    private ShaderStorageBuffer defaultLightShaderStorageBuffer;
     private UniformBuffer defaultShadowUniformBuffer;
     private UniformBuffer defaultSkyboxUniformBuffer;
+    private ShaderStorageBuffer defaultLightShaderStorageBuffer;
+    private ShaderStorageBuffer defaultBoneShaderStorageBuffer;
 
     public RenderManager(GraphicsDevice graphicsDevice, GraphicsContext graphicsContext, Window window, SceneManager sceneManager, AssetManager assetManager) {
         this.outputStages = new ArrayList<>();
@@ -106,9 +97,17 @@ public class RenderManager {
         defaultSkyboxUniformBuffer = graphicsDevice.createUniformBuffer();
         defaultSkyboxUniformBuffer.setLayout(SKYBOX_READ_LAYOUT);
 
+        defaultBoneShaderStorageBuffer = graphicsDevice.createShaderStorageBuffer();
+        defaultBoneShaderStorageBuffer.setLayout(new LayoutConfig().mat4());
+
         assetManager.getDefaultGeometryShader().addUniformBuffer("Camera", defaultCameraUniformBuffer);
         assetManager.getDefaultGeometryShader().addUniformBuffer("Entity", defaultEntityUniformBuffer);
         assetManager.getDefaultGeometryShader().addUniformBuffer("Material", defaultMaterialUniformBuffer);
+
+        assetManager.getDefaultAnimatedGeometryShader().addUniformBuffer("Camera", defaultCameraUniformBuffer);
+        assetManager.getDefaultAnimatedGeometryShader().addUniformBuffer("Entity", defaultEntityUniformBuffer);
+        assetManager.getDefaultAnimatedGeometryShader().addUniformBuffer("Material", defaultMaterialUniformBuffer);
+        assetManager.getDefaultAnimatedGeometryShader().addShaderStorageBuffer("Bone", defaultBoneShaderStorageBuffer);
 
         UniformBuffer simpleCameraUniform = graphicsDevice.createUniformBuffer();
         simpleCameraUniform.setLayout(Camera.READ_LAYOUT);
@@ -169,7 +168,7 @@ public class RenderManager {
         return (GeometryRenderStage)createRenderStage(assetManager.getDefaultGeometryShader(), (shader, renderTarget, graphicsContext) -> {
             renderTarget.addColorTexture(1, graphicsDevice.createTexture2D(renderTarget.getWidth(), renderTarget.getHeight()));
             renderTarget.addColorTexture(2, graphicsDevice.createTexture2D(renderTarget.getWidth(), renderTarget.getHeight()));
-            return new GeometryRenderStage(camera, sceneManager.getRootSceneNode(), shader, renderTarget, graphicsContext);
+            return new GeometryRenderStage(camera, sceneManager.getRootSceneNode(), assetManager.getDefaultAnimatedGeometryShader(), shader, renderTarget, graphicsContext);
         });
     }
 
@@ -232,12 +231,16 @@ public class RenderManager {
         return defaultMaterialUniformBuffer;
     }
 
+    public UniformBuffer getDefaultSkyboxUniformBuffer() {
+        return defaultSkyboxUniformBuffer;
+    }
+
     public ShaderStorageBuffer getDefaultLightShaderStorageBuffer() {
         return defaultLightShaderStorageBuffer;
     }
 
-    public UniformBuffer getDefaultSkyboxUniformBuffer() {
-        return defaultSkyboxUniformBuffer;
+    public ShaderStorageBuffer getDefaultBoneShaderStorageBuffer() {
+        return defaultBoneShaderStorageBuffer;
     }
 
     public Model getDefaultFXModel() {

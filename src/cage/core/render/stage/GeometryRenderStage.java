@@ -1,11 +1,13 @@
 package cage.core.render.stage;
 
 import cage.core.graphics.*;
+import cage.core.graphics.buffer.ShaderStorageBuffer;
 import cage.core.graphics.buffer.UniformBuffer;
 import cage.core.graphics.rendertarget.RenderTarget;
 import cage.core.graphics.shader.Shader;
 import cage.core.graphics.texture.Texture;
 import cage.core.graphics.texture.Texture2D;
+import cage.core.model.ExtModel;
 import cage.core.model.Mesh;
 import cage.core.model.Model;
 import cage.core.model.material.Material;
@@ -13,17 +15,26 @@ import cage.core.scene.Node;
 import cage.core.scene.SceneEntity;
 import cage.core.scene.SceneNode;
 import cage.core.scene.camera.Camera;
+import org.joml.Matrix4f;
+import org.lwjgl.system.MemoryStack;
+
+import java.nio.FloatBuffer;
+
+import static org.lwjgl.system.MemoryStack.stackPush;
 
 public class GeometryRenderStage extends RenderStage {
 
+	private Shader boneShader;
     private UniformBuffer cameraUniform;
     private UniformBuffer entityUniform;
     private UniformBuffer materialUniform;
+    private ShaderStorageBuffer boneShaderStorage;
     private Camera camera;
     private SceneNode node;
 
-    public GeometryRenderStage(Camera camera, SceneNode node, Shader shader, RenderTarget renderTarget, GraphicsContext graphicsContext) {
+    public GeometryRenderStage(Camera camera, SceneNode node, Shader boneShader, Shader shader, RenderTarget renderTarget, GraphicsContext graphicsContext) {
         super(shader, renderTarget, graphicsContext);
+        this.boneShader = boneShader;
         this.camera = camera;
         this.node = node;
     }
@@ -38,6 +49,9 @@ public class GeometryRenderStage extends RenderStage {
         }
         if(materialUniform == null) {
             materialUniform = getShader().getUniformBuffer("Material");
+        }
+        if(boneShaderStorage == null) {
+            boneShaderStorage = boneShader.getShaderStorageBuffer("Bone");
         }
 
         cameraUniform.writeData(camera.readData());
@@ -67,27 +81,48 @@ public class GeometryRenderStage extends RenderStage {
 	            model.getMeshIterator().forEachRemaining((Mesh mesh) -> {
 	                Material material = mesh.getMaterial();
 	                materialUniform.writeData(material.readData());
-	
+
+	                Shader shader = getShader();
+                    if(model instanceof ExtModel) {
+                        shader = boneShader;
+                        ExtModel extModel = (ExtModel) model;
+                        Matrix4f[] jointTransforms = extModel.getAnimatedModel().getJointTransforms();
+                        try (MemoryStack stack = stackPush()) {
+                            FloatBuffer boneBuffer = stack.callocFloat(jointTransforms.length * 16);
+                            for(int i = 0; i < jointTransforms.length; ++i) {
+                                jointTransforms[i].get(i * 16, boneBuffer);
+                            }
+                            boneBuffer.rewind();
+                            boneShaderStorage.writeData(boneBuffer);
+                        }
+                    }
+
 	                if(material.getDiffuseTexture() != null && material.getDiffuseTexture() instanceof Texture2D) {
-	                    getShader().addTexture("diffuseTexture", material.getDiffuseTexture());
+                        shader.addTexture("diffuseTexture", material.getDiffuseTexture());
 	                }
 	
 	                if(material.getNormalTexture() != null && material.getNormalTexture() instanceof Texture2D) {
-	                    getShader().addTexture("normalTexture", material.getNormalTexture());
+                        shader.addTexture("normalTexture", material.getNormalTexture());
 	                }
 	
 	                if(material.getSpecularTexture() != null && material.getSpecularTexture() instanceof Texture2D) {
-	                    getShader().addTexture("specularTexture", material.getSpecularTexture());
+                        shader.addTexture("specularTexture", material.getSpecularTexture());
 	                }
 	
 	                if(material.getHighlightTexture() != null && material.getHighlightTexture() instanceof Texture2D) {
-	                    getShader().addTexture("highlightTexture", material.getHighlightTexture());
+	                    shader.addTexture("highlightTexture", material.getHighlightTexture());
 	                }
-	
+
+	                if(mesh.getBlender() != null) {
+                        getGraphicsContext().bindBlender(mesh.getBlender());
+                    }
 	                getGraphicsContext().setPrimitive(mesh.getPrimitive());
 	                getGraphicsContext().bindRasterizer(mesh.getRasterizer());
-	                getGraphicsContext().bindShader(getShader());
+                    getGraphicsContext().bindShader(shader);
 	                getGraphicsContext().drawIndexed(mesh.getIndexBuffer());
+                    if(mesh.getBlender() != null) {
+                        getGraphicsContext().unbindBlender(mesh.getBlender());
+                    }
 	            });
 	        }
         }

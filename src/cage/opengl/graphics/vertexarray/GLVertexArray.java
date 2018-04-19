@@ -65,6 +65,9 @@ public class GLVertexArray extends VertexArray implements GLBindable {
                 LayoutType type = glBuffer.getLayout().getLayoutStack().get(i);
                 switch(type) {
                     case INT1: unitFlag = GL_INT; unitCount = 1; break;
+                    case INT2: unitFlag = GL_INT; unitCount = 2; break;
+                    case INT3: unitFlag = GL_INT; unitCount = 3; break;
+                    case INT4: unitFlag = GL_INT; unitCount = 4; break;
                     case SHORT1: unitFlag = GL_SHORT; unitCount = 1; break;
                     case FLOAT2: unitFlag = GL_FLOAT; unitCount = 2; break;
                     case FLOAT3: unitFlag = GL_FLOAT; unitCount = 3; break;

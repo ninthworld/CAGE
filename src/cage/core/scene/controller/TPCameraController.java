@@ -35,8 +35,8 @@ public class TPCameraController extends NodeController {
         this.azimuth = 0.0f;
         this.elevation = 0.0f;
         this.maxRadius = 32.0f;
-        this.minElevation = Angle.fromDegrees(-90.0f);
-        this.maxElevation = Angle.fromDegrees(90.0f);
+        this.minElevation = Angle.fromDegrees(-89.0f);
+        this.maxElevation = Angle.fromDegrees(89.0f);
         this.minPitch = Angle.fromDegrees(-45.0f);
         this.maxPitch = Angle.fromDegrees(45.0f);
         this.look = true;

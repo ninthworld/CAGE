@@ -25,7 +25,7 @@ public class SceneNode extends Node {
         SceneEntity node = new SceneEntity(sceneManager, this, model);
         return node;
     }
-
+    
     public PerspectiveCamera createPerspectiveCamera() {
         PerspectiveCamera camera = new PerspectiveCamera(sceneManager, this);
         camera.setSize(getSceneManager().getWindow().getWidth(), getSceneManager().getWindow().getHeight());

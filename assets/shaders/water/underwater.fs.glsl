@@ -46,20 +46,35 @@ void main() {
             float radiusMul = 1.0 - clamp(dist / 256.0, 0.0, 1.0);
             float depthMul = clamp(position.y / WATER_LEVEL, 0.0, 1.0);
 
-            float caOffset = 0.2;
-            vec2 distortion[3];
-            distortion[0] = getDistortedTexCoord(dudvTexture, position.xz + vec2(caOffset, 0.0), 0.03, 0.006, 1.0, skybox.time);
-            distortion[1] = getDistortedTexCoord(dudvTexture, position.xz + vec2(0.0, caOffset), 0.03, 0.006, 1.0, skybox.time);
-            distortion[2] = getDistortedTexCoord(dudvTexture, position.xz + vec2(caOffset, caOffset), 0.03, 0.006, 1.0, skybox.time);
+            vec2 distortion0 = getDistortedTexCoord(dudvTexture, position.xz, 0.03, 0.006, 1.0, skybox.time);
+            float value0 = (distortion0.x + distortion0.y) / 2.0;
+            value0 = clamp(abs(value0), 0.0, 1.0);
+            value0 = pow(1.0 - value0, 16.0) * 0.08;
 
-            float value[3];
-            for(int i=0; i<3; ++i) {
-                value[i] = (distortion[i].x + distortion[i].y) / 2.0;
-                value[i] = clamp(abs(value[i]), 0.0, 1.0);
-                value[i] = pow(1.0 - value[i], 16.0) * 0.08;
-            }
 
-            color += vec3(value[0], value[1], value[2]) * normalMul * radiusMul * depthMul;
+            vec2 distortion1 = getDistortedTexCoord(dudvTexture, position.xz + vec2(0.5, 0.5), 0.04, 0.004, 1.0, -skybox.time);
+            float value1 = (distortion1.x + distortion1.y) / 2.0;
+            value1 = clamp(abs(value1), 0.0, 1.0);
+            value1 = pow(1.0 - value1, 16.0) * 0.08;
+
+            float value = value0 + value1;
+
+            color += vec3(value, value, value) * normalMul * radiusMul * depthMul;
+
+//            float caOffset = 0.2;
+//            vec2 distortion[3];
+//            distortion[0] = getDistortedTexCoord(dudvTexture, position.xz + vec2(caOffset, 0.0), 0.03, 0.006, 1.0, skybox.time);
+//            distortion[1] = getDistortedTexCoord(dudvTexture, position.xz + vec2(0.0, caOffset), 0.03, 0.006, 1.0, skybox.time);
+//            distortion[2] = getDistortedTexCoord(dudvTexture, position.xz + vec2(caOffset, caOffset), 0.03, 0.006, 1.0, skybox.time);
+//
+//            float value[3];
+//            for(int i=0; i<3; ++i) {
+//                value[i] = (distortion[i].x + distortion[i].y) / 2.0;
+//                value[i] = clamp(abs(value[i]), 0.0, 1.0);
+//                value[i] = pow(1.0 - value[i], 16.0) * 0.08;
+//            }
+//
+//            color += vec3(value[0], value[1], value[2]) * normalMul * radiusMul * depthMul;
         }
     }
 

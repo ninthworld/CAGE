@@ -1,5 +1,6 @@
 package cage.core.model;
 
+import cage.core.graphics.blender.Blender;
 import cage.core.graphics.buffer.IndexBuffer;
 import cage.core.graphics.rasterizer.Rasterizer;
 import cage.core.graphics.type.PrimitiveType;
@@ -10,6 +11,7 @@ public class Mesh {
     private IndexBuffer indexBuffer;
     private Material material;
     private Rasterizer rasterizer;
+    private Blender blender;
     private PrimitiveType primitive;
 
     public Mesh(IndexBuffer indexBuffer, Material material, Rasterizer rasterizer) {
@@ -49,5 +51,13 @@ public class Mesh {
 
     public void setPrimitive(PrimitiveType primitive) {
         this.primitive = primitive;
+    }
+
+    public Blender getBlender() {
+        return blender;
+    }
+
+    public void setBlender(Blender blender) {
+        this.blender = blender;
     }
 }

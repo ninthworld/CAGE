@@ -43,5 +43,6 @@
 	<classpathentry kind="lib" path="lib/lwjgl-nanovg/lwjgl-nanovg-natives-windows.jar"/>
 	<classpathentry kind="lib" path="lib/lwjgl-nanovg/lwjgl-nanovg-sources.jar"/>
 	<classpathentry kind="lib" path="lib/lwjgl-nanovg/lwjgl-nanovg.jar"/>
+	<classpathentry kind="lib" path="lib/ColladaParser/ColladaParser.jar"/>
 	<classpathentry kind="output" path="out/production/CAGE"/>
 </classpath>

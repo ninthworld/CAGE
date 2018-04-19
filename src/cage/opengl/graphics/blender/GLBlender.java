@@ -25,6 +25,8 @@ public class GLBlender extends Blender implements GLBindable {
         glEnable(GL_BLEND);
 
         if(isAlphaToCoverage()) {
+        	glEnable(GL_ALPHA_TEST);
+        	glAlphaFunc(GL_GREATER, 0.9f);
             glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE);
         }
 
@@ -36,6 +38,7 @@ public class GLBlender extends Blender implements GLBindable {
     @Override
     public void unbind() {
         if(isAlphaToCoverage()) {
+        	glDisable(GL_ALPHA_TEST);
             glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);
         }
 

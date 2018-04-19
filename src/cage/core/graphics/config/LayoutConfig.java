@@ -23,6 +23,24 @@ public class LayoutConfig {
         return this;
     }
 
+    public LayoutConfig int2(){
+        this.unitSize += LayoutType.sizeof(INT2);
+        this.layoutStack.add(INT2);
+        return this;
+    }
+
+    public LayoutConfig int3(){
+        this.unitSize += LayoutType.sizeof(INT3);
+        this.layoutStack.add(INT3);
+        return this;
+    }
+
+    public LayoutConfig int4(){
+        this.unitSize += LayoutType.sizeof(INT4);
+        this.layoutStack.add(INT4);
+        return this;
+    }
+
     public LayoutConfig short1(){
         this.unitSize += LayoutType.sizeof(SHORT1);
         this.layoutStack.add(SHORT1);

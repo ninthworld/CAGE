@@ -1,5 +1,8 @@
 package cage.core.asset;
 
+import animatedModel.AnimatedModel;
+import animatedModel.Joint;
+import animation.Animation;
 import cage.core.graphics.*;
 import cage.core.graphics.buffer.IndexBuffer;
 import cage.core.graphics.buffer.VertexBuffer;
@@ -19,9 +22,12 @@ import com.owens.oobjloader.builder.FaceVertex;
 import com.owens.oobjloader.parser.Parse;
 
 import cage.core.graphics.config.LayoutConfig;
+import cage.core.model.ExtModel;
 import cage.core.model.Mesh;
 import cage.core.model.Model;
 import cage.core.model.material.Material;
+import colladaLoader.ColladaLoader;
+import dataStructures.*;
 
 import java.io.*;
 import java.nio.*;
@@ -36,8 +42,8 @@ import java.util.logging.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.joml.Vector2f;
-import org.joml.Vector3f;
+import loaders.AnimatedModelLoader;
+import loaders.AnimationLoader;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.stb.STBImage;
 import org.lwjgl.system.MemoryStack;
@@ -48,10 +54,12 @@ public class AssetManager {
     private GraphicsDevice graphicsDevice;
     private GUIManager guiManager;
     private Map<String, Model> models;
+    private Map<String, ExtModel> extModels;
     private Map<String, Texture> textures;
     private Map<String, GUIFont> fonts;
     private Map<String, GUIImage> images;
     private Shader defaultGeometryShader;
+    private Shader defaultAnimatedGeometryShader;
     private Shader defaultSimpleGeometryShader;
     private Shader defaultLightingShader;
     private Shader defaultShadowShader;
@@ -65,12 +73,15 @@ public class AssetManager {
         this.guiManager = guiManager;
 
         this.models = new HashMap<>();
+        this.extModels = new HashMap<>();
         this.textures = new HashMap<>();
         this.fonts = new HashMap<>();
         this.images = new HashMap<>();
 
         this.assetProperties.setDefault("assets.shaders.default.geometry.vertex", "geometry/material.vs.glsl");
+        this.assetProperties.setDefault("assets.shaders.default.geometry.geometry", "geometry/material.gs.glsl");
         this.assetProperties.setDefault("assets.shaders.default.geometry.fragment", "geometry/material.fs.glsl");
+        this.assetProperties.setDefault("assets.shaders.default.geometry.animated.vertex", "geometry/animated.material.vs.glsl");
         this.assetProperties.setDefault("assets.shaders.default.geometry.simple.vertex", "geometry/simple.vs.glsl");
         this.assetProperties.setDefault("assets.shaders.default.geometry.simple.fragment", "geometry/simple.fs.glsl");
         this.assetProperties.setDefault("assets.shaders.default.fx.vertex", "fx/fx.vs.glsl");
@@ -82,6 +93,7 @@ public class AssetManager {
         this.assetProperties.setDefault("assets.textures.default.noise", "noise.bmp");
 
         this.defaultGeometryShader = loadShader("default.geometry");
+        this.defaultAnimatedGeometryShader = loadShader("default.geometry.animated", "default.geometry", "default.geometry");
         this.defaultSimpleGeometryShader = loadShader("default.geometry.simple");
         this.defaultLightingShader = loadShader("default.fx", "default.fx.lighting");
         this.defaultShadowShader = loadShader("default.fx", "default.shadow");
@@ -97,6 +109,10 @@ public class AssetManager {
         return defaultGeometryShader;
     }
 
+    public Shader getDefaultAnimatedGeometryShader() {
+        return defaultAnimatedGeometryShader;
+    }
+    
     public Shader getDefaultSimpleGeometryShader() {
         return defaultSimpleGeometryShader;
     }
@@ -166,6 +182,79 @@ public class AssetManager {
         }
     }
 
+    public ExtModel loadColladaModel(String configKey) {
+    	return loadColladaModelFile(assetProperties.getValuePath("assets.models." + configKey).toString());
+    }
+
+    public ExtModel loadColladaModelFile(String file) {
+    	if(extModels.containsKey(file)) {
+    		return extModels.get(file);
+    	}
+    	else {
+    	    Path path = assetProperties.getModelsPath().resolve(file);
+    		AnimatedModelData modelData = ColladaLoader.loadColladaModel(path, 3);
+    		SkeletonData skeletonData = modelData.getJointsData();
+    		Joint headJoint = AnimatedModelLoader.createJoints(skeletonData.headJoint);
+    		AnimatedModel animatedModel = new AnimatedModel(headJoint, skeletonData.jointCount);
+    		Animation animation = AnimationLoader.loadAnimation(path);
+
+            MeshData mesh = modelData.getMeshData();
+            IntBuffer indices = BufferUtils.createIntBuffer(mesh.getIndices().length);
+            indices.put(mesh.getIndices());
+            indices.flip();
+
+            FloatBuffer vertices = BufferUtils.createFloatBuffer(mesh.getVertexCount() * 3 * 2 * 3 * 3);
+            for(int i=0; i<mesh.getVertexCount(); ++i) {
+                vertices.put(mesh.getVertices()[(i * 3) + 0]);        
+                vertices.put(mesh.getVertices()[(i * 3) + 1]); 
+                vertices.put(mesh.getVertices()[(i * 3) + 2]);
+                
+                vertices.put(mesh.getTextureCoords()[(i * 2) + 0]);        
+                vertices.put(mesh.getTextureCoords()[(i * 2) + 1]); 
+
+                vertices.put(mesh.getNormals()[(i * 3) + 0]);        
+                vertices.put(mesh.getNormals()[(i * 3) + 1]); 
+                vertices.put(mesh.getNormals()[(i * 3) + 2]);
+
+                vertices.put(mesh.getVertexWeights()[(i * 3) + 0]);        
+                vertices.put(mesh.getVertexWeights()[(i * 3) + 1]); 
+                vertices.put(mesh.getVertexWeights()[(i * 3) + 2]);
+            }
+            vertices.flip();
+            
+            FloatBuffer joints = BufferUtils.createFloatBuffer(mesh.getJointIds().length);
+            for(int id : mesh.getJointIds()) {
+                joints.put(id);
+            }
+            joints.flip();
+
+            VertexBuffer vertexBuffer = graphicsDevice.createVertexBuffer();
+            vertexBuffer.setLayout(new LayoutConfig().float3().float2().float3().float3());
+            vertexBuffer.setUnitCount(mesh.getVertexCount());
+            vertexBuffer.writeData(vertices);
+
+            VertexBuffer jointBuffer = graphicsDevice.createVertexBuffer();
+            jointBuffer.setLayout(new LayoutConfig().float3());
+            jointBuffer.setUnitCount(mesh.getJointIds().length);
+            jointBuffer.writeData(joints);
+
+            IndexBuffer indexBuffer = graphicsDevice.createIndexBuffer();
+            indexBuffer.setUnitCount(mesh.getIndices().length);
+            indexBuffer.writeData(indices);
+
+            VertexArray vertexArray = graphicsDevice.createVertexArray();
+            vertexArray.addVertexBuffer(vertexBuffer);
+            vertexArray.addVertexBuffer(jointBuffer);
+
+            Material material = new Material();
+            ExtModel model = new ExtModel(vertexArray, animatedModel, animation);
+            model.addMesh(new Mesh(indexBuffer, material, graphicsDevice.getDefaultRasterizer()));
+
+            extModels.put(file, model);
+            return model;
+    	}
+    }
+
     public Model loadOBJModel(String configKey) {
         return loadOBJModelFile(assetProperties.getValuePath("assets.models." + configKey).toString());
     }
@@ -181,40 +270,12 @@ public class AssetManager {
 
                 HashMap<FaceVertex, Integer> indexMap = new HashMap<>();
                 ArrayList<FaceVertex> faceVertices = new ArrayList<>();
-                ArrayList<Vector3f> faceTangents = new ArrayList();
                 int index = 0;
                 for (Face face : builder.faces) {
-                    Vector3f tangent = new Vector3f();
-                    if(face.vertices.get(0).t != null) {
-                        FaceVertex f1 = face.vertices.get(0);
-                        FaceVertex f2 = face.vertices.get(1);
-                        FaceVertex f3 = face.vertices.get(2);
-
-                        Vector3f v1 = new Vector3f(f1.v.x, f1.v.y, f1.v.z);
-                        Vector3f v2 = new Vector3f(f2.v.x, f2.v.y, f2.v.z);
-                        Vector3f v3 = new Vector3f(f3.v.x, f3.v.y, f3.v.z);
-
-                        Vector2f w1 = new Vector2f(f1.t.u, f1.t.v);
-                        Vector2f w2 = new Vector2f(f2.t.u, f2.t.v);
-                        Vector2f w3 = new Vector2f(f3.t.u, f3.t.v);
-
-                        Vector3f s1 = v2.sub(v1);
-                        Vector3f s2 = v3.sub(v1);
-
-                        Vector2f t1 = w2.sub(w1);
-                        Vector2f t2 = w3.sub(w1);
-
-                        float r = 1.0f / (t1.x * t2.y - t2.x * t1.y);
-                        tangent = new Vector3f(
-                                t2.y * s1.x - t1.y * s2.x,
-                                t2.y * s1.y - t1.y * s2.y,
-                                t2.y * s1.z - t1.y * s2.z).mul(r);
-                    }
                     for (FaceVertex vertex : face.vertices) {
                         if (!indexMap.containsKey(vertex)) {
                             indexMap.put(vertex, index++);
                             faceVertices.add(vertex);
-                            faceTangents.add(tangent);
                         }
                     }
                 }
@@ -227,10 +288,9 @@ public class AssetManager {
                 }
                 indices.flip();
 
-                FloatBuffer vertices = BufferUtils.createFloatBuffer(index * 3 * 2 * 3 * 3);
+                FloatBuffer vertices = BufferUtils.createFloatBuffer(index * 3 * 2 * 3);
                 for (int i = 0; i < faceVertices.size(); ++i) {
                     FaceVertex vertex = faceVertices.get(i);
-                    Vector3f tangent = faceTangents.get(i);
                     vertices.put(vertex.v.x).put(vertex.v.y).put(vertex.v.z);
                     if(vertex.t != null) {
                         vertices.put(vertex.t.u).put(vertex.t.v);
@@ -244,12 +304,11 @@ public class AssetManager {
                     else {
                         vertices.put(0.0f).put(0.0f).put(0.0f);
                     }
-                    vertices.put(tangent.x).put(tangent.y).put(tangent.z);
                 }
                 vertices.flip();
 
                 VertexBuffer vertexBuffer = graphicsDevice.createVertexBuffer();
-                vertexBuffer.setLayout(new LayoutConfig().float3().float2().float3().float3());
+                vertexBuffer.setLayout(new LayoutConfig().float3().float2().float3());
                 vertexBuffer.setUnitCount(index);
                 vertexBuffer.writeData(vertices);
 
