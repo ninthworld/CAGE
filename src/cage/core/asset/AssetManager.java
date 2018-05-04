@@ -61,6 +61,7 @@ public class AssetManager {
     private Shader defaultGeometryShader;
     private Shader defaultAnimatedGeometryShader;
     private Shader defaultSimpleGeometryShader;
+    private Shader defaultSimpleAnimatedGeometryShader;
     private Shader defaultLightingShader;
     private Shader defaultShadowShader;
     private Shader defaultFXAAShader;
@@ -84,6 +85,7 @@ public class AssetManager {
         this.assetProperties.setDefault("assets.shaders.default.geometry.animated.vertex", "geometry/animated.material.vs.glsl");
         this.assetProperties.setDefault("assets.shaders.default.geometry.simple.vertex", "geometry/simple.vs.glsl");
         this.assetProperties.setDefault("assets.shaders.default.geometry.simple.fragment", "geometry/simple.fs.glsl");
+        this.assetProperties.setDefault("assets.shaders.default.geometry.animated.simple.vertex", "geometry/animated.simple.vs.glsl");
         this.assetProperties.setDefault("assets.shaders.default.fx.vertex", "fx/fx.vs.glsl");
         this.assetProperties.setDefault("assets.shaders.default.fx.lighting.fragment", "fx/lighting.fs.glsl");
         this.assetProperties.setDefault("assets.shaders.default.fx.fxaa.fragment", "fx/fxaa.fs.glsl");
@@ -95,6 +97,7 @@ public class AssetManager {
         this.defaultGeometryShader = loadShader("default.geometry");
         this.defaultAnimatedGeometryShader = loadShader("default.geometry.animated", "default.geometry", "default.geometry");
         this.defaultSimpleGeometryShader = loadShader("default.geometry.simple");
+        this.defaultSimpleAnimatedGeometryShader = loadShader("default.geometry.animated.simple","default.geometry.simple");
         this.defaultLightingShader = loadShader("default.fx", "default.fx.lighting");
         this.defaultShadowShader = loadShader("default.fx", "default.shadow");
         this.defaultFXAAShader = loadShader("default.fx", "default.fx.fxaa");
@@ -115,6 +118,10 @@ public class AssetManager {
     
     public Shader getDefaultSimpleGeometryShader() {
         return defaultSimpleGeometryShader;
+    }
+
+    public Shader getDefaultSimpleAnimatedGeometryShader() {
+        return defaultSimpleAnimatedGeometryShader;
     }
 
     public Shader getDefaultLightingShader() {

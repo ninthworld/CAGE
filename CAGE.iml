@@ -74,15 +74,6 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/jbullet/jbullet.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/joml/joml-1.9.8.jar!/" />
         </CLASSES>
         <JAVADOC />
@@ -118,6 +109,15 @@
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/OpenGL-Animation/OpenGL-Animation.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/jbullet/jbullet-jbullet-2.72.2.4/classes/artifacts/JBullet/JBullet.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

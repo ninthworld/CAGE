@@ -88,7 +88,7 @@ public class BiggerFishServer extends GameConnectionServer<UUID> {
 	}
 
     private void createPlayer(UUID playerId, Vector3fc position, Matrix3fc rotation, float scale) {
-        PlayerEntity playerEntity = new PlayerEntity(playerId, null, null, null);
+        PlayerEntity playerEntity = new PlayerEntity(playerId, null, null, null, null);
         playerEntity.setLocalPosition(position);
         playerEntity.setLocalRotation(rotation);
         playerEntity.setLocalScale(scale, scale, scale);

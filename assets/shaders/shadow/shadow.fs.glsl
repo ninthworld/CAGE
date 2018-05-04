@@ -6,10 +6,10 @@
 #define SHADOW_MAP_SIZE	2048.0
 #define MAX_SHADOWS     4
 #define MAX_SOURCES     100.0
-#define SHADOW_DIST0    8.0
-#define SHADOW_DIST1    16.0
-#define SHADOW_DIST2    32.0
-#define SHADOW_DIST3    64.0
+#define SHADOW_DIST0    4.0
+#define SHADOW_DIST1    8.0
+#define SHADOW_DIST2    16.0
+#define SHADOW_DIST3    32.0
 
 in vec2 vs_texCoord;
 

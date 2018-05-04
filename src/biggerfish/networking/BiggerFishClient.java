@@ -73,7 +73,7 @@ public class BiggerFishClient extends GameConnectionClient {
     }
 
     private void createPlayer(UUID playerId, Vector3fc position, Matrix3fc rotation, float scale) {
-        PlayerEntity playerEntity = new PlayerEntity(playerId, engine.getSceneManager(), engine.getSceneManager().getRootSceneNode(), game.getPlayer().getModel());
+        PlayerEntity playerEntity = new PlayerEntity(playerId, engine.getSceneManager(), engine.getSceneManager().getRootSceneNode(), game.getPlayer().getExtModel(), null);
         playerEntity.setLocalPosition(position);
         playerEntity.setLocalRotation(rotation);
         playerEntity.setLocalScale(scale, scale, scale);

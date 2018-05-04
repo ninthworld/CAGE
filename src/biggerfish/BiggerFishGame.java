@@ -20,8 +20,6 @@ import cage.core.graphics.shader.Shader;
 import cage.core.graphics.texture.Texture;
 import cage.core.graphics.type.*;
 import cage.core.input.action.CloseWindowAction;
-import cage.core.input.action.InputAction;
-import cage.core.input.action.InputEvent;
 import cage.core.input.component.Axis;
 import cage.core.input.component.Button;
 import cage.core.input.component.Key;
@@ -30,16 +28,33 @@ import cage.core.input.type.InputActionType;
 import cage.core.model.ExtModel;
 import cage.core.model.Model;
 import cage.core.scene.camera.Camera;
-import cage.core.scene.controller.TPCameraController;
+import biggerfish.physics.TPCameraController;
 import cage.core.scene.light.DirectionalLight;
 import cage.core.scene.light.Light;
 import cage.core.utils.math.Angle;
 import cage.glfw.GLFWBootstrap;
+import com.bulletphysics.collision.broadphase.DbvtBroadphase;
+import com.bulletphysics.collision.dispatch.CollisionConfiguration;
+import com.bulletphysics.collision.dispatch.CollisionDispatcher;
+import com.bulletphysics.collision.dispatch.CollisionObject;
+import com.bulletphysics.collision.dispatch.DefaultCollisionConfiguration;
+import com.bulletphysics.collision.shapes.*;
+import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
+import com.bulletphysics.dynamics.RigidBody;
+import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
+import com.bulletphysics.dynamics.constraintsolver.SequentialImpulseConstraintSolver;
+import com.bulletphysics.linearmath.DefaultMotionState;
+import com.bulletphysics.linearmath.Transform;
+import org.joml.Vector3f;
+import org.lwjgl.stb.STBImage;
+import org.lwjgl.system.MemoryStack;
 import ray.networking.IGameConnection;
 
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.nio.IntBuffer;
+import java.nio.ShortBuffer;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -65,23 +80,45 @@ public class BiggerFishGame implements Game {
     
     private ScriptEngine jsEngine;
 
+    private DiscreteDynamicsWorld dynamicsWorld;
+
     public BiggerFishGame(Engine engine, String[] args) {
         this.animationModels = new ArrayList<>();
     	this.jsEngine = new ScriptEngineManager().getEngineByName("js");
         this.monitor = new FPSMonitor(engine.createTimer());
 
-        ExtModel playerModel = engine.getAssetManager().loadColladaModelFile("fish/anchovy/anchovy.dae");
-        playerModel.setAnimationSpeed(2.0f);
+        // Initialize Physics World
+        CollisionConfiguration config = new DefaultCollisionConfiguration();
+        CollisionDispatcher dispatcher = new CollisionDispatcher(config);
+        DbvtBroadphase broadphase = new DbvtBroadphase();
+        SequentialImpulseConstraintSolver solver = new SequentialImpulseConstraintSolver();
+        this.dynamicsWorld = new DiscreteDynamicsWorld(dispatcher, broadphase, solver, config);
+        this.dynamicsWorld.setGravity(new javax.vecmath.Vector3f(0.0f, 0.0f, 0.0f));
+
+        // Initialize Player
+        ExtModel playerModel = engine.getAssetManager().loadColladaModelFile("fish/clownfish/clownfish.dae");
         animationModels.add(playerModel);
         playerModel.getMesh(0).getMaterial().setDiffuse(1.0f, 1.0f, 1.0f);
-        playerModel.getMesh(0).getMaterial().setSpecular(1.0f, 1.0f, 1.0f);
+        playerModel.getMesh(0).getMaterial().setSpecular(engine.getAssetManager().loadTextureFile("clownfish_spec.png"));
         playerModel.getMesh(0).getMaterial().setShininess(8.0f);
-        playerModel.getMesh(0).getMaterial().setDiffuse(engine.getAssetManager().loadTextureFile("anchovy_color.png"));
-        this.player = new PlayerEntity(null, engine.getSceneManager(), engine.getSceneManager().getRootSceneNode(), playerModel);
+        playerModel.getMesh(0).getMaterial().setDiffuse(engine.getAssetManager().loadTextureFile("clownfish_color.png"));
+
+        CollisionShape playerShape = new SphereShape(1.0f);//new BoxShape(new javax.vecmath.Vector3f(0.5f, 0.5f, 0.5f));
+        Transform playerTransform = new Transform();
+        playerTransform.setIdentity();
+        playerTransform.origin.set(0, 54, 0);
+        DefaultMotionState playerMotion = new DefaultMotionState(playerTransform);
+        RigidBodyConstructionInfo playerBodyCI = new RigidBodyConstructionInfo(1.0f, playerMotion, playerShape);
+        playerBodyCI.restitution = 0.25f;
+        RigidBody playerBody = new RigidBody(playerBodyCI);
+        playerBody.setActivationState(CollisionObject.DISABLE_DEACTIVATION);
+        this.dynamicsWorld.addRigidBody(playerBody);
+
+        this.player = new PlayerEntity(null, engine.getSceneManager(), engine.getSceneManager().getRootSceneNode(), playerModel, playerBody);
         this.player.scale(0.05f);
-        this.player.moveUp(54.0f);
         this.player.addNode(engine.getSceneManager().getDefaultCamera());
 
+        // Initialize Multiplayer
         this.multiplayer = false;
         this.connected = false;
         if(args.length > 0) {
@@ -212,9 +249,44 @@ public class BiggerFishGame implements Game {
 
         engine.getRenderManager().getDefaultFXAARenderStage().setInputRenderStage(0, combineRenderStage);
 
+        initializePhysics(engine);
         initializeInput(engine);
 
     	engine.getGUIManager().getRootContainer().addComponent(monitor);
+    }
+
+    private void initializePhysics(Engine engine) {
+        int width, height;
+        byte[] heightData;
+        //float[] heightData;
+        try(MemoryStack stack = MemoryStack.stackPush()) {
+            IntBuffer w = stack.mallocInt(1);
+            IntBuffer h = stack.mallocInt(1);
+            IntBuffer comp = stack.mallocInt(1);
+            ShortBuffer data = STBImage.stbi_load_16(Paths.get("assets/textures/heightmap.png").toString(), w, h, comp, 1);
+            width = w.get();
+            height = h.get();
+            heightData = new byte[width * height];
+            //heightData = new float[width * height];
+            for(int y = 0; y < height; ++y) {
+                for(int x = 0; x < width; ++x) {
+                    int index = y * width + x;
+                    //heightData[index] = Math.max(-1.0f, Math.min(1.0f, data.get(index) / (float)Short.MAX_VALUE));
+                    heightData[index] = (byte)((data.get(index) / (float)Short.MAX_VALUE) * 64 + 64);
+                }
+            }
+        }
+
+        HeightfieldTerrainShape terrainShape = new HeightfieldTerrainShape(width, height, heightData, 2.0f, -128.0f, 128.0f, 1, HeightfieldTerrainShape.PHY_ScalarType.PHY_UCHAR, false);//, 256.0f, -128.0f, 128.0f, 1, false);
+        //HeightfieldTerrainShape terrainShape = new HeightfieldTerrainShape(width, height, heightData, 128.0f, -128.0f, 128.0f, 1, false);//, 256.0f, -128.0f, 128.0f, 1, false
+        Transform terrainTransform = new Transform();
+        terrainTransform.setIdentity();
+        terrainTransform.origin.set(0, 0, 0);
+        DefaultMotionState terrainMotion = new DefaultMotionState(terrainTransform);
+        RigidBodyConstructionInfo terrainInfo = new RigidBodyConstructionInfo(0.0f, terrainMotion, terrainShape);
+        RigidBody terrainBody = new RigidBody(terrainInfo);
+        terrainBody.setGravity(new javax.vecmath.Vector3f(0.0f, 0.0f, 0.0f));
+        dynamicsWorld.addCollisionObject(terrainBody);
     }
 
     private void initializeInput(Engine engine) {
@@ -259,18 +331,13 @@ public class BiggerFishGame implements Game {
         engine.getInputManager().addAction(mouse, Axis.LEFT_Y, InputActionType.NONE, cameraController.createElevationAction(0.5f));
         engine.getInputManager().addAction(mouse, Axis.RIGHT_Y, InputActionType.NONE, cameraController.createRadiusAction(-64.0f));
         engine.getInputManager().addAction(mouse, Button.RIGHT, InputActionType.PRESS_AND_RELEASE, cameraController.createToggleLookAction());
-        float speed = 2.0f;
-        engine.getInputManager().addAction(keyboard, Key.W, InputActionType.REPEAT, cameraController.createForwardAction(speed));
-        engine.getInputManager().addAction(keyboard, Key.S, InputActionType.REPEAT, cameraController.createForwardAction(-speed));
-        engine.getInputManager().addAction(keyboard, Key.A, InputActionType.REPEAT, cameraController.createYawAction(2.0f));
-        engine.getInputManager().addAction(keyboard, Key.D, InputActionType.REPEAT, cameraController.createYawAction(-2.0f));
-        engine.getInputManager().addAction(keyboard, Key.SPACE, InputActionType.REPEAT, cameraController.createPitchAction(-2.0f));
-        engine.getInputManager().addAction(keyboard, Key.LSHIFT, InputActionType.REPEAT, cameraController.createPitchAction(2.0f));
-
-        engine.getInputManager().addAction(keyboard, Key._1, InputActionType.PRESS, (deltaTime, event) -> animationModels.get(0).togglePause());
-        engine.getInputManager().addAction(keyboard, Key._2, InputActionType.PRESS, (deltaTime, event) -> animationModels.get(0).finishAndPause());
-        engine.getInputManager().addAction(keyboard, Key._3, InputActionType.PRESS, (deltaTime, event) -> animationModels.get(0).stop());
-        engine.getInputManager().addAction(keyboard, Key._4, InputActionType.PRESS, (deltaTime, event) -> animationModels.get(0).start());
+        
+        engine.getInputManager().addAction(keyboard, Key.W, InputActionType.REPEAT, cameraController.createForwardAction(1.0f));
+        engine.getInputManager().addAction(keyboard, Key.S, InputActionType.REPEAT, cameraController.createForwardAction(-1.0f));
+        engine.getInputManager().addAction(keyboard, Key.A, InputActionType.REPEAT, cameraController.createYawAction(1.0f));
+        engine.getInputManager().addAction(keyboard, Key.D, InputActionType.REPEAT, cameraController.createYawAction(-1.0f));
+        engine.getInputManager().addAction(keyboard, Key.SPACE, InputActionType.REPEAT, cameraController.createPitchAction(-1.0f));
+        engine.getInputManager().addAction(keyboard, Key.LSHIFT, InputActionType.REPEAT, cameraController.createPitchAction(1.0f));
     }
 
     @Override
@@ -289,6 +356,8 @@ public class BiggerFishGame implements Game {
 
     @Override
     public void update(Engine engine, float deltaTime) {
+        dynamicsWorld.stepSimulation(deltaTime);
+
         Iterator<Light> it = engine.getSceneManager().getLightIterator();
         while(it.hasNext()) {
             Light light = it.next();

@@ -2,11 +2,13 @@ package cage.core.render.stage;
 
 import cage.core.graphics.GraphicsContext;
 import cage.core.graphics.blender.Blender;
+import cage.core.graphics.buffer.ShaderStorageBuffer;
 import cage.core.graphics.buffer.UniformBuffer;
 import cage.core.graphics.rasterizer.Rasterizer;
 import cage.core.graphics.rendertarget.RenderTarget;
 import cage.core.graphics.shader.Shader;
 import cage.core.graphics.texture.Texture;
+import cage.core.model.ExtModel;
 import cage.core.model.Mesh;
 import cage.core.model.Model;
 import cage.core.scene.Node;
@@ -18,16 +20,20 @@ import cage.core.scene.light.Light;
 import cage.core.scene.light.ShadowCastableLight;
 import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
+import org.lwjgl.system.MemoryStack;
 
 import java.awt.*;
 import java.nio.FloatBuffer;
 
+import static org.lwjgl.system.MemoryStack.stackPush;
+
 public class ShadowRenderStage extends RenderStage {
 
     public static final int SHADOW_RESOLUTION = 2048;
-    private static final float[] RANGES = new float[] { 16.0f, 32.0f, 64.0f, 128.0f };
+    private static final float[] RANGES = new float[] { 4.0f, 8.0f, 16.0f, 32.0f };
 
     private Shader simpleShader;
+    private Shader simpleBoneShader;
     private RenderTarget[] shadowRenderTargets;
     private Model fxModel;
     private Blender blender;
@@ -37,15 +43,17 @@ public class ShadowRenderStage extends RenderStage {
     private UniformBuffer simpleEntityUniform;
     private UniformBuffer cameraUniform;
     private UniformBuffer shadowUniform;
+    private ShaderStorageBuffer boneShaderStorage;
     private FloatBuffer shadowData;
 
     public ShadowRenderStage(
             SceneManager sceneManager, Model fxModel,
-            Shader simpleShader, Shader shadowShader,
+            Shader simpleShader, Shader simpleBoneShader, Shader shadowShader,
             RenderTarget[] shadowRenderTargets, RenderTarget outputRenderTarget,
             Blender blender, GraphicsContext graphicsContext) {
         super(shadowShader, outputRenderTarget, graphicsContext);
         this.simpleShader = simpleShader;
+        this.simpleBoneShader = simpleBoneShader;
         this.shadowRenderTargets = shadowRenderTargets;
         this.fxModel = fxModel;
         this.blender = blender;
@@ -67,6 +75,9 @@ public class ShadowRenderStage extends RenderStage {
         }
         if(shadowUniform == null) {
             shadowUniform = getShader().getUniformBuffer("Shadow");
+        }
+        if(boneShaderStorage == null) {
+            boneShaderStorage = simpleBoneShader.getShaderStorageBuffer("Bone");
         }
 
         getShader().addTexture("shadowTexture[0]", shadowRenderTargets[0].getDepthTexture());
@@ -145,9 +156,25 @@ public class ShadowRenderStage extends RenderStage {
             SceneEntity entity = (SceneEntity)node;
             if(entity.isCastShadow() && shadowCamera.getFrustum().inFrustum(entity.getWorldBounds())) {
                 Model model = entity.getModel();
+
+                Shader shader = simpleShader;
+                if(model instanceof ExtModel) {
+                    shader = simpleBoneShader;
+                    ExtModel extModel = (ExtModel) model;
+                    Matrix4f[] jointTransforms = extModel.getAnimatedModel().getJointTransforms();
+                    try (MemoryStack stack = stackPush()) {
+                        FloatBuffer boneBuffer = stack.callocFloat(jointTransforms.length * 16);
+                        for(int i = 0; i < jointTransforms.length; ++i) {
+                            jointTransforms[i].get(i * 16, boneBuffer);
+                        }
+                        boneBuffer.rewind();
+                        boneShaderStorage.writeData(boneBuffer);
+                    }
+                }
+
                 simpleEntityUniform.writeData(entity.readData());
                 getGraphicsContext().bindVertexArray(model.getVertexArray());
-                getGraphicsContext().bindShader(simpleShader);
+                getGraphicsContext().bindShader(shader);
                 model.getMeshIterator().forEachRemaining((Mesh mesh) -> {
                     getGraphicsContext().setPrimitive(mesh.getPrimitive());
                     getGraphicsContext().bindRasterizer(mesh.getRasterizer());
@@ -163,6 +190,14 @@ public class ShadowRenderStage extends RenderStage {
 
     public void setSimpleShader(Shader simpleShader) {
         this.simpleShader = simpleShader;
+    }
+
+    public Shader getSimpleBoneShader() {
+        return simpleBoneShader;
+    }
+
+    public void setSimpleBoneShader(Shader simpleBoneShader) {
+        this.simpleBoneShader = simpleBoneShader;
     }
 
     public Model getFXModel() {

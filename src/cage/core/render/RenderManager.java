@@ -113,6 +113,9 @@ public class RenderManager {
         simpleCameraUniform.setLayout(Camera.READ_LAYOUT);
         assetManager.getDefaultSimpleGeometryShader().addUniformBuffer("Camera", simpleCameraUniform);
         assetManager.getDefaultSimpleGeometryShader().addUniformBuffer("Entity", defaultEntityUniformBuffer);
+        assetManager.getDefaultSimpleAnimatedGeometryShader().addUniformBuffer("Camera", simpleCameraUniform);
+        assetManager.getDefaultSimpleAnimatedGeometryShader().addUniformBuffer("Entity", defaultEntityUniformBuffer);
+        assetManager.getDefaultSimpleAnimatedGeometryShader().addShaderStorageBuffer("Bone", defaultBoneShaderStorageBuffer);
 
         assetManager.getDefaultLightingShader().addUniformBuffer("Skybox", defaultSkyboxUniformBuffer);
         assetManager.getDefaultLightingShader().addUniformBuffer("Camera", defaultCameraUniformBuffer);
@@ -180,7 +183,7 @@ public class RenderManager {
             }
             return new ShadowRenderStage(
                     sceneManager, defaultFXModel,
-                    assetManager.getDefaultSimpleGeometryShader(), shader,
+                    assetManager.getDefaultSimpleGeometryShader(), assetManager.getDefaultSimpleAnimatedGeometryShader(), shader,
                     shadowRenderTargets, renderTarget,
                     graphicsDevice.getDefaultBlender(), graphicsContext);
         });

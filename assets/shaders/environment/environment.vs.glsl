@@ -23,16 +23,16 @@ layout(std140) uniform Camera {
 uniform sampler2D terrainHeightTexture;
 uniform sampler2D splatTexture;
 
-#define GRASS_SCALE 0.5
+#define GRASS_SCALE 1.0
 
 void main() {
 	int id = gl_InstanceID;
 
 	mat4 camView = inverse(camera.viewMatrix);
-    vec3 camPosition = (vec3(camView[3]) / camView[3].w) / 4.0f;
+    vec3 camPosition = (vec3(camView[3]) / camView[3].w) / 8.0f;
     
     vec2 relPos = vec2(float(id / SQUARED), float(id % SQUARED)) - vec2(SQUARED, SQUARED) / 2.0;
-	vec2 instancePos = (vec2(floor(camPosition.x), floor(camPosition.z)) + relPos) * 4.0f;
+	vec2 instancePos = (vec2(floor(camPosition.x), floor(camPosition.z)) + relPos) * 8.0f;
 	instancePos += vec2(cnoise((instancePos + (WORLD_SCALE / 2.0)) / WORLD_SCALE), 0.0) * 10.0;
 		
 	float distScale = length(relPos) / (SQUARED / 2.0);
