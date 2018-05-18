@@ -12,7 +12,6 @@ layout(location=1) out vec4 fs_specular;
 layout(location=2) out vec4 fs_normal;
 
 uniform sampler2D terrainNormalTexture;
-uniform sampler2D splatTexture;
 
 uniform sampler2D diffuseTexture0;
 uniform sampler2D specularTexture0;
@@ -26,7 +25,6 @@ void main() {
     normal.xy *= -1.0;
 
     vec3 blending = abs(vec3(pow(normal.x, 2.0), pow(normal.y, 2.0), pow(normal.z, 2.0)));
-    //vec3 blending = abs(normal * vec3(1.0, 3.0, 1.0));
     blending = normalize(max(blending, 0.00001));
     float b = (blending.x + blending.y + blending.z);
     blending /= vec3(b, b, b);

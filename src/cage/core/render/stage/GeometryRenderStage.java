@@ -11,6 +11,7 @@ import cage.core.model.ExtModel;
 import cage.core.model.Mesh;
 import cage.core.model.Model;
 import cage.core.model.material.Material;
+import cage.core.scene.InstancedSceneEntity;
 import cage.core.scene.Node;
 import cage.core.scene.SceneEntity;
 import cage.core.scene.SceneNode;
@@ -24,17 +25,24 @@ import static org.lwjgl.system.MemoryStack.stackPush;
 
 public class GeometryRenderStage extends RenderStage {
 
-	private Shader boneShader;
+    private Shader boneShader;
+    private Shader instancedShader;
+    private Shader instancedBoneShader;
     private UniformBuffer cameraUniform;
     private UniformBuffer entityUniform;
     private UniformBuffer materialUniform;
     private ShaderStorageBuffer boneShaderStorage;
+    private ShaderStorageBuffer entityShaderStorage;
     private Camera camera;
     private SceneNode node;
 
-    public GeometryRenderStage(Camera camera, SceneNode node, Shader boneShader, Shader shader, RenderTarget renderTarget, GraphicsContext graphicsContext) {
+    public GeometryRenderStage(Camera camera, SceneNode node,
+                               Shader instancedBoneShader, Shader instancedShader, Shader boneShader, Shader shader,
+                               RenderTarget renderTarget, GraphicsContext graphicsContext) {
         super(shader, renderTarget, graphicsContext);
         this.boneShader = boneShader;
+        this.instancedShader = instancedShader;
+        this.instancedBoneShader = instancedBoneShader;
         this.camera = camera;
         this.node = node;
     }
@@ -52,6 +60,9 @@ public class GeometryRenderStage extends RenderStage {
         }
         if(boneShaderStorage == null) {
             boneShaderStorage = boneShader.getShaderStorageBuffer("Bone");
+        }
+        if(entityShaderStorage == null) {
+            entityShaderStorage = instancedShader.getShaderStorageBuffer("Entity");
         }
 
         cameraUniform.writeData(camera.readData());
@@ -75,7 +86,12 @@ public class GeometryRenderStage extends RenderStage {
         if(node instanceof SceneEntity) {
             SceneEntity entity = (SceneEntity)node;
             if(camera.getFrustum().inFrustum(entity.getWorldBounds())) {
-	            entityUniform.writeData(entity.readData());            
+                if(entity instanceof InstancedSceneEntity) {
+                    entityShaderStorage.writeData(entity.readData());
+                }
+                else {
+                    entityUniform.writeData(entity.readData());
+                }
 	            Model model = entity.getModel();
 	            getGraphicsContext().bindVertexArray(model.getVertexArray());
 	            model.getMeshIterator().forEachRemaining((Mesh mesh) -> {
@@ -83,8 +99,14 @@ public class GeometryRenderStage extends RenderStage {
 	                materialUniform.writeData(material.readData());
 
 	                Shader shader = getShader();
+                    if(entity instanceof InstancedSceneEntity) {
+                        shader = instancedShader;
+                    }
                     if(model instanceof ExtModel) {
                         shader = boneShader;
+                        if(entity instanceof InstancedSceneEntity) {
+                            shader = instancedBoneShader;
+                        }
                         ExtModel extModel = (ExtModel) model;
                         Matrix4f[] jointTransforms = extModel.getAnimatedModel().getJointTransforms();
                         try (MemoryStack stack = stackPush()) {
@@ -119,7 +141,12 @@ public class GeometryRenderStage extends RenderStage {
 	                getGraphicsContext().setPrimitive(mesh.getPrimitive());
 	                getGraphicsContext().bindRasterizer(mesh.getRasterizer());
                     getGraphicsContext().bindShader(shader);
-	                getGraphicsContext().drawIndexed(mesh.getIndexBuffer());
+                    if(entity instanceof InstancedSceneEntity) {
+                        getGraphicsContext().drawIndexedInstanced(((InstancedSceneEntity) entity).getInstanceCount(), mesh.getIndexBuffer());
+                    }
+                    else {
+                        getGraphicsContext().drawIndexed(mesh.getIndexBuffer());
+                    }
                     if(mesh.getBlender() != null) {
                         getGraphicsContext().unbindBlender(mesh.getBlender());
                     }

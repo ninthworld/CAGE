@@ -15,7 +15,7 @@ public class WaterRenderStage extends GeometryRenderStage {
     private UniformBuffer entityUniform;
 
     public WaterRenderStage(WaterManager node, Shader shader, RenderTarget renderTarget, GraphicsContext graphicsContext) {
-        super(node.getCamera(), node, shader, shader, renderTarget, graphicsContext);
+        super(node.getCamera(), node, shader, shader, shader, shader, renderTarget, graphicsContext);
     }
 
     @Override

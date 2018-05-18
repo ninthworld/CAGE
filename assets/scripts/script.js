@@ -1,27 +1,26 @@
 var packages = new JavaImporter(
 	Packages.cage.core.engine.Engine,
-	Packages.cage.core.scene.SceneManager,
-	Packages.cage.core.scene.SceneNode,
-	Packages.cage.core.scene.light.PointLight);
+	Packages.cage.core.render.RenderManager,
+	Packages.cage.core.render.stage.LightingRenderStage,
+	Packages.cage.core.graphics.texture.TextureCubeMap,
+	Packages.cage.core.graphics.texture.Texture2D,
+	Packages.cage.core.asset.AssetManager);
 	
 with(packages) {
 	function initialize(engine) {
-		light1 = engine.getSceneManager().getRootSceneNode().createPointLight();
-		light1.translate(16.0, 72.0, 16.0);
-		light1.setDiffuseColor(1.0, 0.0, 0.0);
-		light1.setSpecularColor(1.0, 1.0, 1.0);
-		light1.setRange(32.0);
-		
-		light2 = engine.getSceneManager().getRootSceneNode().createPointLight();
-		light2.translate(-16.0, 72.0, 16.0);
-		light2.setDiffuseColor(0.0, 1.0, 0.0);
-		light2.setSpecularColor(1.0, 1.0, 1.0);
-		light2.setRange(32.0);
-		
-		light3 = engine.getSceneManager().getRootSceneNode().createPointLight();
-		light3.translate(16.0, 72.0, -16.0);
-		light3.setDiffuseColor(0.0, 0.0, 1.0);
-		light3.setSpecularColor(1.0, 1.0, 1.0);
-		light3.setRange(32.0);
+		var use = 0;		
+		switch(use) {
+			case 0: {
+				engine.getRenderManager().getDefaultLightingRenderStage().setUseAtmosphere(true);
+			} break;
+			case 1: {
+				engine.getRenderManager().getDefaultLightingRenderStage().setUseSkybox(true);
+				engine.getRenderManager().getDefaultLightingRenderStage().setSkyboxTexture(engine.getAssetManager().loadCubeMap("skybox"));				
+			} break;
+			case 2: {
+				engine.getRenderManager().getDefaultLightingRenderStage().setUseSkydome(true);
+				engine.getRenderManager().getDefaultLightingRenderStage().setSkydomeTexture(engine.getAssetManager().loadTextureFile("skydome/skydome.jpg"));				
+			} break;
+		}       
 	}
 }

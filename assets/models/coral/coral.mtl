@@ -1,0 +1,72 @@
+# Blender MTL File: 'coral.blend'
+# Material Count: 7
+
+newmtl None
+Ns 8
+Ka 0.000000 0.000000 0.000000
+Kd 1.0 1.0 1.0
+Ks 0.1 0.1 0.1
+d 1
+illum 2
+map_Kd coral\coral_color.png
+map_Ks coral\coral_spec.png
+
+newmtl None_coral_color.png.001
+Ns 8
+Ka 0.000000 0.000000 0.000000
+Kd 1.0 1.0 1.0
+Ks 0.1 0.1 0.1
+d 1
+illum 2
+map_Kd coral\coral_color.png
+map_Ks coral\coral_spec.png
+
+newmtl None_coral_color.png.002
+Ns 8
+Ka 0.000000 0.000000 0.000000
+Kd 1.0 1.0 1.0
+Ks 0.1 0.1 0.1
+d 1
+illum 2
+map_Kd coral\coral_color.png
+map_Ks coral\coral_spec.png
+
+newmtl None_coral_color.png.004
+Ns 8
+Ka 0.000000 0.000000 0.000000
+Kd 1.0 1.0 1.0
+Ks 0.1 0.1 0.1
+d 1
+illum 2
+map_Kd coral\coral_color.png
+map_Ks coral\coral_spec.png
+
+newmtl None_coral_color.png.005
+Ns 8
+Ka 0.000000 0.000000 0.000000
+Kd 1.0 1.0 1.0
+Ks 0.1 0.1 0.1
+d 1
+illum 2
+map_Kd coral\coral_color.png
+map_Ks coral\coral_spec.png
+
+newmtl None_coral_color.png.006
+Ns 8
+Ka 0.000000 0.000000 0.000000
+Kd 1.0 1.0 1.0
+Ks 0.1 0.1 0.1
+d 1
+illum 2
+map_Kd coral\coral_color.png
+map_Ks coral\coral_spec.png
+
+newmtl None_coral_color.png.007
+Ns 8
+Ka 0.000000 0.000000 0.000000
+Kd 1.0 1.0 1.0
+Ks 0.1 0.1 0.1
+d 1
+illum 2
+map_Kd coral\coral_color.png
+map_Ks coral\coral_spec.png

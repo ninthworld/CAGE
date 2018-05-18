@@ -44,6 +44,7 @@ public class FPSMonitor extends GUIComponent {
     private int msCurrent;
     private int frames;
     private float graphHeight;
+    private boolean enabled;
     
     public FPSMonitor(Timer timer) {
         this.timer = timer;
@@ -61,6 +62,7 @@ public class FPSMonitor extends GUIComponent {
         this.msCurrent = 0;
         this.frames = 0;
         this.graphHeight = height - margin * 3.0f - fontSize;
+        this.enabled = true;
     }
     
     public void update(float deltaTime) {
@@ -83,31 +85,41 @@ public class FPSMonitor extends GUIComponent {
         
     @Override
     public void render(GUIGraphics g) {
-        g.setFill(26.0f / 255.0f, 26.0f / 255.0f, 56.0f / 255.0f, 0.9f);
-        g.beginPath();
-        g.rect(x, y, width, height);
-        g.closePath();
-        g.fill();
+        if(enabled) {
+            g.setFill(26.0f / 255.0f, 26.0f / 255.0f, 56.0f / 255.0f, 0.9f);
+            g.beginPath();
+            g.rect(x, y, width, height);
+            g.closePath();
+            g.fill();
 
-        g.setFill(26.0f / 255.0f, 1.0f, 1.0f, 0.05f);
-        g.beginPath();
-        g.rect(x + margin, y + margin * 2.0f + fontSize, width - margin * 2.0f, graphHeight);
-        g.closePath();
-        g.fill();
+            g.setFill(26.0f / 255.0f, 1.0f, 1.0f, 0.05f);
+            g.beginPath();
+            g.rect(x + margin, y + margin * 2.0f + fontSize, width - margin * 2.0f, graphHeight);
+            g.closePath();
+            g.fill();
 
-        g.setFill(26.0f / 255.0f, 1.0f, 1.0f, 1.0f);
-        g.beginPath();
-        for(int i=0; i<fpsHistory.length; ++i) {
-            float fps = fpsHistory[i];
-            float percent = Math.min(1.0f, Math.max(0.0f, (fps - fpsMin) / (fpsMax - fpsMin)));
-            g.rect(x + margin + i, y + margin * 2.0f + fontSize + (1.0f - percent) * graphHeight, 1.0f, percent * graphHeight);
+            g.setFill(26.0f / 255.0f, 1.0f, 1.0f, 1.0f);
+            g.beginPath();
+            for (int i = 0; i < fpsHistory.length; ++i) {
+                float fps = fpsHistory[i];
+                float percent = Math.min(1.0f, Math.max(0.0f, (fps - fpsMin) / (fpsMax - fpsMin)));
+                g.rect(x + margin + i, y + margin * 2.0f + fontSize + (1.0f - percent) * graphHeight, 1.0f, percent * graphHeight);
+            }
+            g.closePath();
+            g.fill();
+
+            g.setFont("Arial");
+            g.setTextAlign(TextAlign.TOP);
+            g.setFontSize(fontSize);
+            g.drawText(x + margin, y + margin, fpsCurrent + " FPS / " + msCurrent + " MS");
         }
-        g.closePath();
-        g.fill();
+    }
 
-        g.setFont("Arial");
-        g.setTextAlign(TextAlign.TOP);
-        g.setFontSize(fontSize);
-        g.drawText(x + margin, y + margin, fpsCurrent + " FPS / " + msCurrent + " MS");
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }

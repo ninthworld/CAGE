@@ -6,10 +6,10 @@
 #define SHADOW_MAP_SIZE	2048.0
 #define MAX_SHADOWS     4
 #define MAX_SOURCES     100.0
-#define SHADOW_DIST0    4.0
-#define SHADOW_DIST1    8.0
-#define SHADOW_DIST2    16.0
-#define SHADOW_DIST3    32.0
+//#define SHADOW_DIST0    4.0
+//#define SHADOW_DIST1    8.0
+//#define SHADOW_DIST2    16.0
+//#define SHADOW_DIST3    32.0
 
 in vec2 vs_texCoord;
 
@@ -20,6 +20,7 @@ uniform sampler2D shadowTexture[MAX_SHADOWS];
 
 layout(std140) uniform Shadow {
     mat4 viewProjMatrix[MAX_SHADOWS];
+    vec4 range;
 } shadow;
 
 layout(std140) uniform Camera {
@@ -39,19 +40,19 @@ void main() {
     float visibility = 1.0;
 	if(depth < 1.0) {
         float sampleOffset = 0.0005;
-        if (camDistance < SHADOW_DIST0) {
+        if (camDistance < shadow.range[0]) {
             vec4 shadowCoord = BIAS_MATRIX * shadow.viewProjMatrix[0] * vec4(position, 1.0);
             visibility = PCF(shadowTexture[0], vec2(SHADOW_MAP_SIZE, SHADOW_MAP_SIZE), shadowCoord.xy, shadowCoord.z - 0.005);
         }
-        else if (camDistance < SHADOW_DIST1) {
+        else if (camDistance < shadow.range[1]) {
             vec4 shadowCoord = BIAS_MATRIX * shadow.viewProjMatrix[1] * vec4(position, 1.0);
             visibility = PCF(shadowTexture[1], vec2(SHADOW_MAP_SIZE, SHADOW_MAP_SIZE), shadowCoord.xy, shadowCoord.z - 0.005);
         }
-        else if (camDistance < SHADOW_DIST2) {
+        else if (camDistance < shadow.range[2]) {
             vec4 shadowCoord = BIAS_MATRIX * shadow.viewProjMatrix[2] * vec4(position, 1.0);
             visibility = PCF(shadowTexture[2], vec2(SHADOW_MAP_SIZE, SHADOW_MAP_SIZE), shadowCoord.xy, shadowCoord.z - 0.005);
         }
-        else if (camDistance < SHADOW_DIST3) {
+        else if (camDistance < shadow.range[3]) {
             vec4 shadowCoord = BIAS_MATRIX * shadow.viewProjMatrix[3] * vec4(position, 1.0);
             visibility = PCF(shadowTexture[3], vec2(SHADOW_MAP_SIZE, SHADOW_MAP_SIZE), shadowCoord.xy, shadowCoord.z - 0.005);
         }

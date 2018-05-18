@@ -71,6 +71,7 @@ public abstract class Texture implements Destroyable, Sizable, Writable {
 
     public void setSampler(Sampler sampler) {
         this.sampler = sampler;
+        setMipmapping(sampler.isMipmapping());
     }
 
     @Override

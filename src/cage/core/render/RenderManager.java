@@ -33,7 +33,7 @@ import java.util.List;
 
 public class RenderManager {
 
-    public static final LayoutConfig SHADOW_READ_LAYOUT = new LayoutConfig().mat4().mat4().mat4().mat4();
+    public static final LayoutConfig SHADOW_READ_LAYOUT = new LayoutConfig().mat4().mat4().mat4().mat4().float4();
     public static final int SHADOW_READ_SIZE = SHADOW_READ_LAYOUT.getUnitSize() / 4;
 
     public static final LayoutConfig SKYBOX_READ_LAYOUT = new LayoutConfig().float4().float4().float1().float1().float2();
@@ -64,6 +64,7 @@ public class RenderManager {
     private UniformBuffer defaultSkyboxUniformBuffer;
     private ShaderStorageBuffer defaultLightShaderStorageBuffer;
     private ShaderStorageBuffer defaultBoneShaderStorageBuffer;
+    private ShaderStorageBuffer defaultEntityShaderStorageBuffer;
 
     public RenderManager(GraphicsDevice graphicsDevice, GraphicsContext graphicsContext, Window window, SceneManager sceneManager, AssetManager assetManager) {
         this.outputStages = new ArrayList<>();
@@ -100,6 +101,9 @@ public class RenderManager {
         defaultBoneShaderStorageBuffer = graphicsDevice.createShaderStorageBuffer();
         defaultBoneShaderStorageBuffer.setLayout(new LayoutConfig().mat4());
 
+        defaultEntityShaderStorageBuffer = graphicsDevice.createShaderStorageBuffer();
+        defaultEntityShaderStorageBuffer.setLayout(new LayoutConfig().mat4());
+
         assetManager.getDefaultGeometryShader().addUniformBuffer("Camera", defaultCameraUniformBuffer);
         assetManager.getDefaultGeometryShader().addUniformBuffer("Entity", defaultEntityUniformBuffer);
         assetManager.getDefaultGeometryShader().addUniformBuffer("Material", defaultMaterialUniformBuffer);
@@ -113,9 +117,26 @@ public class RenderManager {
         simpleCameraUniform.setLayout(Camera.READ_LAYOUT);
         assetManager.getDefaultSimpleGeometryShader().addUniformBuffer("Camera", simpleCameraUniform);
         assetManager.getDefaultSimpleGeometryShader().addUniformBuffer("Entity", defaultEntityUniformBuffer);
+
         assetManager.getDefaultSimpleAnimatedGeometryShader().addUniformBuffer("Camera", simpleCameraUniform);
         assetManager.getDefaultSimpleAnimatedGeometryShader().addUniformBuffer("Entity", defaultEntityUniformBuffer);
         assetManager.getDefaultSimpleAnimatedGeometryShader().addShaderStorageBuffer("Bone", defaultBoneShaderStorageBuffer);
+
+        assetManager.getDefaultInstancedGeometryShader().addUniformBuffer("Camera", defaultCameraUniformBuffer);
+        assetManager.getDefaultInstancedGeometryShader().addShaderStorageBuffer("Entity", defaultEntityShaderStorageBuffer);
+        assetManager.getDefaultInstancedGeometryShader().addUniformBuffer("Material", defaultMaterialUniformBuffer);
+
+        assetManager.getDefaultInstancedAnimatedGeometryShader().addUniformBuffer("Camera", defaultCameraUniformBuffer);
+        assetManager.getDefaultInstancedAnimatedGeometryShader().addShaderStorageBuffer("Entity", defaultEntityShaderStorageBuffer);
+        assetManager.getDefaultInstancedAnimatedGeometryShader().addUniformBuffer("Material", defaultMaterialUniformBuffer);
+        assetManager.getDefaultInstancedAnimatedGeometryShader().addShaderStorageBuffer("Bone", defaultBoneShaderStorageBuffer);
+
+        assetManager.getDefaultInstancedSimpleGeometryShader().addUniformBuffer("Camera", simpleCameraUniform);
+        assetManager.getDefaultInstancedSimpleGeometryShader().addShaderStorageBuffer("Entity", defaultEntityShaderStorageBuffer);
+
+        assetManager.getDefaultInstancedSimpleAnimatedGeometryShader().addUniformBuffer("Camera", simpleCameraUniform);
+        assetManager.getDefaultInstancedSimpleAnimatedGeometryShader().addShaderStorageBuffer("Entity", defaultEntityShaderStorageBuffer);
+        assetManager.getDefaultInstancedSimpleAnimatedGeometryShader().addShaderStorageBuffer("Bone", defaultBoneShaderStorageBuffer);
 
         assetManager.getDefaultLightingShader().addUniformBuffer("Skybox", defaultSkyboxUniformBuffer);
         assetManager.getDefaultLightingShader().addUniformBuffer("Camera", defaultCameraUniformBuffer);
@@ -171,7 +192,10 @@ public class RenderManager {
         return (GeometryRenderStage)createRenderStage(assetManager.getDefaultGeometryShader(), (shader, renderTarget, graphicsContext) -> {
             renderTarget.addColorTexture(1, graphicsDevice.createTexture2D(renderTarget.getWidth(), renderTarget.getHeight()));
             renderTarget.addColorTexture(2, graphicsDevice.createTexture2D(renderTarget.getWidth(), renderTarget.getHeight()));
-            return new GeometryRenderStage(camera, sceneManager.getRootSceneNode(), assetManager.getDefaultAnimatedGeometryShader(), shader, renderTarget, graphicsContext);
+            return new GeometryRenderStage(camera, sceneManager.getRootSceneNode(),
+                    assetManager.getDefaultInstancedAnimatedGeometryShader(), assetManager.getDefaultInstancedGeometryShader(),
+                    assetManager.getDefaultAnimatedGeometryShader(), shader,
+                    renderTarget, graphicsContext);
         });
     }
 
@@ -183,6 +207,7 @@ public class RenderManager {
             }
             return new ShadowRenderStage(
                     sceneManager, defaultFXModel,
+                    assetManager.getDefaultInstancedSimpleGeometryShader(), assetManager.getDefaultInstancedSimpleAnimatedGeometryShader(),
                     assetManager.getDefaultSimpleGeometryShader(), assetManager.getDefaultSimpleAnimatedGeometryShader(), shader,
                     shadowRenderTargets, renderTarget,
                     graphicsDevice.getDefaultBlender(), graphicsContext);

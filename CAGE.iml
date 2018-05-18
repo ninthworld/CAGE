@@ -117,10 +117,26 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/jbullet/jbullet-jbullet-2.72.2.4/classes/artifacts/JBullet/JBullet.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/jbullet/jbullet.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/lwjgl-openal/lwjgl-openal-natives-linux.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/lwjgl-openal/lwjgl-openal-natives-macos.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/lwjgl-openal/lwjgl-openal-natives-windows.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/lwjgl-openal/lwjgl-openal.jar!/" />
+        </CLASSES>
+        <JAVADOC>
+          <root url="jar://$MODULE_DIR$/lib/lwjgl-openal/lwjgl-openal-javadoc.jar!/" />
+        </JAVADOC>
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/lwjgl-openal/lwjgl-openal-sources.jar!/" />
+        </SOURCES>
       </library>
     </orderEntry>
   </component>

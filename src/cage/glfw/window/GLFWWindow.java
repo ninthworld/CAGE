@@ -3,6 +3,7 @@ package cage.glfw.window;
 import cage.core.common.listener.Listener;
 import cage.core.window.Window;
 import cage.core.window.listener.*;
+import org.joml.Vector2f;
 import org.lwjgl.glfw.*;
 import org.lwjgl.system.MemoryStack;
 
@@ -206,6 +207,14 @@ public class GLFWWindow extends Window {
         if(maximized) {
             glfwMaximizeWindow(handle);
         }
+    }
+
+    @Override
+    public Vector2f getMousePosition() {
+        double[] posx = new double[1];
+        double[] posy = new double[1];
+        glfwGetCursorPos(handle, posx, posy);
+        return new Vector2f((float)posx[0], (float)posy[0]);
     }
 
     public void destroy() {
