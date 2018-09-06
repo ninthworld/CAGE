@@ -86,7 +86,10 @@ public class LightingRenderStage extends FXRenderStage {
             FloatBuffer lightBuffer = stack.callocFloat(sceneManager.getLightCount() * Light.READ_SIZE);
             Iterator<Light> it = sceneManager.getLightIterator();
             while(it.hasNext()) {
-                lightBuffer.put(it.next().readData());
+                Light light = it.next();
+                if(light.isEnabled()) {
+                    lightBuffer.put(light.readData());
+                }
             }
             lightBuffer.flip();
             lightShaderStorage.writeData(lightBuffer);

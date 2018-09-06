@@ -4,22 +4,36 @@ import cage.core.common.Destroyable;
 import cage.core.graphics.buffer.ShaderStorageBuffer;
 import cage.core.graphics.buffer.UniformBuffer;
 import cage.core.graphics.texture.Texture;
+import cage.core.graphics.type.ImageType;
 
 import java.util.*;
 
 public abstract class Shader implements Destroyable {
 
+    public static final int VERTEX_SHADER_TYPE          = 0b1;
+    public static final int TESS_CONTROL_SHADER_TYPE    = 0b10;
+    public static final int TESS_EVAL_SHADER_TYPE       = 0b100;
+    public static final int GEOMETRY_SHADER_TYPE        = 0b1000;
+    public static final int FRAGMENT_SHADER_TYPE        = 0b10000;
+    public static final int COMPUTE_SHADER_TYPE         = 0b100000;
+
     protected Map<Integer, ShaderStorageBuffer> shaderStorageBuffers;
     protected Map<Integer, UniformBuffer> uniformBuffers;
     protected Map<Integer, Texture> textures;
+    protected Map<Texture, ImageType> textureImageTypes;
     private String vertexShaderSrc;
+    private String tessControlShaderSrc;
+    private String tessEvalShaderSrc;
     private String geometryShaderSrc;
     private String fragmentShaderSrc;
+    private String computeShaderSrc;
+    private int shaderType;
 
     public Shader() {
         this.shaderStorageBuffers = new HashMap<>();
         this.uniformBuffers = new HashMap<>();
         this.textures = new HashMap<>();
+        this.textureImageTypes = new HashMap<>();
     }
     
     public void addShaderStorageBuffer(int index, ShaderStorageBuffer buffer) {
@@ -119,11 +133,13 @@ public abstract class Shader implements Destroyable {
     }
 
     public void removeTexture(int index) {
-        textures.remove(index);
+        Texture texture = textures.remove(index);
+        textureImageTypes.remove(texture);
     }
 
     public void removeTexture(int index, Texture texture) {
         textures.remove(index, texture);
+        textureImageTypes.remove(texture);
     }
 
     public void removeAllTextures() {
@@ -160,16 +176,66 @@ public abstract class Shader implements Destroyable {
 
     public abstract Texture getTexture(String name);
 
+    public void addTexture(int index, Texture texture, ImageType type) {
+        textures.put(index, texture);
+        textureImageTypes.put(texture, type);
+    }
+
+    public void addTexture(String name, Texture texture, ImageType type) {
+        addTexture(name, texture);
+        textureImageTypes.put(texture, type);
+    }
+
     public void setVertexShaderSource(String src) {
         this.vertexShaderSrc = src;
+        if(src != null) {
+            this.shaderType |= VERTEX_SHADER_TYPE;
+        }
+        else {
+            this.shaderType &= ~VERTEX_SHADER_TYPE;
+        }
     }
 
     public String getVertexShaderSource() {
         return vertexShaderSrc;
     }
 
+    public void setTessControlSource(String src) {
+        this.tessControlShaderSrc = src;
+        if(src != null) {
+            this.shaderType |= TESS_CONTROL_SHADER_TYPE;
+        }
+        else {
+            this.shaderType &= ~TESS_CONTROL_SHADER_TYPE;
+        }
+    }
+
+    public String getTessControlSource() {
+        return tessControlShaderSrc;
+    }
+
+    public void setTessEvalSource(String src) {
+        this.tessEvalShaderSrc = src;
+        if(src != null) {
+            this.shaderType |= TESS_EVAL_SHADER_TYPE;
+        }
+        else {
+            this.shaderType &= ~TESS_EVAL_SHADER_TYPE;
+        }
+    }
+
+    public String getTessEvalSource() {
+        return tessEvalShaderSrc;
+    }
+
     public void setGeometryShaderSrc(String src) {
         this.geometryShaderSrc = src;
+        if(src != null) {
+            this.shaderType |= GEOMETRY_SHADER_TYPE;
+        }
+        else {
+            this.shaderType &= ~GEOMETRY_SHADER_TYPE;
+        }
     }
 
     public String getGeometryShaderSrc() {
@@ -178,10 +244,38 @@ public abstract class Shader implements Destroyable {
 
     public void setFragmentShaderSource(String src) {
         this.fragmentShaderSrc = src;
+        if(src != null) {
+            this.shaderType |= FRAGMENT_SHADER_TYPE;
+        }
+        else {
+            this.shaderType &= ~FRAGMENT_SHADER_TYPE;
+        }
     }
 
     public String getFragmentShaderSource() {
         return fragmentShaderSrc;
+    }
+
+    public void setComputeShaderSource(String src) {
+        this.computeShaderSrc = src;
+        if(src != null) {
+            this.shaderType |= COMPUTE_SHADER_TYPE;
+        }
+        else {
+            this.shaderType &= ~COMPUTE_SHADER_TYPE;
+        }
+    }
+
+    public String getComputeShaderSource() {
+        return computeShaderSrc;
+    }
+
+    public void setShaderType(int type) {
+        this.shaderType = type;
+    }
+
+    public int getShaderType() {
+        return shaderType;
     }
 
     public abstract void compile();

@@ -1,0 +1,7 @@
+#ifndef COMMON_TERRAIN_GLSL
+#define COMMON_TERRAIN_GLSL
+
+#define WORLD_SCALE 2048.0
+#define WORLD_HEIGHT 256.0
+
+#endif

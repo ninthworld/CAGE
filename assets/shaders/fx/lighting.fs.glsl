@@ -140,4 +140,11 @@ void main() {
 	}
 
 	fs_color = vec4(color, 1.0);
+
+    // Tacked-On: HSV Color Correction
+//	vec3 hsv = rgb2hsv(fs_color.rgb);
+//	hsv.x = mod(hsv.x - 8.0 / 360.0, 1.0);
+//	hsv.y *= 1.4;
+//	hsv.z *= 1.2;
+//	fs_color = vec4(hsv2rgb(hsv), 1.0);
 }

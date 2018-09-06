@@ -17,8 +17,10 @@ import cage.opengl.graphics.rasterizer.GLRasterizer;
 import cage.opengl.graphics.rendertarget.GLRenderTarget;
 import cage.opengl.graphics.shader.GLShader;
 import cage.opengl.graphics.vertexarray.GLVertexArray;
+import org.lwjgl.BufferUtils;
 
 import java.awt.*;
+import java.nio.ByteBuffer;
 import java.util.Map;
 
 import static cage.opengl.utils.GLUtils.*;
@@ -27,6 +29,9 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.opengl.GL31.*;
 import static org.lwjgl.opengl.GL40.*;
+import static org.lwjgl.opengl.GL42.GL_SHADER_IMAGE_ACCESS_BARRIER_BIT;
+import static org.lwjgl.opengl.GL42.glMemoryBarrier;
+import static org.lwjgl.opengl.GL43.glDispatchCompute;
 
 public class GLGraphicsContext implements GraphicsContext {
 
@@ -125,6 +130,18 @@ public class GLGraphicsContext implements GraphicsContext {
 			checkError("glDrawElements");
 			glBuffer.unbind();
 		}
+	}
+
+	@Override
+	public void computeDispatch(int numGroupsX, int numGroupsY, int numGroupsZ) {
+		glDispatchCompute(numGroupsX, numGroupsY, numGroupsZ);
+		checkError("glDispatchCompute");
+	}
+
+	@Override
+	public void computeMemoryBarrier() {
+		glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+		checkError("glMemoryBarrier");
 	}
 	
     @Override
@@ -312,4 +329,11 @@ public class GLGraphicsContext implements GraphicsContext {
 		this.patchSize = patchSize;
     	setPrimitive(primitive);
     }
+
+    @Override
+	public ByteBuffer getPixels(Rectangle bounds) {
+		ByteBuffer buffer = BufferUtils.createByteBuffer(bounds.width * bounds.height * 4);
+		glReadPixels(bounds.x, bounds.y, bounds.width, bounds.height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+		return buffer;
+	}
 }

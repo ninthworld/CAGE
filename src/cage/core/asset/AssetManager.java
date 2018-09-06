@@ -62,6 +62,10 @@ public class AssetManager {
     private Shader defaultAnimatedGeometryShader;
     private Shader defaultSimpleGeometryShader;
     private Shader defaultSimpleAnimatedGeometryShader;
+    private Shader defaultInstancedGeometryShader;
+    private Shader defaultInstancedAnimatedGeometryShader;
+    private Shader defaultInstancedSimpleGeometryShader;
+    private Shader defaultInstancedSimpleAnimatedGeometryShader;
     private Shader defaultLightingShader;
     private Shader defaultShadowShader;
     private Shader defaultFXAAShader;
@@ -86,6 +90,10 @@ public class AssetManager {
         this.assetProperties.setDefault("assets.shaders.default.geometry.simple.vertex", "geometry/simple.vs.glsl");
         this.assetProperties.setDefault("assets.shaders.default.geometry.simple.fragment", "geometry/simple.fs.glsl");
         this.assetProperties.setDefault("assets.shaders.default.geometry.animated.simple.vertex", "geometry/animated.simple.vs.glsl");
+        this.assetProperties.setDefault("assets.shaders.default.geometry.instanced.vertex", "geometry/instanced.material.vs.glsl");
+        this.assetProperties.setDefault("assets.shaders.default.geometry.animated.instanced.vertex", "geometry/instanced.animated.material.vs.glsl");
+        this.assetProperties.setDefault("assets.shaders.default.geometry.simple.instanced.vertex", "geometry/instanced.simple.vs.glsl");
+        this.assetProperties.setDefault("assets.shaders.default.geometry.animated.simple.instanced.vertex", "geometry/instanced.animated.simple.vs.glsl");
         this.assetProperties.setDefault("assets.shaders.default.fx.vertex", "fx/fx.vs.glsl");
         this.assetProperties.setDefault("assets.shaders.default.fx.lighting.fragment", "fx/lighting.fs.glsl");
         this.assetProperties.setDefault("assets.shaders.default.fx.fxaa.fragment", "fx/fxaa.fs.glsl");
@@ -98,6 +106,10 @@ public class AssetManager {
         this.defaultAnimatedGeometryShader = loadShader("default.geometry.animated", "default.geometry", "default.geometry");
         this.defaultSimpleGeometryShader = loadShader("default.geometry.simple");
         this.defaultSimpleAnimatedGeometryShader = loadShader("default.geometry.animated.simple","default.geometry.simple");
+        this.defaultInstancedGeometryShader = loadShader("default.geometry.instanced", "default.geometry", "default.geometry");
+        this.defaultInstancedAnimatedGeometryShader = loadShader("default.geometry.animated.instanced", "default.geometry", "default.geometry");
+        this.defaultInstancedSimpleGeometryShader = loadShader("default.geometry.simple.instanced","default.geometry.simple");
+        this.defaultInstancedSimpleAnimatedGeometryShader = loadShader("default.geometry.animated.simple.instanced","default.geometry.simple");
         this.defaultLightingShader = loadShader("default.fx", "default.fx.lighting");
         this.defaultShadowShader = loadShader("default.fx", "default.shadow");
         this.defaultFXAAShader = loadShader("default.fx", "default.fx.fxaa");
@@ -122,6 +134,22 @@ public class AssetManager {
 
     public Shader getDefaultSimpleAnimatedGeometryShader() {
         return defaultSimpleAnimatedGeometryShader;
+    }
+
+    public Shader getDefaultInstancedGeometryShader() {
+        return defaultInstancedGeometryShader;
+    }
+
+    public Shader getDefaultInstancedAnimatedGeometryShader() {
+        return defaultInstancedAnimatedGeometryShader;
+    }
+
+    public Shader getDefaultInstancedSimpleGeometryShader() {
+        return defaultInstancedSimpleGeometryShader;
+    }
+
+    public Shader getDefaultInstancedSimpleAnimatedGeometryShader() {
+        return defaultInstancedSimpleAnimatedGeometryShader;
     }
 
     public Shader getDefaultLightingShader() {
@@ -194,7 +222,11 @@ public class AssetManager {
     }
 
     public ExtModel loadColladaModelFile(String file) {
-    	if(extModels.containsKey(file)) {
+        return loadColladaModelFile(file, true);
+    }
+
+    public ExtModel loadColladaModelFile(String file, boolean cacheFlag) {
+    	if(cacheFlag && extModels.containsKey(file)) {
     		return extModels.get(file);
     	}
     	else {
@@ -257,7 +289,9 @@ public class AssetManager {
             ExtModel model = new ExtModel(vertexArray, animatedModel, animation);
             model.addMesh(new Mesh(indexBuffer, material, graphicsDevice.getDefaultRasterizer()));
 
-            extModels.put(file, model);
+            if(cacheFlag) {
+                extModels.put(file, model);
+            }
             return model;
     	}
     }
@@ -359,31 +393,63 @@ public class AssetManager {
     }
 
     public Shader loadShader(String configKey) {
-        return loadShader(configKey, configKey, configKey);
+        return loadShader(configKey, configKey, configKey, configKey, configKey, configKey);
     }
 
     public Shader loadShader(String configKeyVertex, String configKeyFragment) {
-        return loadShader(configKeyVertex, "", configKeyFragment);
+        return loadShader(configKeyVertex, "", "", "", configKeyFragment, "");
     }
 
     public Shader loadShader(String configKeyVertex, String configKeyGeometry, String configKeyFragment) {
+        return loadShader(configKeyVertex, "", "", configKeyGeometry, configKeyFragment, "");
+    }
+
+    public Shader loadShader(String configKeyVertex, String configKeyTessControl, String configKeyTessEval, String configKeyFragment) {
+        return loadShader(configKeyVertex, configKeyTessControl, configKeyTessEval, "", configKeyFragment, "");
+    }
+
+    public Shader loadShader(String configKeyVertex, String configKeyTessControl, String configKeyTessEval, String configKeyGeometry, String configKeyFragment) {
+        return loadShader(configKeyVertex, configKeyTessControl, configKeyTessEval, configKeyGeometry, configKeyFragment, "");
+    }
+
+    public Shader loadShader(String configKeyVertex, String configKeyTessControl, String configKeyTessEval, String configKeyGeometry, String configKeyFragment, String configKeyCompute) {
         return loadShaderFile(
                 assetProperties.getValuePath("assets.shaders." + configKeyVertex + ".vertex").toString(),
+                assetProperties.getValuePath("assets.shaders." + configKeyTessControl + ".tessCtrl").toString(),
+                assetProperties.getValuePath("assets.shaders." + configKeyTessEval + ".tessEval").toString(),
                 assetProperties.getValuePath("assets.shaders." + configKeyGeometry + ".geometry").toString(),
-                assetProperties.getValuePath("assets.shaders." + configKeyFragment + ".fragment").toString());
+                assetProperties.getValuePath("assets.shaders." + configKeyFragment + ".fragment").toString(),
+                assetProperties.getValuePath("assets.shaders." + configKeyCompute + ".compute").toString());
     }
 
     public Shader loadShaderFile(String vertexFile, String fragmentFile) {
-        return loadShaderFile(vertexFile, "", fragmentFile);
+        return loadShaderFile(vertexFile, "", "", "", fragmentFile, "");
     }
 
     public Shader loadShaderFile(String vertexFile, String geometryFile, String fragmentFile) {
+        return loadShaderFile(vertexFile, "", "", geometryFile, fragmentFile, "");
+    }
+
+    public Shader loadShaderFile(String vertexFile, String tessControlFile, String tessEvalFile, String fragmentFile) {
+        return loadShaderFile(vertexFile, tessControlFile, tessEvalFile, "", fragmentFile, "");
+    }
+
+    public Shader loadShaderFile(String vertexFile, String tessControlFile, String tessEvalFile, String geometryFile, String fragmentFile) {
+        return loadShaderFile(vertexFile, tessControlFile, tessEvalFile, geometryFile, fragmentFile, "");
+    }
+
+    public Shader loadShaderFile(String computeFile) {
+        return loadShaderFile("", "", "", "", "", computeFile);
+    }
+
+    public Shader loadShaderFile(String vertexFile, String tessControlFile, String tessEvalFile, String geometryFile, String fragmentFile, String computeFile) {
         Shader shader = graphicsDevice.createShader();
-        shader.setVertexShaderSource(getShaderSource(assetProperties.getShadersPath().resolve(vertexFile).toString()));
-        shader.setFragmentShaderSource(getShaderSource(assetProperties.getShadersPath().resolve(fragmentFile).toString()));
-        if(!geometryFile.isEmpty()) {
-            shader.setGeometryShaderSrc(getShaderSource(assetProperties.getShadersPath().resolve(geometryFile).toString()));
-        }
+        if(!vertexFile.isEmpty()) shader.setVertexShaderSource(getShaderSource(assetProperties.getShadersPath().resolve(vertexFile).toString()));
+        if(!tessControlFile.isEmpty()) shader.setTessControlSource(getShaderSource(assetProperties.getShadersPath().resolve(tessControlFile).toString()));
+        if(!tessEvalFile.isEmpty()) shader.setTessEvalSource(getShaderSource(assetProperties.getShadersPath().resolve(tessEvalFile).toString()));
+        if(!geometryFile.isEmpty()) shader.setGeometryShaderSrc(getShaderSource(assetProperties.getShadersPath().resolve(geometryFile).toString()));
+        if(!fragmentFile.isEmpty()) shader.setFragmentShaderSource(getShaderSource(assetProperties.getShadersPath().resolve(fragmentFile).toString()));
+        if(!computeFile.isEmpty()) shader.setComputeShaderSource(getShaderSource(assetProperties.getShadersPath().resolve(computeFile).toString()));
         shader.compile();
         return shader;
     }

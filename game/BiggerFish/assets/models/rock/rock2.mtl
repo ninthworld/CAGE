@@ -1,0 +1,12 @@
+# Blender MTL File: 'rock2.blend'
+# Material Count: 1
+
+newmtl None
+Ns 8
+Ka 0.000000 0.000000 0.000000
+Kd 1.2 1.2 1.2
+Ks 0.3 0.3 0.3
+d 1
+illum 2
+map_Kd rock\rock_color.jpg
+map_Ks rock\rock_spec.jpg

@@ -1,0 +1,92 @@
+# Blender MTL File: 'kelp_grass.blend'
+# Material Count: 10
+
+newmtl None
+Ns 8
+Ka 0.000000 0.000000 0.000000
+Kd 1.0 1.0 1.0
+Ks 0.1 0.1 0.1
+d 1
+illum 2
+map_Kd kelp\kelp_color.png
+
+newmtl None_kelp_color.png.017
+Ns 8
+Ka 0.000000 0.000000 0.000000
+Kd 1.0 1.0 1.0
+Ks 0.1 0.1 0.1
+d 1
+illum 2
+map_Kd kelp\kelp_color.png
+
+newmtl None_kelp_color.png.018
+Ns 8
+Ka 0.000000 0.000000 0.000000
+Kd 1.0 1.0 1.0
+Ks 0.1 0.1 0.1
+d 1
+illum 2
+map_Kd kelp\kelp_color.png
+
+newmtl None_kelp_color.png.019
+Ns 8
+Ka 0.000000 0.000000 0.000000
+Kd 1.0 1.0 1.0
+Ks 0.1 0.1 0.1
+d 1
+illum 2
+map_Kd kelp\kelp_color.png
+
+newmtl None_kelp_color.png.037
+Ns 8
+Ka 0.000000 0.000000 0.000000
+Kd 1.0 1.0 1.0
+Ks 0.1 0.1 0.1
+d 1
+illum 2
+map_Kd kelp\kelp_color.png
+
+newmtl None_kelp_color.png.038
+Ns 8
+Ka 0.000000 0.000000 0.000000
+Kd 1.0 1.0 1.0
+Ks 0.1 0.1 0.1
+d 1
+illum 2
+map_Kd kelp\kelp_color.png
+
+newmtl None_kelp_color.png.039
+Ns 8
+Ka 0.000000 0.000000 0.000000
+Kd 1.0 1.0 1.0
+Ks 0.1 0.1 0.1
+d 1
+illum 2
+map_Kd kelp\kelp_color.png
+
+newmtl None_kelp_color.png.040
+Ns 8
+Ka 0.000000 0.000000 0.000000
+Kd 1.0 1.0 1.0
+Ks 0.1 0.1 0.1
+d 1
+illum 2
+map_Kd kelp\kelp_color.png
+
+newmtl None_kelp_color.png.041
+Ns 8
+Ka 0.000000 0.000000 0.000000
+Kd 1.0 1.0 1.0
+Ks 0.1 0.1 0.1
+d 1
+illum 2
+map_Kd kelp\kelp_color.png
+
+newmtl None_kelp_color.png.042
+Ns 8
+Ka 0.000000 0.000000 0.000000
+Kd 1.0 1.0 1.0
+Ks 0.1 0.1 0.1
+d 1
+illum 2
+map_Kd kelp\kelp_color.png

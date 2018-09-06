@@ -8,6 +8,7 @@ import cage.core.common.listener.MoveListener;
 import cage.core.common.listener.ResizeListener;
 import cage.core.graphics.config.LayoutConfig;
 import cage.core.window.listener.WindowListener;
+import org.joml.Vector2f;
 import org.lwjgl.BufferUtils;
 
 import java.nio.FloatBuffer;
@@ -181,6 +182,10 @@ public abstract class Window implements Sizable, Movable, Readable {
 
     public void setMaximized(boolean maximized) {
         this.maximized = maximized;
+    }
+
+    public Vector2f getMousePosition() {
+        return new Vector2f();
     }
 
     @Override

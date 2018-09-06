@@ -16,7 +16,7 @@ public abstract class Rasterizer implements Destroyable {
     public Rasterizer() {
         this.fill = FillType.SOLID;
         this.cull = CullType.BACK;
-        this.frontCCW = true;
+        this.frontCCW = false;
         this.multisampling = true;
         this.scissoring = false;
         this.depthClipping = true;

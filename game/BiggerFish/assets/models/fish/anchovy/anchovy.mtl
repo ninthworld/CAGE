@@ -1,0 +1,10 @@
+# Blender MTL File: 'anchovy.blend'
+# Material Count: 1
+
+newmtl None
+Ns 8
+Kd 1.00000 1.00000 1.00000
+Ks 0.600000 0.600000 0.600000
+d 1
+illum 2
+map_Kd anchovy_color.png

@@ -9,6 +9,7 @@ import cage.core.graphics.type.PrimitiveType;
 import cage.core.graphics.vertexarray.VertexArray;
 
 import java.awt.*;
+import java.nio.ByteBuffer;
 
 public interface GraphicsContext {
 
@@ -21,7 +22,10 @@ public interface GraphicsContext {
 	void drawInstanced(int instances, int vertexCount, int startIndex);
 	void drawIndexedInstanced(int instances, IndexBuffer indexBuffer);
 	void drawIndexedInstanced(int instances, IndexBuffer indexBuffer, int indexCount, int startIndex);
-	
+
+	void computeDispatch(int numGroupsX, int numGroupsY, int numGroupsZ);
+	void computeMemoryBarrier();
+
     void swapBuffers();
 
     void bindBackBuffer();
@@ -47,4 +51,6 @@ public interface GraphicsContext {
     void setViewport(Rectangle viewport);
     void setPrimitive(PrimitiveType primitive);
     void setPrimitive(PrimitiveType primitive, int patchSize);
+
+    ByteBuffer getPixels(Rectangle bounds);
 }

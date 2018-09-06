@@ -16,7 +16,7 @@ public class GLTimer implements Timer {
     }
 
     @Override
-        public void reset() {
+    public void reset() {
         lastTime = getCurrentTime();
     }
 

@@ -11,6 +11,8 @@ public enum FormatType {
     RG_16_UNORM,
     R_16_UNORM,
 
+    RGBA_32_FLOAT,
+
     DEPTH_16,
     DEPTH_32,
     DEPTH_24_STENCIL_8;
@@ -31,6 +33,7 @@ public enum FormatType {
             case DEPTH_24_STENCIL_8:
                 return 24;
             case DEPTH_32:
+            case RGBA_32_FLOAT:
                 return 32;
             default: return 0;
         }
@@ -40,6 +43,7 @@ public enum FormatType {
         switch (this) {
             case RGBA_8_UNORM:
             case RGBA_16_UNORM:
+            case RGBA_32_FLOAT:
                 return 4;
             case RGB_8_UNORM:
             case RGB_16_UNORM:

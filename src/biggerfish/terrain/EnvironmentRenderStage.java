@@ -55,7 +55,7 @@ public class EnvironmentRenderStage extends RenderStage {
         getGraphicsContext().setPrimitive(mesh.getPrimitive());
         getGraphicsContext().bindRasterizer(mesh.getRasterizer());
         getGraphicsContext().bindShader(getShader());
-        getGraphicsContext().drawIndexedInstanced(1024, mesh.getIndexBuffer());
+        getGraphicsContext().drawIndexedInstanced(4096, mesh.getIndexBuffer());
         if(mesh.getBlender() != null) {
             getGraphicsContext().unbindBlender(mesh.getBlender());
         }

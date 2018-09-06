@@ -109,6 +109,7 @@ public class GLTypeUtils {
     
     public static int getGLDataType(FormatType format) {
         switch(format) {
+            case RGBA_32_FLOAT: return GL_FLOAT;
             case DEPTH_24_STENCIL_8: return GL_UNSIGNED_INT_24_8;
             case DEPTH_32: return GL_UNSIGNED_INT;
             case DEPTH_16:
@@ -130,7 +131,8 @@ public class GLTypeUtils {
             case DEPTH_32: return GL_DEPTH_COMPONENT;
             case DEPTH_24_STENCIL_8: return GL_DEPTH_STENCIL;
             case RGBA_8_UNORM:
-            case RGBA_16_UNORM: return GL_RGBA;
+            case RGBA_16_UNORM:
+            case RGBA_32_FLOAT: return GL_RGBA;
             case RGB_8_UNORM:
             case RGB_16_UNORM: return GL_RGB;
             case RG_8_UNORM:
@@ -143,10 +145,15 @@ public class GLTypeUtils {
 
     public static int getGLInternalFormatType(FormatType format) {
         switch(format) {
+            case RGBA_32_FLOAT: return GL_RGBA32F;
             case RGBA_16_UNORM: return GL_RGBA16;
             case RGB_16_UNORM: return GL_RGB16;
             case RG_16_UNORM: return GL_RG16;
             case R_16_UNORM: return GL_R16;
+            case RGBA_8_UNORM: return GL_RGBA8;
+            case RGB_8_UNORM: return GL_RGB8;
+            case RG_8_UNORM: return GL_RG8;
+            case R_8_UNORM: return GL_R8;
             default: return getGLFormatType(format);
         }
     }

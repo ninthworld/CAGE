@@ -9,6 +9,7 @@ import cage.opengl.graphics.buffer.GLShaderStorageBuffer;
 import cage.opengl.graphics.sampler.GLSampler;
 import cage.opengl.graphics.buffer.GLUniformBuffer;
 import cage.opengl.graphics.texture.GLTexture;
+import cage.opengl.graphics.type.GLTypeUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,11 +18,17 @@ import java.util.Map.Entry;
 import static cage.opengl.utils.GLUtils.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.*;
+import static org.lwjgl.opengl.GL15.GL_READ_ONLY;
+import static org.lwjgl.opengl.GL15.GL_READ_WRITE;
+import static org.lwjgl.opengl.GL15.GL_WRITE_ONLY;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.opengl.GL31.*;
 import static org.lwjgl.opengl.GL32.GL_GEOMETRY_SHADER;
 import static org.lwjgl.opengl.GL33.*;
+import static org.lwjgl.opengl.GL40.GL_TESS_CONTROL_SHADER;
+import static org.lwjgl.opengl.GL40.GL_TESS_EVALUATION_SHADER;
+import static org.lwjgl.opengl.GL42.glBindImageTexture;
 import static org.lwjgl.opengl.GL43.*;
 
 public class GLShader extends Shader implements GLBindable {
@@ -207,10 +214,20 @@ public class GLShader extends Shader implements GLBindable {
                 GLTexture glTexture = (GLTexture)texture;
                 glUniform1i(entry.getKey(), j);
                 checkError("glUniform1i");
-                glActiveTexture(GL_TEXTURE0 + j);
-                glTexture.bind();
-                if(texture.getSampler() != null && texture.getSampler() instanceof GLSampler) {
-                    glBindSampler(j, ((GLSampler)texture.getSampler()).getSamplerId());
+                if(!textureImageTypes.containsKey(texture)) {
+                    glActiveTexture(GL_TEXTURE0 + j);
+                    glTexture.bind();
+                    if (texture.getSampler() != null && texture.getSampler() instanceof GLSampler) {
+                        glBindSampler(j, ((GLSampler) texture.getSampler()).getSamplerId());
+                    }
+                }
+                else {
+                    int imageType = GL_READ_WRITE;
+                    switch (textureImageTypes.get(texture)) {
+                        case READ_ONLY: imageType = GL_READ_ONLY; break;
+                        case WRITE_ONLY: imageType = GL_WRITE_ONLY; break;
+                    }
+                    glBindImageTexture(j, glTexture.getTextureId(), 0, false, 0, imageType, GLTypeUtils.getGLInternalFormatType(texture.getFormat()));
                 }
             }
     		++j;
@@ -224,23 +241,41 @@ public class GLShader extends Shader implements GLBindable {
 
     @Override
     public void compile(){
-        if(!getVertexShaderSource().isEmpty() && !getFragmentShaderSource().isEmpty()) {
-
-            int vertexShaderId = compileShader(getVertexShaderSource(), GL_VERTEX_SHADER);
-            int fragmentShaderId = compileShader(getFragmentShaderSource(), GL_FRAGMENT_SHADER);
-
-            if (vertexShaderId != GL_FALSE) {
-                glAttachShader(programId, vertexShaderId);
+        if(getShaderType() > 0) {
+            if((getShaderType() & VERTEX_SHADER_TYPE) > 0) {
+                int shaderId = compileShader(getVertexShaderSource(), GL_VERTEX_SHADER);
+                if (shaderId != GL_FALSE) {
+                    glAttachShader(programId, shaderId);
+                }
             }
-
-            if (fragmentShaderId != GL_FALSE) {
-                glAttachShader(programId, fragmentShaderId);
+            if((getShaderType() & TESS_CONTROL_SHADER_TYPE) > 0) {
+                int shaderId = compileShader(getTessControlSource(), GL_TESS_CONTROL_SHADER);
+                if (shaderId != GL_FALSE) {
+                    glAttachShader(programId, shaderId);
+                }
             }
-
-            if (getGeometryShaderSrc() != null) {
-                int geometryShaderId = compileShader(getGeometryShaderSrc(), GL_GEOMETRY_SHADER);
-                if (geometryShaderId != GL_FALSE) {
-                    glAttachShader(programId, geometryShaderId);
+            if((getShaderType() & TESS_EVAL_SHADER_TYPE) > 0) {
+                int shaderId = compileShader(getTessEvalSource(), GL_TESS_EVALUATION_SHADER);
+                if (shaderId != GL_FALSE) {
+                    glAttachShader(programId, shaderId);
+                }
+            }
+            if((getShaderType() & GEOMETRY_SHADER_TYPE) > 0) {
+                int shaderId = compileShader(getGeometryShaderSrc(), GL_GEOMETRY_SHADER);
+                if (shaderId != GL_FALSE) {
+                    glAttachShader(programId, shaderId);
+                }
+            }
+            if((getShaderType() & FRAGMENT_SHADER_TYPE) > 0) {
+                int shaderId = compileShader(getFragmentShaderSource(), GL_FRAGMENT_SHADER);
+                if (shaderId != GL_FALSE) {
+                    glAttachShader(programId, shaderId);
+                }
+            }
+            if((getShaderType() & COMPUTE_SHADER_TYPE) > 0) {
+                int shaderId = compileShader(getComputeShaderSource(), GL_COMPUTE_SHADER);
+                if (shaderId != GL_FALSE) {
+                    glAttachShader(programId, shaderId);
                 }
             }
 

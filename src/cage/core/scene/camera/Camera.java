@@ -5,8 +5,10 @@ import cage.core.graphics.config.LayoutConfig;
 import cage.core.scene.Node;
 import cage.core.scene.SceneManager;
 import cage.core.scene.SceneNode;
+import cage.core.utils.math.Angle;
 import cage.core.utils.math.Frustum;
 
+import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 import org.joml.Vector3f;
@@ -41,7 +43,7 @@ public abstract class Camera extends SceneNode implements Readable {
         super.updateNode();
 
         viewMatrix.identity();
-        viewMatrix.mul(new Matrix4f().identity().set(getLocalRotation()));
+        viewMatrix.mul(new Matrix4f().identity().set(getLocalRotation().scale(1.0f, 1.0f, -1.0f, new Matrix3f())));
         viewMatrix.translate(getWorldPosition().mul(-1.0f, new Vector3f()));
 
         buffer.clear();
