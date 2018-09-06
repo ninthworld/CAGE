@@ -313,10 +313,10 @@ public class RenderManager {
     
     private Model createDefaultFXModel() {
         float[] quadPositions = new float[] {
-                1.0f, -1.0f,
                 -1.0f, -1.0f,
-                -1.0f, 1.0f,
-                1.0f, 1.0f
+                1.0f, -1.0f,
+                1.0f, 1.0f,
+                -1.0f, 1.0f
         };
         VertexBuffer quadVertexBuffer = graphicsDevice.createVertexBuffer();
         quadVertexBuffer.setLayout(new LayoutConfig().float2());

@@ -82,10 +82,10 @@ void main() {
                 numShadows += light.castShadow;
                 vec3 relLightDir = vec3(0.0, 0.0, 0.0);
                 if(light.type == POINT_TYPE) {
-                    relLightDir = -normalize(position - light.worldPosition.xyz);
+                    relLightDir = normalize(position - light.worldPosition.xyz);
                 }
                 else if(light.type == DIRECTIONAL_TYPE) {
-                    relLightDir = -normalize(light.worldPosition.xyz);
+                    relLightDir = normalize(light.worldPosition.xyz);
                 }
 
                 // Diffuse
